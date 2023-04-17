@@ -10,6 +10,7 @@ export default function Home() {
   if (status === "authenticated") {
     return (
       <>
+        <div>{session.user?.name}</div>
         <button onClick={() => signOut()}>Sign out</button>
       </>
     )
