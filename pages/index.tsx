@@ -1,12 +1,16 @@
 import { useSession, signIn, signOut } from "next-auth/react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import { useRouter } from "next/router"
 import MenuDots from "@/components/menuDots"
 import PlusIcon from "@/components/plusIcon"
 import List from "@/components/list"
 import SideMenu from "@/components/sideMenu"
+import AddButton from "@/components/addButton"
+import LayoutContext from "@/context/LayoutContext"
 
 export default function Home() {
+  const { isSideMenuOpen } = useContext(LayoutContext)
+
   const router = useRouter()
   const { data: session, status } = useSession({
     required: true,
@@ -29,10 +33,12 @@ export default function Home() {
         <List />
         <List />
       </div>
-      <button className="group mx-auto mt-4 flex items-center gap-2 border border-neutral-800 bg-zinc-800 p-4 text-lg font-bold transition-colors hover:bg-zinc-900">
-        new list <PlusIcon />
-      </button>
-      <SideMenu />
+      <AddButton>
+        <>
+          new list <PlusIcon />
+        </>
+      </AddButton>
+      {isSideMenuOpen && <SideMenu />}
     </div>
   )
 }

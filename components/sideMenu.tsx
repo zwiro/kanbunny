@@ -2,6 +2,7 @@ import PlusIcon from "./plusIcon"
 import Project from "./project"
 import { AiOutlineArrowRight } from "react-icons/ai"
 import { useState } from "react"
+import AddButton from "./addButton"
 
 function SideMenu() {
   return (
@@ -9,6 +10,11 @@ function SideMenu() {
       <Project />
       <Project />
       <Project />
+      <AddButton>
+        <>
+          new project <PlusIcon />
+        </>
+      </AddButton>
     </aside>
   )
 }

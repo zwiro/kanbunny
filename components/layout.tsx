@@ -1,3 +1,4 @@
+import LayoutContext, { LayoutProvider } from "@/context/LayoutContext"
 import Navbar from "./Navbar"
 import { Jura } from "next/font/google"
 
@@ -9,12 +10,14 @@ interface LayoutProps {
 
 function Layout({ children }: LayoutProps) {
   return (
-    <div
-      className={`${jura.className} min-h-screen bg-zinc-700 text-slate-100`}
-    >
-      <Navbar />
-      <main className="p-4">{children}</main>
-    </div>
+    <LayoutProvider>
+      <div
+        className={`${jura.className} min-h-screen bg-zinc-700 text-slate-100`}
+      >
+        <Navbar />
+        <main className="p-4">{children}</main>
+      </div>
+    </LayoutProvider>
   )
 }
 
