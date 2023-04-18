@@ -3,6 +3,7 @@ import { createContext, useState } from "react"
 const LayoutContext = createContext({
   isSideMenuOpen: false,
   toggleSideMenu: () => {},
+  closeSideMenu: () => {},
 })
 
 export function LayoutProvider({ children }: { children: JSX.Element }) {
@@ -10,10 +11,14 @@ export function LayoutProvider({ children }: { children: JSX.Element }) {
   const toggleSideMenu = () => {
     setIsSideMenuOpen((prevOpen) => !prevOpen)
   }
+  const closeSideMenu = () => {
+    setIsSideMenuOpen(false)
+  }
 
   const value = {
     isSideMenuOpen,
     toggleSideMenu,
+    closeSideMenu,
   }
 
   return (

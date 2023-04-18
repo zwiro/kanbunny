@@ -1,4 +1,4 @@
-import LayoutContext, { LayoutProvider } from "@/context/LayoutContext"
+import { LayoutProvider } from "@/context/LayoutContext"
 import Navbar from "./Navbar"
 import { Jura } from "next/font/google"
 

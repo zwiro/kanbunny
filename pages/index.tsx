@@ -7,9 +7,10 @@ import List from "@/components/list"
 import SideMenu from "@/components/sideMenu"
 import AddButton from "@/components/addButton"
 import LayoutContext from "@/context/LayoutContext"
+import { AnimatePresence } from "framer-motion"
 
 export default function Home() {
-  const { isSideMenuOpen } = useContext(LayoutContext)
+  const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
 
   const router = useRouter()
   const { data: session, status } = useSession({
@@ -17,7 +18,7 @@ export default function Home() {
   })
 
   return (
-    <div className="flex flex-col">
+    <div onClick={closeSideMenu} className="flex flex-col">
       <div>
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold">board name</h1>
@@ -38,7 +39,7 @@ export default function Home() {
           new list <PlusIcon />
         </>
       </AddButton>
-      {isSideMenuOpen && <SideMenu />}
+      <AnimatePresence>{isSideMenuOpen && <SideMenu />}</AnimatePresence>
     </div>
   )
 }
