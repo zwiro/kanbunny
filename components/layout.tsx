@@ -10,10 +10,10 @@ interface LayoutProps {
 function Layout({ children }: LayoutProps) {
   return (
     <div
-      className={`${jura.className} bg-zinc-700 min-h-screen text-slate-100`}
+      className={`${jura.className} min-h-screen bg-zinc-700 text-slate-100`}
     >
       <Navbar />
-      <main>{children}</main>
+      <main className="p-4">{children}</main>
     </div>
   )
 }
