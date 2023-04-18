@@ -2,6 +2,8 @@ import { useSession, signIn, signOut } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import MenuDots from "@/components/menuDots"
+import PlusIcon from "@/components/plusIcon"
+import List from "@/components/list"
 
 export default function Home() {
   const router = useRouter()
@@ -13,13 +15,18 @@ export default function Home() {
     <>
       <div>
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold">board name</h1>
+          <h1 className="text-2xl font-bold">board name</h1>
           <MenuDots />
           <div className="ml-auto pr-3">
             <MenuDots />
           </div>
         </div>
         <p className="text-slate-300">owner: zwiro</p>
+      </div>
+      <div className="flex flex-col justify-center">
+        <List />
+        <List />
+        <List />
       </div>
     </>
   )
