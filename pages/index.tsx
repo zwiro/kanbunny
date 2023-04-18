@@ -12,7 +12,7 @@ export default function Home() {
   })
 
   return (
-    <>
+    <div className="flex flex-col">
       <div>
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold">board name</h1>
@@ -28,6 +28,9 @@ export default function Home() {
         <List />
         <List />
       </div>
-    </>
+      <button className="group mx-auto mt-4 flex items-center gap-2 border border-neutral-800 bg-zinc-800 p-4 text-lg font-bold transition-colors hover:bg-zinc-900">
+        new list <PlusIcon />
+      </button>
+    </div>
   )
 }

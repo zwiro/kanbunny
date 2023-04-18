@@ -16,12 +16,15 @@ function Navbar() {
   }
 
   return (
-    <nav className="flex items-center gap-4 bg-zinc-800 p-4 text-lg">
+    <nav className="flex items-center gap-4 border-b border-neutral-800 bg-zinc-800 p-4 text-lg">
       <GiRabbit size={32} />
-      <Link href="/" className="ml-auto">
+      <Link href="/" className="ml-auto hover:underline">
         {session?.user?.name}
       </Link>
-      <button onClick={() => signOut({ callbackUrl: "/auth/login" })}>
+      <button
+        onClick={() => signOut({ callbackUrl: "/auth/login" })}
+        className="hover:underline"
+      >
         sign out
       </button>
     </nav>
