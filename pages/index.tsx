@@ -4,6 +4,7 @@ import { useRouter } from "next/router"
 import MenuDots from "@/components/menuDots"
 import PlusIcon from "@/components/plusIcon"
 import List from "@/components/list"
+import SideMenu from "@/components/sideMenu"
 
 export default function Home() {
   const router = useRouter()
@@ -31,6 +32,7 @@ export default function Home() {
       <button className="group mx-auto mt-4 flex items-center gap-2 border border-neutral-800 bg-zinc-800 p-4 text-lg font-bold transition-colors hover:bg-zinc-900">
         new list <PlusIcon />
       </button>
+      <SideMenu />
     </div>
   )
 }

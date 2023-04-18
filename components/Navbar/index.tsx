@@ -16,7 +16,7 @@ function Navbar() {
   }
 
   return (
-    <nav className="flex items-center gap-4 border-b border-neutral-800 bg-zinc-800 p-4 text-lg">
+    <nav className="sticky top-0 z-20 flex items-center gap-4 border-b border-neutral-800 bg-zinc-800 p-4 text-lg">
       <GiRabbit size={32} />
       <Link href="/" className="ml-auto hover:underline">
         {session?.user?.name}
