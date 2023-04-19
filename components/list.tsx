@@ -16,7 +16,7 @@ function List() {
       <div className="flex items-center gap-2">
         <div className="h-4 w-4 rounded-full bg-blue-500" />
         <h2 className="text-xl">to do</h2>
-        <button className="group">
+        <button className="group py-2">
           <PlusIcon />
         </button>
         <div className="ml-auto pr-2">

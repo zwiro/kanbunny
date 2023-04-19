@@ -14,7 +14,7 @@ function Project() {
     <section className="my-4">
       <div className="flex items-center gap-4">
         <p>project 1</p>
-        <button className="group">
+        <button className="group py-2">
           <PlusIcon />
         </button>
       </div>

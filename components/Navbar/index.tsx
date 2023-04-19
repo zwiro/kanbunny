@@ -15,19 +15,22 @@ function Navbar() {
 
   if (router.pathname === "/auth/login") return null
 
-  if (status === "loading") {
-    return <LoadingDots />
-  }
-
   return (
     <nav className="sticky top-0 z-20 flex items-center gap-4 border-b border-neutral-800 bg-zinc-800 p-4 text-lg">
-      <button onClick={toggleSideMenu} className="py-2">
+      <button
+        onClick={toggleSideMenu}
+        className="py-2 transition-transform hover:scale-110"
+      >
         <BurgerMenu />
       </button>
       <GiRabbit size={32} />
-      <Link href="/" className="ml-auto hover:underline">
-        {session?.user?.name}
-      </Link>
+      {status === "loading" ? (
+        <LoadingDots />
+      ) : (
+        <Link href="/" className="ml-auto hover:underline">
+          {session?.user?.name}
+        </Link>
+      )}
       <button
         onClick={() => signOut({ callbackUrl: "/auth/login" })}
         className="hover:underline"
