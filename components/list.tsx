@@ -1,5 +1,4 @@
 import MenuButton from "./MenuButton"
-import MenuDots from "./MenuDots"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
 

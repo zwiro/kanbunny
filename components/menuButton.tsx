@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react"
 import Menu from "./Menu"
 import MenuDots from "./MenuDots"
 import { AnimatePresence } from "framer-motion"
-import MenuItem from "./MenuItem"
 
 interface MenuButtonProps {
   children: JSX.Element

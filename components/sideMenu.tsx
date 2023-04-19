@@ -1,6 +1,4 @@
 import PlusIcon from "./PlusIcon"
-import { AiOutlineArrowRight } from "react-icons/ai"
-import { useState } from "react"
 import AddButton from "./AddButton"
 import { motion } from "framer-motion"
 

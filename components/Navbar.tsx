@@ -2,7 +2,7 @@ import Link from "next/link"
 import { GiRabbit } from "react-icons/gi"
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/router"
-import { useEffect, useContext } from "react"
+import { useContext } from "react"
 import LayoutContext from "@/context/LayoutContext"
 
 function Navbar() {
