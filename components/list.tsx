@@ -1,11 +1,19 @@
+import MenuButton from "./menuButton"
 import MenuDots from "./menuDots"
+import MenuItem from "./menuItem"
 import PlusIcon from "./plusIcon"
 
 function Task() {
   return (
     <div className="flex items-center justify-between border border-neutral-800 bg-zinc-700 p-2">
       <p>task 1</p>
-      <MenuDots />
+      <MenuButton>
+        <>
+          <MenuItem>edit task name</MenuItem>
+          <MenuItem>assign user</MenuItem>
+          <MenuItem>delete task</MenuItem>
+        </>
+      </MenuButton>
     </div>
   )
 }
@@ -20,7 +28,13 @@ function List() {
           <PlusIcon />
         </button>
         <div className="ml-auto pr-2">
-          <MenuDots />
+          <MenuButton>
+            <>
+              <MenuItem>edit list name</MenuItem>
+              <MenuItem>change color</MenuItem>
+              <MenuItem>delete list</MenuItem>
+            </>
+          </MenuButton>
         </div>
       </div>
       <Task />

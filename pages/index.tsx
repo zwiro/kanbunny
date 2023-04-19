@@ -10,11 +10,13 @@ import LayoutContext from "@/context/LayoutContext"
 import { motion, AnimatePresence } from "framer-motion"
 import Menu from "@/components/menu"
 import MenuItem from "@/components/menuItem"
-import { MenuType } from "@/types"
+import useMenu from "@/hooks/useMenu"
+import MenuButton from "@/components/menuButton"
 
 export default function Home() {
-  const [openedMenu, setOpenedMenu] = useState<MenuType | null>(null)
   const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
+
+  const { toggleMenu } = useMenu()
 
   const router = useRouter()
   const { data: session, status } = useSession({
@@ -30,7 +32,6 @@ export default function Home() {
   return (
     <div
       onClick={() => {
-        setOpenedMenu(null)
         closeSideMenu()
       }}
       className="flex flex-col"
@@ -38,51 +39,22 @@ export default function Home() {
       <div>
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold">board name</h1>
-          <div className="relative">
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setOpenedMenu(MenuType.BOARD)
-              }}
-              className="py-2"
-            >
-              <MenuDots />
-            </button>
-            <AnimatePresence>
-              {openedMenu === MenuType.BOARD && (
-                <Menu>
-                  <>
-                    <MenuItem>Edit board name</MenuItem>
-                    <MenuItem>Add user</MenuItem>
-                    <MenuItem>Change color</MenuItem>
-                    <MenuItem>Delete board</MenuItem>
-                  </>
-                </Menu>
-              )}
-            </AnimatePresence>
-          </div>
-          <div className="relative ml-auto">
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setOpenedMenu(MenuType.FILTERS)
-              }}
-              className="py-2"
-            >
-              <MenuDots />
-            </button>
-            <AnimatePresence>
-              {openedMenu === MenuType.FILTERS && (
-                <Menu direction="left">
-                  <>
-                    <MenuItem>Edit board name</MenuItem>
-                    <MenuItem>Add user</MenuItem>
-                    <MenuItem>Change color</MenuItem>
-                    <MenuItem>Delete board</MenuItem>
-                  </>
-                </Menu>
-              )}
-            </AnimatePresence>
+          <MenuButton direction="right">
+            <>
+              <MenuItem>edit board name</MenuItem>
+              <MenuItem>add user</MenuItem>
+              <MenuItem>change color</MenuItem>
+              <MenuItem>delete board</MenuItem>
+            </>
+          </MenuButton>
+          <div className="ml-auto">
+            <MenuButton>
+              <>
+                <MenuItem>sort</MenuItem>
+                <MenuItem>filter</MenuItem>
+                <MenuItem>search</MenuItem>
+              </>
+            </MenuButton>
           </div>
         </div>
         <p className="text-slate-300">owner: zwiro</p>

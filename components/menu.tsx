@@ -2,10 +2,10 @@ import { motion } from "framer-motion"
 
 interface MenuProps {
   children: JSX.Element
-  direction?: "left" | "right"
+  direction: "left" | "right"
 }
 
-function Menu({ children, direction = "right" }: MenuProps) {
+function Menu({ children, direction }: MenuProps) {
   const menuAnimation = {
     initial: { opacity: 0, scale: 0 },
     animate: { opacity: 1, scale: 1 },
