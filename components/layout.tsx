@@ -1,6 +1,6 @@
 import { LayoutProvider } from "@/context/LayoutContext"
-import Navbar from "./Navbar"
 import { Jura } from "next/font/google"
+import Navbar from "./Navbar"
 
 const jura = Jura({ subsets: ["latin"], weight: ["400", "700"] })
 

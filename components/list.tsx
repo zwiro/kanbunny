@@ -1,22 +1,7 @@
-import MenuButton from "./menuButton"
-import MenuDots from "./menuDots"
-import MenuItem from "./menuItem"
-import PlusIcon from "./plusIcon"
-
-function Task() {
-  return (
-    <div className="flex items-center justify-between border border-neutral-800 bg-zinc-700 p-2">
-      <p>task 1</p>
-      <MenuButton>
-        <>
-          <MenuItem>edit task name</MenuItem>
-          <MenuItem>assign user</MenuItem>
-          <MenuItem>delete task</MenuItem>
-        </>
-      </MenuButton>
-    </div>
-  )
-}
+import MenuButton from "./MenuButton"
+import MenuDots from "./MenuDots"
+import MenuItem from "./MenuItem"
+import PlusIcon from "./PlusIcon"
 
 function List() {
   return (
@@ -41,6 +26,21 @@ function List() {
       <Task />
       <Task />
     </section>
+  )
+}
+
+function Task() {
+  return (
+    <div className="flex items-center justify-between border border-neutral-800 bg-zinc-700 p-2">
+      <p>task 1</p>
+      <MenuButton>
+        <>
+          <MenuItem>edit task name</MenuItem>
+          <MenuItem>assign user</MenuItem>
+          <MenuItem>delete task</MenuItem>
+        </>
+      </MenuButton>
+    </div>
   )
 }
 

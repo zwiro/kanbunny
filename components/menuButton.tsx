@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react"
-import Menu from "./menu"
-import MenuDots from "./menuDots"
+import Menu from "./Menu"
+import MenuDots from "./MenuDots"
 import { AnimatePresence } from "framer-motion"
-import MenuItem from "./menuItem"
+import MenuItem from "./MenuItem"
 
 interface MenuButtonProps {
   children: JSX.Element
@@ -15,7 +15,7 @@ function MenuButton({ children, direction = "left" }: MenuButtonProps) {
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = () => {
       if (menuRef.current) {
         setIsMenuOpened(false)
       }
@@ -28,8 +28,8 @@ function MenuButton({ children, direction = "left" }: MenuButtonProps) {
 
   return (
     <div className="relative">
-      <button onClick={() => setIsMenuOpened(true)} className="py-4">
-        <MenuDots />
+      <button onClick={() => setIsMenuOpened(true)} className="px-1 py-4">
+        <MenuDots isMenuOpened={isMenuOpened} />
       </button>
       <AnimatePresence>
         {isMenuOpened && (

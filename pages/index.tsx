@@ -1,22 +1,19 @@
 import { useSession, signIn, signOut } from "next-auth/react"
 import { useEffect, useState, useContext } from "react"
 import { useRouter } from "next/router"
-import MenuDots from "@/components/menuDots"
-import PlusIcon from "@/components/plusIcon"
-import List from "@/components/list"
-import SideMenu from "@/components/sideMenu"
-import AddButton from "@/components/addButton"
+import MenuDots from "@/components/MenuDots"
+import PlusIcon from "@/components/PlusIcon"
+import List from "@/components/List"
+import SideMenu from "@/components/SideMenu"
 import LayoutContext from "@/context/LayoutContext"
 import { motion, AnimatePresence } from "framer-motion"
-import Menu from "@/components/menu"
-import MenuItem from "@/components/menuItem"
-import useMenu from "@/hooks/useMenu"
-import MenuButton from "@/components/menuButton"
+import Menu from "@/components/Menu"
+import MenuItem from "@/components/MenuItem"
+import MenuButton from "@/components/MenuButton"
+import AddButton from "@/components/AddButton"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
-
-  const { toggleMenu } = useMenu()
 
   const router = useRouter()
   const { data: session, status } = useSession({

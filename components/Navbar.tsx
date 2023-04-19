@@ -3,8 +3,6 @@ import { GiRabbit } from "react-icons/gi"
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/router"
 import { useEffect, useContext } from "react"
-import LoadingDots from "../loadingDots"
-import BurgerMenu from "../burgerMenu"
 import LayoutContext from "@/context/LayoutContext"
 
 function Navbar() {
@@ -38,6 +36,28 @@ function Navbar() {
         sign out
       </button>
     </nav>
+  )
+}
+
+function BurgerMenu() {
+  const { isSideMenuOpen } = useContext(LayoutContext)
+  return (
+    <div
+      className={`relative h-0.5 w-6 bg-slate-100 transition-all before:absolute before:-top-2 before:left-0 before:h-0.5 before:w-6 before:bg-slate-100 before:transition-all after:absolute after:left-0 after:top-2 after:h-0.5 after:w-6 after:bg-slate-100 after:transition-all ${
+        isSideMenuOpen &&
+        "rotate-45 before:translate-y-2 before:rotate-90 after:-translate-y-2 after:-rotate-90"
+      } `}
+    />
+  )
+}
+
+function LoadingDots() {
+  return (
+    <div className="ml-auto flex justify-center gap-2 pt-2">
+      <div className="h-2 w-2 animate-bounceLeft rounded-full bg-slate-100" />
+      <div className="h-2 w-2 animate-bounceCenter rounded-full bg-slate-100" />
+      <div className="h-2 w-2 animate-bounceRight rounded-full bg-slate-100" />
+    </div>
   )
 }
 
