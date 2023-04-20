@@ -2,11 +2,17 @@ import { useEffect, useState } from "react"
 
 interface MenuItemProps {
   children: string
+  handleClick?: () => void
 }
 
-function MenuItem({ children }: MenuItemProps) {
+function MenuItem({ children, handleClick }: MenuItemProps) {
   return (
-    <li className="px-8 hover:cursor-pointer hover:bg-zinc-800">{children}</li>
+    <li
+      onClick={handleClick}
+      className="px-8 hover:cursor-pointer hover:bg-zinc-800"
+    >
+      {children}
+    </li>
   )
 }
 

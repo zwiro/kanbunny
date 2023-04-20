@@ -1,6 +1,8 @@
 import PlusIcon from "./PlusIcon"
 import AddButton from "./AddButton"
 import { motion } from "framer-motion"
+import MenuButton from "./MenuButton"
+import MenuItem from "./MenuItem"
 
 function SideMenu() {
   const sideMenuAnimation = {
@@ -14,7 +16,7 @@ function SideMenu() {
     <motion.aside
       {...sideMenuAnimation}
       onClick={(e) => e.stopPropagation()}
-      className="fixed bottom-0 left-0 top-16 overflow-y-scroll border-r border-t border-neutral-800 bg-zinc-800 p-8 text-2xl lg:px-16 lg:text-3xl"
+      className="fixed bottom-0 left-0 top-16 overflow-y-scroll border-r border-t border-neutral-800 bg-zinc-800 px-16 py-8 text-2xl lg:px-24 lg:text-3xl"
     >
       <Project />
       <Project />
@@ -32,12 +34,16 @@ function SideMenu() {
 
 function Project() {
   return (
-    <section className="my-4">
-      <div className="flex items-center gap-4">
+    <section className="my-4 border-b border-neutral-700">
+      <div className="flex items-center justify-between">
         <p>project 1</p>
-        <button className="group py-2">
-          <PlusIcon />
-        </button>
+        <MenuButton>
+          <>
+            <MenuItem>add board</MenuItem>
+            <MenuItem>add user</MenuItem>
+            <MenuItem>delete project</MenuItem>
+          </>
+        </MenuButton>
       </div>
       <ul className="flex flex-col gap-2 py-4 lg:gap-4">
         <Board />

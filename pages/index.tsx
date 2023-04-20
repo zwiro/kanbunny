@@ -39,7 +39,6 @@ export default function Home() {
           <MenuButton direction="right">
             <>
               <MenuItem>edit board name</MenuItem>
-              <MenuItem>add user</MenuItem>
               <MenuItem>change color</MenuItem>
               <MenuItem>delete board</MenuItem>
             </>

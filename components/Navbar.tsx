@@ -23,7 +23,7 @@ function Navbar() {
       </button>
       <div className="flex items-center">
         <GiRabbit className="h-8 w-8 xl:h-12 xl:w-12" />
-        <p className="hidden font-bold sm:block">kanbunny</p>
+        <p className="font-bold">kanbunny</p>
       </div>
       {status === "loading" ? (
         <LoadingDots />
