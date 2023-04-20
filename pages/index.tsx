@@ -44,7 +44,7 @@ export default function Home() {
               <MenuItem>delete board</MenuItem>
             </>
           </MenuButton>
-          <div className="ml-auto">
+          <div className="ml-auto sm:hidden">
             <MenuButton>
               <>
                 <MenuItem>sort</MenuItem>
@@ -53,19 +53,27 @@ export default function Home() {
               </>
             </MenuButton>
           </div>
+          <div className="ml-auto hidden sm:block">
+            <ul className="flex gap-4 text-2xl md:gap-12 lg:gap-16">
+              <li>sort</li>
+              <li>filter</li>
+              <li>search</li>
+            </ul>
+          </div>
         </div>
         <p className="text-slate-300">owner: zwiro</p>
       </div>
-      <div className="flex gap-4 overflow-x-scroll">
+      <div className="flex gap-4 overflow-x-scroll lg:gap-8 xl:gap-16">
         <List />
         <List />
         <List />
+        <AddButton>
+          <>
+            new list <PlusIcon />
+          </>
+        </AddButton>
       </div>
-      <AddButton>
-        <>
-          new list <PlusIcon />
-        </>
-      </AddButton>
+
       <AnimatePresence>
         {isSideMenuOpen && (
           <>

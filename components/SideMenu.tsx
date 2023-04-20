@@ -14,8 +14,10 @@ function SideMenu() {
     <motion.aside
       {...sideMenuAnimation}
       onClick={(e) => e.stopPropagation()}
-      className="fixed bottom-0 left-0 top-16 border-r border-t border-neutral-800 bg-zinc-800 p-8 text-2xl"
+      className="fixed bottom-0 left-0 top-16 overflow-y-scroll border-r border-t border-neutral-800 bg-zinc-800 p-8 text-2xl lg:px-16 lg:text-3xl"
     >
+      <Project />
+      <Project />
       <Project />
       <Project />
       <Project />
@@ -37,7 +39,9 @@ function Project() {
           <PlusIcon />
         </button>
       </div>
-      <ul className="flex flex-col gap-2 py-4">
+      <ul className="flex flex-col gap-2 py-4 lg:gap-4">
+        <Board />
+        <Board />
         <Board />
         <Board />
         <Board />

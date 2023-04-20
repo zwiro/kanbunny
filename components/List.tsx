@@ -4,7 +4,7 @@ import PlusIcon from "./PlusIcon"
 
 function List() {
   return (
-    <section className="mt-4 flex min-w-[16rem] flex-col gap-4 border border-neutral-800 bg-zinc-800 p-4">
+    <section className="mt-4 flex min-w-[18rem] flex-col gap-4 border border-neutral-800 bg-zinc-800 p-4">
       <div className="flex items-center gap-2">
         <div className="h-4 w-4 rounded-full bg-blue-500" />
         <h2 className="text-xl">to do</h2>
@@ -21,6 +21,15 @@ function List() {
           </MenuButton>
         </div>
       </div>
+      <Task />
+      <Task />
+      <Task />
+      <Task />
+      <Task />
+      <Task />
+      <Task />
+      <Task />
+      <Task />
       <Task />
       <Task />
       <Task />
