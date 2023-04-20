@@ -3,6 +3,8 @@ import AddButton from "./AddButton"
 import { motion } from "framer-motion"
 import MenuButton from "./MenuButton"
 import MenuItem from "./MenuItem"
+import useEdit from "@/hooks/useEdit"
+import EditForm from "./EditForm"
 
 function SideMenu() {
   const sideMenuAnimation = {
@@ -33,14 +35,16 @@ function SideMenu() {
 }
 
 function Project() {
+  const { isEditing, edit, cancelEdit } = useEdit()
   return (
     <section className="my-4 border-b border-neutral-700">
       <div className="flex items-center justify-between">
-        <p>project 1</p>
+        {!isEditing ? <p>project 1</p> : <EditForm cancelEdit={cancelEdit} />}
         <MenuButton>
           <>
             <MenuItem>add board</MenuItem>
             <MenuItem>add user</MenuItem>
+            <MenuItem handleClick={edit}>edit project name</MenuItem>
             <MenuItem>delete project</MenuItem>
           </>
         </MenuButton>

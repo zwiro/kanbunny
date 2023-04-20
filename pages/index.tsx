@@ -11,10 +11,12 @@ import Menu from "@/components/Menu"
 import MenuItem from "@/components/MenuItem"
 import MenuButton from "@/components/MenuButton"
 import AddButton from "@/components/AddButton"
+import useEdit from "@/hooks/useEdit"
+import EditForm from "@/components/EditForm"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
-
+  const { isEditing, edit, cancelEdit } = useEdit()
   const router = useRouter()
   const { data: session, status } = useSession({
     required: true,
@@ -35,10 +37,14 @@ export default function Home() {
     >
       <div>
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold">board name</h1>
+          {!isEditing ? (
+            <h1 className="text-2xl font-bold">board name</h1>
+          ) : (
+            <EditForm cancelEdit={cancelEdit} />
+          )}
           <MenuButton direction="right">
             <>
-              <MenuItem>edit board name</MenuItem>
+              <MenuItem handleClick={edit}>edit board name</MenuItem>
               <MenuItem>change color</MenuItem>
               <MenuItem>delete board</MenuItem>
             </>

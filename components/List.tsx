@@ -4,6 +4,7 @@ import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
 import useEdit from "../hooks/useEdit"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
+import EditForm from "./EditForm"
 
 function List() {
   const { isEditing, edit, cancelEdit } = useEdit()
@@ -19,19 +20,7 @@ function List() {
             </button>
           </>
         ) : (
-          <form className="flex w-48 items-center gap-1">
-            <input type="text" className="w-full bg-zinc-900" />
-            <button className="transition-transform hover:scale-110">
-              <AiOutlineCheck />
-            </button>
-            <button
-              type="button"
-              onClick={cancelEdit}
-              className="transition-transform hover:scale-110"
-            >
-              <AiOutlineClose />
-            </button>
-          </form>
+          <EditForm cancelEdit={cancelEdit} />
         )}
         <div className="ml-auto pr-2">
           <MenuButton>
@@ -65,23 +54,7 @@ function Task() {
 
   return (
     <div className="flex items-center justify-between border border-neutral-800 bg-zinc-700 p-2">
-      {!isEditing ? (
-        <p>task 1</p>
-      ) : (
-        <form className="flex w-48 items-center gap-1">
-          <input type="text" className="w-full bg-zinc-900" />
-          <button className="transition-transform hover:scale-110">
-            <AiOutlineCheck />
-          </button>
-          <button
-            type="button"
-            onClick={cancelEdit}
-            className="transition-transform hover:scale-110"
-          >
-            <AiOutlineClose />
-          </button>
-        </form>
-      )}
+      {!isEditing ? <p>task 1</p> : <EditForm cancelEdit={cancelEdit} />}
       <MenuButton>
         <>
           <MenuItem handleClick={edit}>edit task name</MenuItem>
