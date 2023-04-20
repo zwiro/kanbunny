@@ -51,7 +51,7 @@ function Board() {
   return (
     <li className="flex items-center gap-2 text-xl">
       <div className="h-4 w-4 rounded-full bg-red-500" />
-      <li>board 1</li>
+      <p>board 1</p>
     </li>
   )
 }

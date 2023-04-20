@@ -56,7 +56,7 @@ export default function Home() {
         </div>
         <p className="text-slate-300">owner: zwiro</p>
       </div>
-      <div className="flex flex-col justify-center">
+      <div className="flex gap-4 overflow-x-scroll">
         <List />
         <List />
         <List />
