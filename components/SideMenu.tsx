@@ -51,7 +51,7 @@ function Project() {
           </MenuButton>
         </div>
       ) : (
-        <div className="pt-2 [&>form>input]:py-0 [&>form>input]:text-3xl">
+        <div className="pt-3 [&>form>input]:py-0">
           <AddEditForm
             name="project-name"
             placeholder="project name"

@@ -1,7 +1,6 @@
 import { useSession } from "next-auth/react"
 import { useEffect, useState, useContext } from "react"
 import { useRouter } from "next/router"
-import MenuDots from "@/components/MenuDots"
 import PlusIcon from "@/components/PlusIcon"
 import List from "@/components/List"
 import SideMenu from "@/components/SideMenu"
@@ -16,6 +15,7 @@ import AddEditForm from "@/components/AddEditForm"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useAdd from "@/hooks/useAdd"
 import ListContainer from "@/components/ListContainer"
+import AddTaskModal from "@/components/AddTaskModal"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
@@ -54,7 +54,7 @@ export default function Home() {
               </MenuButton>
             </>
           ) : (
-            <div className="text-2xl [&>form>input]:py-1">
+            <div className="[&>form>input]:py-1">
               <AddEditForm
                 name="board-name"
                 placeholder="board name"
@@ -62,23 +62,7 @@ export default function Home() {
               />
             </div>
           )}
-
-          <div className="ml-auto sm:hidden">
-            <MenuButton>
-              <>
-                <MenuItem>sort</MenuItem>
-                <MenuItem>filter</MenuItem>
-                <MenuItem>search</MenuItem>
-              </>
-            </MenuButton>
-          </div>
-          <div className="ml-auto hidden sm:block">
-            <ul className="flex gap-4 text-2xl md:gap-12 lg:gap-16">
-              <li>sort</li>
-              <li>filter</li>
-              <li>search</li>
-            </ul>
-          </div>
+          <Filters />
         </div>
         <p className="text-slate-300">owner: zwiro</p>
       </div>
@@ -111,6 +95,30 @@ export default function Home() {
           </>
         )}
       </AnimatePresence>
+      <AddTaskModal />
     </div>
+  )
+}
+
+function Filters() {
+  return (
+    <>
+      <div className="ml-auto hidden sm:block">
+        <ul className="flex gap-4 text-2xl md:gap-12 lg:gap-16">
+          <li>sort</li>
+          <li>filter</li>
+          <li>search</li>
+        </ul>
+      </div>
+      <div className="ml-auto sm:hidden">
+        <MenuButton>
+          <>
+            <MenuItem>sort</MenuItem>
+            <MenuItem>filter</MenuItem>
+            <MenuItem>search</MenuItem>
+          </>
+        </MenuButton>
+      </div>
+    </>
   )
 }

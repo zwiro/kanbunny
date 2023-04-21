@@ -31,13 +31,11 @@ function List() {
             </div>
           </>
         ) : (
-          <div className="text-xl">
-            <AddEditForm
-              name="list-name"
-              placeholder="list name"
-              cancel={cancelEdit}
-            />
-          </div>
+          <AddEditForm
+            name="list-name"
+            placeholder="list name"
+            cancel={cancelEdit}
+          />
         )}
       </div>
       <Task />
