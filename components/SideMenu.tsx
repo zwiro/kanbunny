@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import MenuButton from "./MenuButton"
 import MenuItem from "./MenuItem"
 import useEdit from "@/hooks/useEdit"
-import EditForm from "./EditForm"
+import AddEditForm from "./AddEditForm"
 
 function SideMenu() {
   const sideMenuAnimation = {
@@ -38,17 +38,27 @@ function Project() {
   const { isEditing, edit, cancelEdit } = useEdit()
   return (
     <section className="my-4 border-b border-neutral-700">
-      <div className="flex items-center justify-between">
-        {!isEditing ? <p>project 1</p> : <EditForm cancelEdit={cancelEdit} />}
-        <MenuButton>
-          <>
-            <MenuItem>add board</MenuItem>
-            <MenuItem>add user</MenuItem>
-            <MenuItem handleClick={edit}>edit project name</MenuItem>
-            <MenuItem>delete project</MenuItem>
-          </>
-        </MenuButton>
-      </div>
+      {!isEditing ? (
+        <div className="flex items-center gap-4">
+          <p>project 1</p>
+          <MenuButton>
+            <>
+              <MenuItem>add board</MenuItem>
+              <MenuItem>add user</MenuItem>
+              <MenuItem handleClick={edit}>edit project name</MenuItem>
+              <MenuItem>delete project</MenuItem>
+            </>
+          </MenuButton>
+        </div>
+      ) : (
+        <div className="pt-2 [&>form>input]:py-0 [&>form>input]:text-3xl">
+          <AddEditForm
+            name="project-name"
+            placeholder="project name"
+            cancel={cancelEdit}
+          />
+        </div>
+      )}
       <ul className="flex flex-col gap-2 py-4 lg:gap-4">
         <Board />
         <Board />

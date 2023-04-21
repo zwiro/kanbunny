@@ -12,11 +12,15 @@ import MenuItem from "@/components/MenuItem"
 import MenuButton from "@/components/MenuButton"
 import AddButton from "@/components/AddButton"
 import useEdit from "@/hooks/useEdit"
-import EditForm from "@/components/EditForm"
+import AddEditForm from "@/components/AddEditForm"
+import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
+import useAdd from "@/hooks/useAdd"
+import ListContainer from "@/components/ListContainer"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
   const { isEditing, edit, cancelEdit } = useEdit()
+  const { isAdding, add, cancelAdd } = useAdd()
   const router = useRouter()
   const { data: session, status } = useSession({
     required: true,
@@ -38,17 +42,27 @@ export default function Home() {
       <div>
         <div className="flex items-center gap-4">
           {!isEditing ? (
-            <h1 className="text-2xl font-bold">board name</h1>
-          ) : (
-            <EditForm cancelEdit={cancelEdit} />
-          )}
-          <MenuButton direction="right">
             <>
-              <MenuItem handleClick={edit}>edit board name</MenuItem>
-              <MenuItem>change color</MenuItem>
-              <MenuItem>delete board</MenuItem>
+              <h1 className="text-2xl font-bold">board name</h1>
+              <MenuButton direction="right">
+                <>
+                  <MenuItem handleClick={edit}>edit board name</MenuItem>
+                  <MenuItem handleClick={add}>add list</MenuItem>
+                  <MenuItem>change color</MenuItem>
+                  <MenuItem>delete board</MenuItem>
+                </>
+              </MenuButton>
             </>
-          </MenuButton>
+          ) : (
+            <div className="text-2xl [&>form>input]:py-1">
+              <AddEditForm
+                name="board-name"
+                placeholder="board name"
+                cancel={cancelEdit}
+              />
+            </div>
+          )}
+
           <div className="ml-auto sm:hidden">
             <MenuButton>
               <>
@@ -68,15 +82,25 @@ export default function Home() {
         </div>
         <p className="text-slate-300">owner: zwiro</p>
       </div>
-      <div className="flex gap-4 overflow-x-scroll lg:gap-8 xl:gap-16">
+      <div className="flex min-h-[16rem] gap-4 overflow-x-scroll lg:gap-8 xl:gap-16">
         <List />
         <List />
         <List />
-        <AddButton>
-          <>
-            new list <PlusIcon />
-          </>
-        </AddButton>
+        {isAdding ? (
+          <ListContainer>
+            <AddEditForm
+              name="list-name"
+              placeholder="list name"
+              cancel={cancelAdd}
+            />
+          </ListContainer>
+        ) : (
+          <AddButton handleClick={add}>
+            <>
+              new list <PlusIcon />
+            </>
+          </AddButton>
+        )}
       </div>
 
       <AnimatePresence>
