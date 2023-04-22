@@ -18,7 +18,7 @@ function SideMenu() {
     <motion.aside
       {...sideMenuAnimation}
       onClick={(e) => e.stopPropagation()}
-      className="fixed bottom-0 left-0 top-16 overflow-y-scroll border-r border-t border-neutral-800 bg-zinc-800 px-16 py-8 text-2xl lg:px-24 lg:text-3xl"
+      className="fixed bottom-0 left-0 top-16 overflow-y-scroll bg-zinc-800 px-16 py-8 text-2xl lg:px-24 lg:text-3xl"
     >
       <Project />
       <Project />

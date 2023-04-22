@@ -58,7 +58,7 @@ function Task() {
   const { isEditing, edit, cancelEdit } = useEdit()
 
   return (
-    <div className="flex items-center justify-between border border-neutral-800 bg-zinc-700 p-2">
+    <div className="flex items-center justify-between border border-neutral-700 bg-zinc-700 p-2">
       {!isEditing ? (
         <>
           <p>task 1</p>

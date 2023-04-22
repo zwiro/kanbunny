@@ -22,3 +22,24 @@
 *::-webkit-scrollbar-thumb {
   @apply bg-slate-100;
 }
+
+/* react datetimepicker styling */
+.react-datetime-picker {
+  @apply bg-zinc-900;
+}
+
+.react-calendar {
+  @apply bg-zinc-900;
+}
+
+.react-calendar button:enabled:hover {
+  @apply bg-zinc-950;
+}
+
+.react-calendar__tile:disabled {
+  @apply text-zinc-800;
+}
+
+select option {
+  @apply bg-zinc-900;
+}

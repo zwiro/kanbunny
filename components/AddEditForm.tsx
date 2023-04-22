@@ -1,5 +1,5 @@
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
-import Input from "./Input"
+import Input from "./TextInput"
 
 interface AddEditFormProps {
   name: string
