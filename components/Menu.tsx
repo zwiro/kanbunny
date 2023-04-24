@@ -16,7 +16,7 @@ function Menu({ children, direction }: MenuProps) {
   return (
     <motion.div
       {...menuAnimation}
-      className={`absolute top-5 z-10 w-max origin-top-left bg-zinc-900/95 py-4 text-lg ${
+      className={`absolute top-5 z-50 w-max origin-top-left bg-zinc-900/95 py-4 text-lg ${
         direction === "right"
           ? "left-0 origin-top-left"
           : "right-0 origin-top-right"

@@ -101,15 +101,21 @@ function Board() {
     cancelEdit: cancelEditColor,
   } = useEdit()
   return (
-    <li onClick={editColor} className="group flex items-center gap-2 text-xl">
-      <div className="relative h-4 w-4 rounded-full bg-red-500">
-        {isEditingColor && <ColorPicker />}
+    <li className="group flex items-center gap-2 text-xl">
+      <div
+        onClick={editColor}
+        className="relative z-0 h-4 w-4 rounded-full bg-red-500"
+      >
+        {isEditingColor && <ColorPicker cancel={cancelEditColor} />}
       </div>
       {!isEditing ? (
         <>
           <p>board 1</p>
-
-          <div className="scale-0 transition-transform group-hover:scale-100">
+          <div
+            className={`z-20 scale-0 transition-transform group-hover:scale-100 ${
+              isEditingColor && "scale-0 group-hover:scale-0"
+            } `}
+          >
             <MenuButton>
               <MenuItem handleClick={edit}>edit board name</MenuItem>
               <MenuItem handleClick={editColor}>change color</MenuItem>
