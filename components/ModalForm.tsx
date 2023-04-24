@@ -41,7 +41,7 @@ function ModalForm({ children, cancel }: ModalFormProps) {
         <motion.div
           ref={modalRef}
           variants={formVariant}
-          className="bg-zinc-800 p-12 [&>div.field:last-of-type]:border-t-0 [&>div.field:nth-of-type(2)]:border-t-0"
+          className="w-full bg-zinc-800 p-12 [&>div.field:last-of-type]:border-t-0 [&>div.field:nth-of-type(2)]:border-t-0"
         >
           {children}
         </motion.div>

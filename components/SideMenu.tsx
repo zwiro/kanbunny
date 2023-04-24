@@ -13,6 +13,7 @@ import LayoutContext from "@/context/LayoutContext"
 import ColorPicker from "./ColorPicker"
 import TextInput from "./TextInput"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
+import useInviteUser from "@/hooks/useInviteUser"
 
 function SideMenu() {
   const { isAdding, add, cancelAdd } = useAdd()
@@ -58,6 +59,9 @@ function Project() {
 
   const { isAdding, add, cancelAdd } = useAdd()
 
+  const { user, invitedUsers, inviteUser, removeUser, handleChange } =
+    useInviteUser()
+
   const projectUsersAnimation = {
     initial: { height: 0, opacity: 0 },
     animate: { height: "auto", opacity: 1 },
@@ -91,17 +95,28 @@ function Project() {
             {...projectUsersAnimation}
             className="flex flex-col gap-2 pt-4 text-base"
           >
-            <div className="flex items-center gap-2">
-              <TextInput name="users" placeholder="johndoe21" />
-              <button type="button" className="group">
+            <form className="flex items-center gap-2">
+              <TextInput
+                name="users"
+                placeholder="johndoe21"
+                handleChange={handleChange}
+                value={user}
+              />
+              <button onClick={inviteUser} className="group">
                 <PlusIcon />
               </button>
-            </div>
-            <p>invited (3)</p>
-            <ul className="flex gap-2">
-              <li className="border border-zinc-900 p-2">johnny</li>
-              <li className="border border-zinc-900 p-2">bobby</li>
-              <li className="border border-zinc-900 p-2">adamson</li>
+            </form>
+            <p>invited ({invitedUsers.length})</p>
+            <ul className="flex flex-wrap gap-2">
+              {invitedUsers.map((user, i) => (
+                <li
+                  key={`${user}-${i}`}
+                  onClick={() => removeUser(user)}
+                  className="border border-zinc-900 p-2"
+                >
+                  {user}
+                </li>
+              ))}
             </ul>
             <div className="flex items-center gap-1">
               <button className="ml-auto transition-transform hover:scale-110">
