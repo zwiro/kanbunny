@@ -1,9 +1,9 @@
-interface InputProps {
+interface TextInputProps {
   name: string
   placeholder: string
 }
 
-function Input({ name, placeholder }: InputProps) {
+function TextInput({ name, placeholder }: TextInputProps) {
   return (
     <input
       type="text"
@@ -14,4 +14,4 @@ function Input({ name, placeholder }: InputProps) {
   )
 }
 
-export default Input
+export default TextInput

@@ -11,6 +11,8 @@ import useClickOutside from "@/hooks/useClickOutside"
 import { useContext, useRef, useState } from "react"
 import LayoutContext from "@/context/LayoutContext"
 import ColorPicker from "./ColorPicker"
+import TextInput from "./TextInput"
+import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 
 function SideMenu() {
   const { isAdding, add, cancelAdd } = useAdd()
@@ -48,7 +50,19 @@ function SideMenu() {
 
 function Project() {
   const { isEditing, edit, cancelEdit } = useEdit()
+  const {
+    isEditing: isEditingUsers,
+    edit: editUsers,
+    cancelEdit: cancelEditUsers,
+  } = useEdit()
+
   const { isAdding, add, cancelAdd } = useAdd()
+
+  const projectUsersAnimation = {
+    initial: { height: 0, opacity: 0 },
+    animate: { height: "auto", opacity: 1 },
+    exit: { height: 0, opacity: 0 },
+  }
 
   return (
     <section className="my-4 border-b border-neutral-700">
@@ -57,7 +71,7 @@ function Project() {
           <p>project 1</p>
           <MenuButton>
             <MenuItem handleClick={add}>add board</MenuItem>
-            <MenuItem>add user</MenuItem>
+            <MenuItem handleClick={editUsers}>add user</MenuItem>
             <MenuItem handleClick={edit}>edit project name</MenuItem>
             <MenuItem>delete project</MenuItem>
           </MenuButton>
@@ -71,6 +85,39 @@ function Project() {
           />
         </div>
       )}
+      <AnimatePresence>
+        {isEditingUsers && (
+          <motion.div
+            {...projectUsersAnimation}
+            className="flex flex-col gap-2 pt-4 text-base"
+          >
+            <div className="flex items-center gap-2">
+              <TextInput name="users" placeholder="johndoe21" />
+              <button type="button" className="group">
+                <PlusIcon />
+              </button>
+            </div>
+            <p>invited (3)</p>
+            <ul className="flex gap-2">
+              <li className="border border-zinc-900 p-2">johnny</li>
+              <li className="border border-zinc-900 p-2">bobby</li>
+              <li className="border border-zinc-900 p-2">adamson</li>
+            </ul>
+            <div className="flex items-center gap-1">
+              <button className="ml-auto transition-transform hover:scale-110">
+                <AiOutlineCheck size={20} />
+              </button>
+              <button
+                type="button"
+                onClick={cancelEditUsers}
+                className="transition-transform hover:scale-110"
+              >
+                <AiOutlineClose size={20} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <ul className="flex flex-col gap-2 py-4 lg:gap-4">
         {isAdding && (
           <div className="flex items-center gap-2">
