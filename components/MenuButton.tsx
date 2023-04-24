@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import Menu from "./Menu"
 import { AnimatePresence } from "framer-motion"
+import useClickOutside from "@/hooks/useClickOutside"
 
 interface MenuButtonProps {
   children: JSX.Element | JSX.Element[]
@@ -12,17 +13,7 @@ function MenuButton({ children, direction = "left" }: MenuButtonProps) {
 
   const menuRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const handleClickOutside = () => {
-      if (menuRef.current) {
-        setIsMenuOpened(false)
-      }
-    }
-    document.addEventListener("click", handleClickOutside, true)
-    return () => {
-      document.removeEventListener("click", handleClickOutside, true)
-    }
-  }, [menuRef])
+  useClickOutside([menuRef], () => setIsMenuOpened(false))
 
   return (
     <div className="relative">

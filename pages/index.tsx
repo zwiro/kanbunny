@@ -35,7 +35,7 @@ export default function Home() {
   return (
     <div
       onClick={() => {
-        closeSideMenu()
+        // closeSideMenu()
       }}
       className="flex flex-col"
     >
