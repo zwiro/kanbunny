@@ -1,4 +1,6 @@
+import useClickOutside from "@/hooks/useClickOutside"
 import { motion } from "framer-motion"
+import { useRef } from "react"
 
 const modalVariant = {
   hidden: {
@@ -20,11 +22,15 @@ const formVariant = {
 
 interface ModalFormProps {
   children: JSX.Element | JSX.Element[]
+  cancel?: () => void
 }
 
-function ModalForm({ children }: ModalFormProps) {
+function ModalForm({ children, cancel }: ModalFormProps) {
+  const modalRef = useRef<HTMLDivElement>(null)
+  useClickOutside([modalRef], cancel)
   return (
     <motion.div
+      onClick={(e) => e.stopPropagation()}
       variants={modalVariant}
       initial="hidden"
       animate="visible"
@@ -33,8 +39,9 @@ function ModalForm({ children }: ModalFormProps) {
     >
       <form className="grid h-full w-3/4 place-items-center">
         <motion.div
+          ref={modalRef}
           variants={formVariant}
-          className="bg-zinc-800 p-12 [&>div:first-child]:border-b-0 [&>div:nth-last-child(2)]:border-t-0"
+          className="bg-zinc-800 p-12 [&>div.field:last-of-type]:border-t-0 [&>div.field:nth-of-type(2)]:border-t-0"
         >
           {children}
         </motion.div>

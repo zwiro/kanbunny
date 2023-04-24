@@ -13,7 +13,17 @@ function MenuButton({ children, direction = "left" }: MenuButtonProps) {
 
   const menuRef = useRef<HTMLDivElement>(null)
 
-  useClickOutside([menuRef], () => setIsMenuOpened(false))
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (menuRef.current) {
+        setIsMenuOpened(false)
+      }
+    }
+    document.addEventListener("click", handleClickOutside, true)
+    return () => {
+      document.removeEventListener("click", handleClickOutside, true)
+    }
+  }, [menuRef])
 
   return (
     <div className="relative">

@@ -9,6 +9,8 @@ import ListContainer from "./ListContainer"
 import AddTaskModal from "./AddTaskModal"
 import useAdd from "@/hooks/useAdd"
 import { AnimatePresence } from "framer-motion"
+import useClickOutside from "@/hooks/useClickOutside"
+import { useRef } from "react"
 
 function List() {
   const { isEditing, edit, cancelEdit } = useEdit()

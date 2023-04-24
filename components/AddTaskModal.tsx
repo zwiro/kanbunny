@@ -1,4 +1,4 @@
-import Input from "./TextInput"
+import TextInput from "./TextInput"
 import DateTimePicker from "react-datetime-picker"
 import "react-datetime-picker/dist/DateTimePicker.css"
 import { useState } from "react"
@@ -8,6 +8,8 @@ import UserCheckbox from "./UserCheckbox"
 import { motion } from "framer-motion"
 import ModalForm from "./ModalForm"
 import FormFieldContainer from "./FormFieldContainer"
+import { useRef } from "react"
+import useClickOutside from "@/hooks/useClickOutside"
 
 interface AddTaskModalProps {
   cancel?: () => void
@@ -17,12 +19,12 @@ function AddTaskModal({ cancel }: AddTaskModalProps) {
   const [value, onChange] = useState<Date | null>(new Date())
 
   return (
-    <ModalForm>
+    <ModalForm cancel={cancel}>
       <h2 className="pb-4 text-center font-bold">add a new task</h2>
       <FormFieldContainer>
         <label htmlFor="task-name">task name</label>
         <div className="[&>input]:w-full [&>input]:text-base">
-          <Input name="task-name" placeholder="add dark theme" />
+          <TextInput name="task-name" placeholder="add dark theme" />
         </div>
       </FormFieldContainer>
       <FormFieldContainer>

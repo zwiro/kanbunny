@@ -1,5 +1,5 @@
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
-import Input from "./TextInput"
+import TextInput from "./TextInput"
 
 interface AddEditFormProps {
   name: string
@@ -10,7 +10,7 @@ interface AddEditFormProps {
 function AddEditForm({ name, placeholder, cancel }: AddEditFormProps) {
   return (
     <form className="flex items-center gap-1">
-      <Input name={name} placeholder={placeholder} />
+      <TextInput name={name} placeholder={placeholder} />
       <button className="ml-auto transition-transform hover:scale-110">
         <AiOutlineCheck size={20} />
       </button>

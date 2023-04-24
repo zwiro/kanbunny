@@ -1,12 +1,15 @@
 import PlusIcon from "./PlusIcon"
 import AddButton from "./AddButton"
-import { motion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import MenuButton from "./MenuButton"
 import MenuItem from "./MenuItem"
 import useEdit from "@/hooks/useEdit"
 import AddEditForm from "./AddEditForm"
 import useAdd from "@/hooks/useAdd"
 import AddProjectModal from "./AddProjectModal"
+import useClickOutside from "@/hooks/useClickOutside"
+import { useContext, useRef } from "react"
+import LayoutContext from "@/context/LayoutContext"
 
 function SideMenu() {
   const { isAdding, add, cancelAdd } = useAdd()
@@ -20,8 +23,8 @@ function SideMenu() {
   return (
     <>
       <motion.aside
-        {...sideMenuAnimation}
         onClick={(e) => e.stopPropagation()}
+        {...sideMenuAnimation}
         className="fixed bottom-0 left-0 top-16 w-11/12 overflow-y-scroll bg-zinc-800 px-24 py-8 text-2xl lg:px-36 lg:text-3xl [&>button]:my-0"
       >
         <AddButton handleClick={add}>
@@ -35,7 +38,9 @@ function SideMenu() {
         <Project />
         <Project />
       </motion.aside>
-      {isAdding && <AddProjectModal />}
+      <AnimatePresence>
+        {isAdding && <AddProjectModal cancel={cancelAdd} />}
+      </AnimatePresence>
     </>
   )
 }
