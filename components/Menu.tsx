@@ -2,7 +2,7 @@ import { motion } from "framer-motion"
 import { useState } from "react"
 
 interface MenuProps {
-  children: JSX.Element
+  children: JSX.Element | JSX.Element[]
   direction: "left" | "right"
 }
 

@@ -6,9 +6,13 @@ import useEdit from "../hooks/useEdit"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import AddEditForm from "./AddEditForm"
 import ListContainer from "./ListContainer"
+import AddTaskModal from "./AddTaskModal"
+import useAdd from "@/hooks/useAdd"
+import { AnimatePresence } from "framer-motion"
 
 function List() {
   const { isEditing, edit, cancelEdit } = useEdit()
+  const { isAdding, add, cancelAdd } = useAdd()
   return (
     <section className="mt-4 flex h-min min-w-[18rem] flex-col gap-4 border border-neutral-800 bg-zinc-800 p-4">
       <div className="flex items-center gap-2">
@@ -16,17 +20,15 @@ function List() {
         {!isEditing ? (
           <>
             <h2 className="text-xl">to do</h2>
-            <button className="group py-2">
+            <button onClick={add} className="group py-2">
               <PlusIcon />
             </button>
             <div className="ml-auto pr-2">
               <MenuButton>
-                <>
-                  <MenuItem>add task</MenuItem>
-                  <MenuItem handleClick={edit}>edit list name</MenuItem>
-                  <MenuItem>change color</MenuItem>
-                  <MenuItem>delete list</MenuItem>
-                </>
+                <MenuItem handleClick={add}>add task</MenuItem>
+                <MenuItem handleClick={edit}>edit list name</MenuItem>
+                <MenuItem>change color</MenuItem>
+                <MenuItem>delete list</MenuItem>
               </MenuButton>
             </div>
           </>
@@ -50,6 +52,9 @@ function List() {
       <Task />
       <Task />
       <Task />
+      <AnimatePresence>
+        {isAdding && <AddTaskModal cancel={cancelAdd} />}
+      </AnimatePresence>
     </section>
   )
 }
@@ -58,17 +63,17 @@ function Task() {
   const { isEditing, edit, cancelEdit } = useEdit()
 
   return (
-    <div className="flex items-center justify-between border border-neutral-700 bg-zinc-700 p-2">
+    <div className="group flex items-center justify-between border border-neutral-700 bg-zinc-700 p-2">
       {!isEditing ? (
         <>
           <p>task 1</p>
-          <MenuButton>
-            <>
+          <div className="scale-0 transition-transform group-hover:scale-100">
+            <MenuButton>
               <MenuItem handleClick={edit}>edit task name</MenuItem>
               <MenuItem>assign user</MenuItem>
               <MenuItem>delete task</MenuItem>
-            </>
-          </MenuButton>
+            </MenuButton>
+          </div>
         </>
       ) : (
         <div className="[&>form>input]:py-1.5 [&>form>input]:text-base">

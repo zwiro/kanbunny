@@ -3,7 +3,7 @@ import Menu from "./Menu"
 import { AnimatePresence } from "framer-motion"
 
 interface MenuButtonProps {
-  children: JSX.Element
+  children: JSX.Element | JSX.Element[]
   direction?: "left" | "right"
 }
 

@@ -45,12 +45,10 @@ export default function Home() {
             <>
               <h1 className="text-2xl font-bold">board name</h1>
               <MenuButton direction="right">
-                <>
-                  <MenuItem handleClick={edit}>edit board name</MenuItem>
-                  <MenuItem handleClick={add}>add list</MenuItem>
-                  <MenuItem>change color</MenuItem>
-                  <MenuItem>delete board</MenuItem>
-                </>
+                <MenuItem handleClick={edit}>edit board name</MenuItem>
+                <MenuItem handleClick={add}>add list</MenuItem>
+                <MenuItem>change color</MenuItem>
+                <MenuItem>delete board</MenuItem>
               </MenuButton>
             </>
           ) : (
@@ -95,7 +93,6 @@ export default function Home() {
           </>
         )}
       </AnimatePresence>
-      <AddTaskModal />
     </div>
   )
 }
@@ -112,11 +109,9 @@ function Filters() {
       </div>
       <div className="ml-auto sm:hidden">
         <MenuButton>
-          <>
-            <MenuItem>sort</MenuItem>
-            <MenuItem>filter</MenuItem>
-            <MenuItem>search</MenuItem>
-          </>
+          <MenuItem>sort</MenuItem>
+          <MenuItem>filter</MenuItem>
+          <MenuItem>search</MenuItem>
         </MenuButton>
       </div>
     </>
