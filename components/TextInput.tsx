@@ -9,7 +9,7 @@ function Input({ name, placeholder }: InputProps) {
       type="text"
       name={name}
       placeholder={placeholder}
-      className="w-44 bg-zinc-900 p-1"
+      className="w-44 bg-zinc-900 p-1 text-xl"
     />
   )
 }

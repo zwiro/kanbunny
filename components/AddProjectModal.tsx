@@ -14,15 +14,13 @@ function AddProjectModal({ cancel }: AddProjectModalProps) {
       <h2 className="pb-4 text-center font-bold">add a new project</h2>
       <FormFieldContainer>
         <label htmlFor="project-name">project name</label>
-        <div className="[&>input]:w-full [&>input]:text-base">
-          <TextInput name="project-name" placeholder="social platform" />
-        </div>
+        <TextInput name="project-name" placeholder="social platform" />
       </FormFieldContainer>
       <FormFieldContainer>
         <p>invite users</p>
         <div className="flex items-center gap-2">
           <TextInput name="users" placeholder="johndoe21" />
-          <button className="group">
+          <button type="button" className="group">
             <PlusIcon />
           </button>
         </div>

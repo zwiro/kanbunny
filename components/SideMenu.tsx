@@ -8,8 +8,9 @@ import AddEditForm from "./AddEditForm"
 import useAdd from "@/hooks/useAdd"
 import AddProjectModal from "./AddProjectModal"
 import useClickOutside from "@/hooks/useClickOutside"
-import { useContext, useRef } from "react"
+import { useContext, useRef, useState } from "react"
 import LayoutContext from "@/context/LayoutContext"
+import ColorPicker from "./ColorPicker"
 
 function SideMenu() {
   const { isAdding, add, cancelAdd } = useAdd()
@@ -94,16 +95,24 @@ function Project() {
 
 function Board() {
   const { isEditing, edit, cancelEdit } = useEdit()
+  const {
+    isEditing: isEditingColor,
+    edit: editColor,
+    cancelEdit: cancelEditColor,
+  } = useEdit()
   return (
-    <li className="group flex items-center gap-2 text-xl">
-      <div className="h-4 w-4 rounded-full bg-red-500" />
+    <li onClick={editColor} className="group flex items-center gap-2 text-xl">
+      <div className="relative h-4 w-4 rounded-full bg-red-500">
+        {isEditingColor && <ColorPicker />}
+      </div>
       {!isEditing ? (
         <>
           <p>board 1</p>
+
           <div className="scale-0 transition-transform group-hover:scale-100">
             <MenuButton>
               <MenuItem handleClick={edit}>edit board name</MenuItem>
-              <MenuItem>change color</MenuItem>
+              <MenuItem handleClick={editColor}>change color</MenuItem>
               <MenuItem>delete board</MenuItem>
             </MenuButton>
           </div>
