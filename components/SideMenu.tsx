@@ -14,6 +14,7 @@ import ColorPicker from "./ColorPicker"
 import TextInput from "./TextInput"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useInviteUser from "@/hooks/useInviteUser"
+import { trpc } from "@/utils/trpc"
 
 function SideMenu() {
   const { isAdding, add, cancelAdd } = useAdd()
@@ -22,6 +23,11 @@ function SideMenu() {
     animate: { x: 0 },
     exit: { x: "-100vw" },
     transition: { type: "tween" },
+  }
+
+  const project = trpc.project.user.useQuery()
+  if (!project.data) {
+    return <div>Loading...</div>
   }
 
   return (

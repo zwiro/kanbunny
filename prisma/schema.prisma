@@ -13,6 +13,7 @@ datasource db {
 
 model Project {
   id            String  @id @default(cuid())
+  name          String
   owner         User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId       String
   boards        Board[]
