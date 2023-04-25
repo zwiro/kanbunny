@@ -6,28 +6,72 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
+model Project {
+  id     String  @id @default(cuid())
+  owner  String
+  boards Board[]
+  users  User[]
+}
+
+model Board {
+  id         String   @id @default(cuid())
+  name       String
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  lists      List[]
+  created_at DateTime @default(now())
+  color      String
+
+  @@index([projectId])
+}
+
+model List {
+  id         String   @id @default(cuid())
+  name       String
+  boardId    String
+  board      Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  tasks      Task[]
+  created_at DateTime @default(now())
+  color      String
+
+  @@index([boardId])
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  name        String
+  listId      String
+  list        List      @relation(fields: [listId], references: [id], onDelete: Cascade)
+  created_at  DateTime  @default(now())
+  assigned_to User[]
+  due_to      DateTime?
+
+  @@index([listId])
+}
+
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@index([userId])
+
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -36,6 +80,7 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
 }
 
@@ -47,6 +92,13 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  Projects      Project?  @relation(fields: [projectId], references: [id])
+  projectId     String?
+  Tasks         Task?     @relation(fields: [taskId], references: [id])
+  taskId        String?
+
+  @@index([projectId])
+  @@index([taskId])
 }
 
 model VerificationToken {
