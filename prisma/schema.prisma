@@ -12,10 +12,14 @@ datasource db {
 }
 
 model Project {
-  id     String  @id @default(cuid())
-  owner  String
-  boards Board[]
-  users  User[]
+  id            String  @id @default(cuid())
+  owner         User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId       String
+  boards        Board[]
+  users         User[]  @relation("ProjectUsers")
+  invited_users User[]  @relation("ProjectInvites")
+
+  @@index([ownerId])
 }
 
 model Board {
@@ -85,20 +89,17 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  Projects      Project?  @relation(fields: [projectId], references: [id])
-  projectId     String?
-  Tasks         Task?     @relation(fields: [taskId], references: [id])
-  taskId        String?
-
-  @@index([projectId])
-  @@index([taskId])
+  id             String    @id @default(cuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  accounts       Account[]
+  sessions       Session[]
+  projects_owned Project[]
+  projects_in    Project[] @relation("ProjectUsers")
+  invites        Project[] @relation("ProjectInvites")
+  tasks          Task[]
 }
 
 model VerificationToken {
