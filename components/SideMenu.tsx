@@ -3,9 +3,8 @@ import AddButton from "./AddButton"
 import { AnimatePresence, motion } from "framer-motion"
 import MenuButton from "./MenuButton"
 import MenuItem from "./MenuItem"
-import useEdit from "@/hooks/useEdit"
 import AddEditForm from "./AddEditForm"
-import useAdd from "@/hooks/useAdd"
+import useAddOrEdit from "@/hooks/useAddOrEdit"
 import AddProjectModal from "./AddProjectModal"
 import useClickOutside from "@/hooks/useClickOutside"
 import { useContext, useRef, useState } from "react"
@@ -17,17 +16,12 @@ import useInviteUser from "@/hooks/useInviteUser"
 import { trpc } from "@/utils/trpc"
 
 function SideMenu() {
-  const { isAdding, add, cancelAdd } = useAdd()
+  const [isAdding, add, cancelAdd] = useAddOrEdit()
   const sideMenuAnimation = {
     initial: { x: "-100vw" },
     animate: { x: 0 },
     exit: { x: "-100vw" },
     transition: { type: "tween" },
-  }
-
-  const project = trpc.project.user.useQuery()
-  if (!project.data) {
-    return <div>Loading...</div>
   }
 
   return (
@@ -56,14 +50,10 @@ function SideMenu() {
 }
 
 function Project() {
-  const { isEditing, edit, cancelEdit } = useEdit()
-  const {
-    isEditing: isEditingUsers,
-    edit: editUsers,
-    cancelEdit: cancelEditUsers,
-  } = useEdit()
+  const [isEditingName, editName, cancelEditName] = useAddOrEdit()
+  const [isEditingUsers, editUsers, cancelEditUsers] = useAddOrEdit()
 
-  const { isAdding, add, cancelAdd } = useAdd()
+  const [isAdding, add, cancelAdd] = useAddOrEdit()
 
   const { user, invitedUsers, inviteUser, removeUser, handleChange } =
     useInviteUser()
@@ -76,13 +66,13 @@ function Project() {
 
   return (
     <section className="my-4 border-b border-neutral-700">
-      {!isEditing ? (
+      {!isEditingName ? (
         <div className="flex items-center gap-4">
           <p>project 1</p>
           <MenuButton>
             <MenuItem handleClick={add}>add board</MenuItem>
             <MenuItem handleClick={editUsers}>add user</MenuItem>
-            <MenuItem handleClick={edit}>edit project name</MenuItem>
+            <MenuItem handleClick={editName}>edit project name</MenuItem>
             <MenuItem>delete project</MenuItem>
           </MenuButton>
         </div>
@@ -91,7 +81,7 @@ function Project() {
           <AddEditForm
             name="project-name"
             placeholder="project name"
-            cancel={cancelEdit}
+            cancel={cancelEditName}
           />
         </div>
       )}
@@ -162,12 +152,8 @@ function Project() {
 }
 
 function Board() {
-  const { isEditing, edit, cancelEdit } = useEdit()
-  const {
-    isEditing: isEditingColor,
-    edit: editColor,
-    cancelEdit: cancelEditColor,
-  } = useEdit()
+  const [isEditingName, editName, cancelEditName] = useAddOrEdit()
+  const [isEditingColor, editColor, cancelEditColor] = useAddOrEdit()
   return (
     <li className="group flex items-center gap-2 text-xl">
       <div
@@ -176,7 +162,7 @@ function Board() {
       >
         {isEditingColor && <ColorPicker cancel={cancelEditColor} />}
       </div>
-      {!isEditing ? (
+      {!isEditingName ? (
         <>
           <p>board 1</p>
           <div
@@ -185,7 +171,7 @@ function Board() {
             } `}
           >
             <MenuButton>
-              <MenuItem handleClick={edit}>edit board name</MenuItem>
+              <MenuItem handleClick={editName}>edit board name</MenuItem>
               <MenuItem handleClick={editColor}>change color</MenuItem>
               <MenuItem>delete board</MenuItem>
             </MenuButton>
@@ -196,7 +182,7 @@ function Board() {
           <AddEditForm
             name="board-name"
             placeholder="board name"
-            cancel={cancelEdit}
+            cancel={cancelEditName}
           />
         </div>
       )}

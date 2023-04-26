@@ -10,17 +10,16 @@ import Menu from "@/components/Menu"
 import MenuItem from "@/components/MenuItem"
 import MenuButton from "@/components/MenuButton"
 import AddButton from "@/components/AddButton"
-import useEdit from "@/hooks/useEdit"
 import AddEditForm from "@/components/AddEditForm"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
-import useAdd from "@/hooks/useAdd"
 import ListContainer from "@/components/ListContainer"
 import AddTaskModal from "@/components/AddTaskModal"
+import useAddOrEdit from "@/hooks/useAddOrEdit"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
-  const { isEditing, edit, cancelEdit } = useEdit()
-  const { isAdding, add, cancelAdd } = useAdd()
+  const [isEditingName, editName, cancelEditName] = useAddOrEdit()
+  const [isAdding, add, cancelAdd] = useAddOrEdit()
   const router = useRouter()
   const { data: session, status } = useSession({
     required: true,
@@ -41,11 +40,11 @@ export default function Home() {
     >
       <div>
         <div className="flex items-center gap-4">
-          {!isEditing ? (
+          {!isEditingName ? (
             <>
               <h1 className="text-2xl font-bold">board name</h1>
               <MenuButton direction="right">
-                <MenuItem handleClick={edit}>edit board name</MenuItem>
+                <MenuItem handleClick={editName}>edit board name</MenuItem>
                 <MenuItem handleClick={add}>add list</MenuItem>
                 <MenuItem>change color</MenuItem>
                 <MenuItem>delete board</MenuItem>
@@ -56,7 +55,7 @@ export default function Home() {
               <AddEditForm
                 name="board-name"
                 placeholder="board name"
-                cancel={cancelEdit}
+                cancel={cancelEditName}
               />
             </div>
           )}

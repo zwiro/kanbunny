@@ -2,12 +2,11 @@ import { useState } from "react"
 import MenuButton from "./MenuButton"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
-import useEdit from "../hooks/useEdit"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import AddEditForm from "./AddEditForm"
 import ListContainer from "./ListContainer"
 import AddTaskModal from "./AddTaskModal"
-import useAdd from "@/hooks/useAdd"
+import useAddOrEdit from "@/hooks/useAddOrEdit"
 import { AnimatePresence, motion } from "framer-motion"
 import useClickOutside from "@/hooks/useClickOutside"
 import { useRef } from "react"
@@ -15,13 +14,9 @@ import ColorPicker from "./ColorPicker"
 import UserCheckbox from "./UserCheckbox"
 
 function List() {
-  const { isEditing, edit, cancelEdit } = useEdit()
-  const {
-    isEditing: isEditingColor,
-    edit: editColor,
-    cancelEdit: cancelEditColor,
-  } = useEdit()
-  const { isAdding, add, cancelAdd } = useAdd()
+  const [isEditingName, editName, cancelEditName] = useAddOrEdit()
+  const [isEditingColor, editColor, cancelEditColor] = useAddOrEdit()
+  const [isAdding, add, cancelAdd] = useAddOrEdit()
 
   return (
     <section className="mt-4 flex h-min min-w-[18rem] flex-col gap-4 border border-neutral-800 bg-zinc-800 p-4">
@@ -34,7 +29,7 @@ function List() {
             {isEditingColor && <ColorPicker cancel={cancelEditColor} />}
           </AnimatePresence>
         </div>
-        {!isEditing ? (
+        {!isEditingName ? (
           <>
             <h2 className="text-xl">to do</h2>
             <button
@@ -46,7 +41,7 @@ function List() {
             <div className="ml-auto pr-2">
               <MenuButton>
                 <MenuItem handleClick={add}>add task</MenuItem>
-                <MenuItem handleClick={edit}>edit list name</MenuItem>
+                <MenuItem handleClick={editName}>edit list name</MenuItem>
                 <MenuItem handleClick={editColor}>change color</MenuItem>
                 <MenuItem>delete list</MenuItem>
               </MenuButton>
@@ -56,7 +51,7 @@ function List() {
           <AddEditForm
             name="list-name"
             placeholder="list name"
-            cancel={cancelEdit}
+            cancel={cancelEditName}
           />
         )}
       </div>
@@ -80,12 +75,8 @@ function List() {
 }
 
 function Task() {
-  const { isEditing, edit, cancelEdit } = useEdit()
-  const {
-    isEditing: isEditingUsers,
-    edit: editUsers,
-    cancelEdit: cancelEditUsers,
-  } = useEdit()
+  const [isEditingName, editName, cancelEditName] = useAddOrEdit()
+  const [isEditingUsers, editUsers, cancelEditUsers] = useAddOrEdit()
 
   const taskAnimation = {
     initial: { height: 0, opacity: 0, padding: 0 },
@@ -96,12 +87,12 @@ function Task() {
   return (
     <>
       <div className="group flex items-center justify-between border border-neutral-700 bg-zinc-700 p-2">
-        {!isEditing ? (
+        {!isEditingName ? (
           <>
             <p>task 1</p>
             <div className="scale-0 transition-transform group-hover:scale-100">
               <MenuButton>
-                <MenuItem handleClick={edit}>edit task name</MenuItem>
+                <MenuItem handleClick={editName}>edit task name</MenuItem>
                 <MenuItem handleClick={editUsers}>assign user</MenuItem>
                 <MenuItem>delete task</MenuItem>
               </MenuButton>
@@ -112,7 +103,7 @@ function Task() {
             <AddEditForm
               name="task name"
               placeholder="task name"
-              cancel={cancelEdit}
+              cancel={cancelEditName}
             />
           </div>
         )}
