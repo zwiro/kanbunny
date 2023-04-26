@@ -32,9 +32,7 @@ function SideMenu() {
         className="fixed bottom-0 left-0 top-16 w-11/12 overflow-y-scroll bg-zinc-800 px-24 py-8 text-2xl lg:px-36 lg:text-3xl [&>button]:my-0"
       >
         <AddButton handleClick={add}>
-          <>
-            new project <PlusIcon />
-          </>
+          new project <PlusIcon />
         </AddButton>
         <Project />
         <Project />

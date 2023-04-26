@@ -52,9 +52,7 @@ function AddTaskModal({ cancel }: AddTaskModalProps) {
         />
       </FormFieldContainer>
       <AddButton handleClick={cancel}>
-        <>
-          add task <PlusIcon />
-        </>
+        add task <PlusIcon />
       </AddButton>
     </ModalForm>
   )

@@ -6,7 +6,6 @@ import List from "@/components/List"
 import SideMenu from "@/components/SideMenu"
 import LayoutContext from "@/context/LayoutContext"
 import { motion, AnimatePresence } from "framer-motion"
-import Menu from "@/components/Menu"
 import MenuItem from "@/components/MenuItem"
 import MenuButton from "@/components/MenuButton"
 import AddButton from "@/components/AddButton"
@@ -77,9 +76,7 @@ export default function Home() {
           </ListContainer>
         ) : (
           <AddButton handleClick={add}>
-            <>
-              new list <PlusIcon />
-            </>
+            new list <PlusIcon />
           </AddButton>
         )}
       </div>

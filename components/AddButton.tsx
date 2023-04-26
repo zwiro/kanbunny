@@ -1,7 +1,7 @@
 import { useState } from "react"
 
 interface AddButtonProps {
-  children: JSX.Element
+  children: JSX.Element | [string, JSX.Element]
   handleClick?: () => void
 }
 
