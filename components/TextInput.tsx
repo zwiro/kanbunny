@@ -1,19 +1,26 @@
+import { useFormContext } from "react-hook-form"
+
 interface TextInputProps {
   name: string
   placeholder: string
-  value?: string
-  handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  // handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-function TextInput({ name, placeholder, value, handleChange }: TextInputProps) {
+function TextInput({ placeholder, name }: TextInputProps) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext()
+
   return (
     <input
+      id={name}
       type="text"
-      name={name}
+      {...register(name)}
       placeholder={placeholder}
-      value={value}
-      onChange={handleChange}
-      className="w-44 bg-zinc-900 p-1 text-xl"
+      className={`w-44 bg-zinc-900 p-1 text-xl ${
+        errors[name] && "border border-red-800"
+      } `}
     />
   )
 }
