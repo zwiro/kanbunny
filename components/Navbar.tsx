@@ -4,6 +4,7 @@ import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/router"
 import { useContext } from "react"
 import LayoutContext from "@/context/LayoutContext"
+import { LoadingDots } from "./LoadingDots"
 
 function Navbar() {
   const { data: session, status } = useSession()
@@ -51,16 +52,6 @@ function BurgerMenu() {
         "rotate-45 before:translate-y-2 before:rotate-90 after:-translate-y-2 after:-rotate-90 before:xl:translate-y-3 after:xl:-translate-y-3"
       } `}
     />
-  )
-}
-
-function LoadingDots() {
-  return (
-    <div className="ml-auto flex justify-center gap-2 pt-2">
-      <div className="h-2 w-2 animate-bounceLeft rounded-full bg-slate-100" />
-      <div className="h-2 w-2 animate-bounceCenter rounded-full bg-slate-100" />
-      <div className="h-2 w-2 animate-bounceRight rounded-full bg-slate-100" />
-    </div>
   )
 }
 

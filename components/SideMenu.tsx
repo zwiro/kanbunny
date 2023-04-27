@@ -14,6 +14,8 @@ import TextInput from "./TextInput"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useInviteUser from "@/hooks/useInviteUser"
 import { trpc } from "@/utils/trpc"
+import { Prisma, Project } from "@prisma/client"
+import { LoadingDots } from "./LoadingDots"
 
 function SideMenu() {
   const [isAdding, add, closeAdd] = useAddOrEdit()
@@ -24,6 +26,8 @@ function SideMenu() {
     transition: { type: "tween" },
   }
 
+  const userProjects = trpc.project.user.useQuery()
+
   return (
     <>
       <motion.aside
@@ -31,14 +35,18 @@ function SideMenu() {
         {...sideMenuAnimation}
         className="fixed bottom-0 left-0 top-16 w-11/12 overflow-y-scroll bg-zinc-800 px-24 py-8 text-2xl lg:px-36 lg:text-3xl [&>button]:my-0"
       >
-        <AddButton handleClick={add}>
-          new project <PlusIcon />
-        </AddButton>
-        <Project />
-        <Project />
-        <Project />
-        <Project />
-        <Project />
+        {!userProjects.isLoading ? (
+          <AddButton handleClick={add}>
+            new project <PlusIcon />
+          </AddButton>
+        ) : (
+          <LoadingDots />
+        )}
+        {userProjects.data
+          ?.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+          .map((project) => (
+            <Project key={project.id} project={project} />
+          ))}
       </motion.aside>
       <AnimatePresence>
         {isAdding && <AddProjectModal close={closeAdd} />}
@@ -47,12 +55,14 @@ function SideMenu() {
   )
 }
 
-function Project() {
+interface ProjectProps {
+  project: Project
+}
+
+function Project({ project }: ProjectProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
-
   const [isAdding, add, closeAdd] = useAddOrEdit()
-
   const { user, invitedUsers, inviteUser, removeUser, handleChange } =
     useInviteUser()
 
@@ -66,7 +76,7 @@ function Project() {
     <section className="my-4 border-b border-neutral-700">
       {!isEditingName ? (
         <div className="flex items-center gap-4">
-          <p>project 1</p>
+          <p>{project.name}</p>
           <MenuButton>
             <MenuItem handleClick={add}>add board</MenuItem>
             <MenuItem handleClick={editUsers}>add user</MenuItem>
@@ -90,12 +100,7 @@ function Project() {
             className="flex flex-col gap-2 pt-4 text-base"
           >
             <form className="flex items-center gap-2">
-              <TextInput
-                name="users"
-                placeholder="johndoe21"
-                handleChange={handleChange}
-                value={user}
-              />
+              <TextInput name="users" placeholder="johndoe21" />
               <button onClick={inviteUser} className="group">
                 <PlusIcon />
               </button>

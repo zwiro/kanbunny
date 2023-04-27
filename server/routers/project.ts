@@ -4,7 +4,9 @@ import { projectSchema } from "@/components/AddProjectModal"
 
 export const projectRouter = createTRPCRouter({
   user: protectedProcedure.query(async ({ ctx }) => {
-    const projects = await ctx.prisma.project.findMany({})
+    const projects = await ctx.prisma.project.findMany({
+      where: { users: { some: { id: ctx.session.user.id } } },
+    })
     return projects
   }),
   create: protectedProcedure

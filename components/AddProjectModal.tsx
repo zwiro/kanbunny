@@ -29,7 +29,14 @@ function AddProjectModal({ close }: AddProjectModalProps) {
   const { user, invitedUsers, inviteUser, removeUser, handleChange } =
     useInviteUser()
 
-  const createProject = trpc.project.create.useMutation({ onSuccess: close })
+  const utils = trpc.useContext()
+
+  const createProject = trpc.project.create.useMutation({
+    onSuccess() {
+      utils.project.user.invalidate()
+      close()
+    },
+  })
 
   type ProjectSchema = z.infer<typeof projectSchema>
 

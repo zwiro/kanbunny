@@ -86,7 +86,7 @@ function Task() {
 
   return (
     <>
-      <div className="group flex items-center justify-between border border-neutral-700 bg-zinc-700 p-2">
+      <div className="group flex items-center justify-between border-l-8 border-neutral-900 bg-zinc-700 p-2">
         {!isEditingName ? (
           <>
             <p>task 1</p>
