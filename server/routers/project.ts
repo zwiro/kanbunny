@@ -10,20 +10,17 @@ export const projectRouter = createTRPCRouter({
   create: protectedProcedure
     .input(projectSchema)
     .mutation(async ({ ctx, input }) => {
-      const owner = await ctx.prisma.user.findUnique({
-        where: { email: ctx.session.user.email! },
-      })
       const invitedUsers = await ctx.prisma.user.findMany({
         where: { name: { in: input.invited_users } },
       })
       const project = await ctx.prisma.project.create({
         data: {
           name: input.name,
-          ownerId: owner?.id,
-          users: { connect: { id: owner?.id } },
+          ownerId: ctx.session.user.id,
+          users: { connect: { id: ctx.session.user.id } },
           invited_users: {
             connect: invitedUsers
-              .filter((user) => user.id !== owner?.id)
+              .filter((user) => user.id !== ctx.session.user.id)
               .map((user) => ({ id: user.id })),
           },
         },

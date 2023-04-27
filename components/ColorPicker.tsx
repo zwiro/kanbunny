@@ -3,12 +3,12 @@ import { useRef } from "react"
 import { motion } from "framer-motion"
 
 interface ColorPickerProps {
-  cancel?: () => void
+  close?: () => void
 }
 
-function ColorPicker({ cancel }: ColorPickerProps) {
+function ColorPicker({ close }: ColorPickerProps) {
   const pickerRef = useRef(null)
-  useClickOutside([pickerRef], cancel)
+  useClickOutside([pickerRef], close)
 
   const pickerAnimation = {
     initial: { opacity: 0 },

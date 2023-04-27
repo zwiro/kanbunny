@@ -14,9 +14,9 @@ import ColorPicker from "./ColorPicker"
 import UserCheckbox from "./UserCheckbox"
 
 function List() {
-  const [isEditingName, editName, cancelEditName] = useAddOrEdit()
-  const [isEditingColor, editColor, cancelEditColor] = useAddOrEdit()
-  const [isAdding, add, cancelAdd] = useAddOrEdit()
+  const [isEditingName, editName, closeEditName] = useAddOrEdit()
+  const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
+  const [isAdding, add, closeAdd] = useAddOrEdit()
 
   return (
     <section className="mt-4 flex h-min min-w-[18rem] flex-col gap-4 border border-neutral-800 bg-zinc-800 p-4">
@@ -26,7 +26,7 @@ function List() {
           className="relative h-4 w-4 rounded-full bg-blue-500"
         >
           <AnimatePresence>
-            {isEditingColor && <ColorPicker cancel={cancelEditColor} />}
+            {isEditingColor && <ColorPicker close={closeEditColor} />}
           </AnimatePresence>
         </div>
         {!isEditingName ? (
@@ -51,7 +51,7 @@ function List() {
           <AddEditForm
             name="list-name"
             placeholder="list name"
-            cancel={cancelEditName}
+            close={closeEditName}
           />
         )}
       </div>
@@ -68,15 +68,15 @@ function List() {
       <Task />
       <Task />
       <AnimatePresence>
-        {isAdding && <AddTaskModal cancel={cancelAdd} />}
+        {isAdding && <AddTaskModal close={closeAdd} />}
       </AnimatePresence>
     </section>
   )
 }
 
 function Task() {
-  const [isEditingName, editName, cancelEditName] = useAddOrEdit()
-  const [isEditingUsers, editUsers, cancelEditUsers] = useAddOrEdit()
+  const [isEditingName, editName, closeEditName] = useAddOrEdit()
+  const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
 
   const taskAnimation = {
     initial: { height: 0, opacity: 0, padding: 0 },
@@ -103,7 +103,7 @@ function Task() {
             <AddEditForm
               name="task name"
               placeholder="task name"
-              cancel={cancelEditName}
+              close={closeEditName}
             />
           </div>
         )}
@@ -125,7 +125,7 @@ function Task() {
               </button>
               <button
                 type="button"
-                onClick={cancelEditUsers}
+                onClick={closeEditUsers}
                 className="transition-transform hover:scale-110"
               >
                 <AiOutlineClose size={20} />

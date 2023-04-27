@@ -23,13 +23,13 @@ const formVariant = {
 
 interface ModalFormProps {
   children: JSX.Element | JSX.Element[]
-  cancel?: () => void
+  close?: () => void
   handleSubmit: (data: any) => void
 }
 
-function ModalForm({ children, cancel, handleSubmit }: ModalFormProps) {
+function ModalForm({ children, close, handleSubmit }: ModalFormProps) {
   const modalRef = useRef<HTMLDivElement>(null)
-  useClickOutside([modalRef], cancel)
+  useClickOutside([modalRef], close)
 
   return (
     <motion.div

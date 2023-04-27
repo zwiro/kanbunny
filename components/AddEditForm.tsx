@@ -4,10 +4,10 @@ import TextInput from "./TextInput"
 interface AddEditFormProps {
   name: string
   placeholder: string
-  cancel?: () => void
+  close?: () => void
 }
 
-function AddEditForm({ name, placeholder, cancel }: AddEditFormProps) {
+function AddEditForm({ name, placeholder, close }: AddEditFormProps) {
   return (
     <form className="flex items-center gap-1">
       <TextInput name={name} placeholder={placeholder} />
@@ -16,7 +16,7 @@ function AddEditForm({ name, placeholder, cancel }: AddEditFormProps) {
       </button>
       <button
         type="button"
-        onClick={cancel}
+        onClick={close}
         className="transition-transform hover:scale-110"
       >
         <AiOutlineClose size={20} />

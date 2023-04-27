@@ -16,7 +16,7 @@ import useInviteUser from "@/hooks/useInviteUser"
 import { trpc } from "@/utils/trpc"
 
 function SideMenu() {
-  const [isAdding, add, cancelAdd] = useAddOrEdit()
+  const [isAdding, add, closeAdd] = useAddOrEdit()
   const sideMenuAnimation = {
     initial: { x: "-100vw" },
     animate: { x: 0 },
@@ -41,17 +41,17 @@ function SideMenu() {
         <Project />
       </motion.aside>
       <AnimatePresence>
-        {isAdding && <AddProjectModal cancel={cancelAdd} />}
+        {isAdding && <AddProjectModal close={closeAdd} />}
       </AnimatePresence>
     </>
   )
 }
 
 function Project() {
-  const [isEditingName, editName, cancelEditName] = useAddOrEdit()
-  const [isEditingUsers, editUsers, cancelEditUsers] = useAddOrEdit()
+  const [isEditingName, editName, closeEditName] = useAddOrEdit()
+  const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
 
-  const [isAdding, add, cancelAdd] = useAddOrEdit()
+  const [isAdding, add, closeAdd] = useAddOrEdit()
 
   const { user, invitedUsers, inviteUser, removeUser, handleChange } =
     useInviteUser()
@@ -79,7 +79,7 @@ function Project() {
           <AddEditForm
             name="project-name"
             placeholder="project name"
-            cancel={cancelEditName}
+            close={closeEditName}
           />
         </div>
       )}
@@ -118,7 +118,7 @@ function Project() {
               </button>
               <button
                 type="button"
-                onClick={cancelEditUsers}
+                onClick={closeEditUsers}
                 className="transition-transform hover:scale-110"
               >
                 <AiOutlineClose size={20} />
@@ -134,7 +134,7 @@ function Project() {
             <AddEditForm
               name="board-name"
               placeholder="board name"
-              cancel={cancelAdd}
+              close={closeAdd}
             />
           </div>
         )}
@@ -150,8 +150,8 @@ function Project() {
 }
 
 function Board() {
-  const [isEditingName, editName, cancelEditName] = useAddOrEdit()
-  const [isEditingColor, editColor, cancelEditColor] = useAddOrEdit()
+  const [isEditingName, editName, closeEditName] = useAddOrEdit()
+  const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
   return (
     <li className="group flex items-center gap-2 text-xl">
       <div
@@ -159,7 +159,7 @@ function Board() {
         className="relative h-4 w-4 rounded-full bg-red-500"
       >
         <AnimatePresence>
-          {isEditingColor && <ColorPicker cancel={cancelEditColor} />}
+          {isEditingColor && <ColorPicker close={closeEditColor} />}
         </AnimatePresence>
       </div>
       {!isEditingName ? (
@@ -182,7 +182,7 @@ function Board() {
           <AddEditForm
             name="board-name"
             placeholder="board name"
-            cancel={cancelEditName}
+            close={closeEditName}
           />
         </div>
       )}

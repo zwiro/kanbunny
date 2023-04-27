@@ -17,7 +17,7 @@ import { trpc } from "@/utils/trpc"
 import { Prisma, User } from "@prisma/client"
 
 interface AddProjectModalProps {
-  cancel?: () => void
+  close: () => void
 }
 
 export const projectSchema = z.object({
@@ -25,11 +25,11 @@ export const projectSchema = z.object({
   invited_users: z.array(z.string()).optional(),
 })
 
-function AddProjectModal({ cancel }: AddProjectModalProps) {
+function AddProjectModal({ close }: AddProjectModalProps) {
   const { user, invitedUsers, inviteUser, removeUser, handleChange } =
     useInviteUser()
 
-  const createProject = trpc.project.create.useMutation()
+  const createProject = trpc.project.create.useMutation({ onSuccess: close })
 
   type ProjectSchema = z.infer<typeof projectSchema>
 
@@ -43,7 +43,7 @@ function AddProjectModal({ cancel }: AddProjectModalProps) {
 
   return (
     <FormProvider {...methods}>
-      <ModalForm cancel={cancel} handleSubmit={methods.handleSubmit(onSubmit)}>
+      <ModalForm close={close} handleSubmit={methods.handleSubmit(onSubmit)}>
         <h2 className="pb-4 text-center font-bold">add a new project</h2>
         <FormFieldContainer>
           <label htmlFor="name">project name</label>
@@ -74,16 +74,26 @@ function AddProjectModal({ cancel }: AddProjectModalProps) {
               <li
                 key={`${user}-${i}`}
                 onClick={() => removeUser(user)}
-                className="border border-zinc-900 p-2"
+                className="cursor-pointer border border-zinc-900 bg-zinc-900 p-2 transition-colors hover:bg-transparent"
               >
                 {user}
               </li>
             ))}
           </ul>
         </FormFieldContainer>
-        <AddButton>
-          add project <PlusIcon />
+        <AddButton isLoading={createProject.isLoading}>
+          add project
+          <div className={`${createProject.isLoading && "animate-spin"}`}>
+            <PlusIcon />
+          </div>
         </AddButton>
+        <>
+          {createProject.error && (
+            <p role="alert" className="text-center text-red-500">
+              something went wrong
+            </p>
+          )}
+        </>
       </ModalForm>
     </FormProvider>
   )

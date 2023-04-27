@@ -7,11 +7,11 @@ function useAddOrEdit() {
     setIsAddingOrEditing(true)
   }
 
-  const cancelAddOrEdit = () => {
+  const closeAddOrEdit = () => {
     setIsAddingOrEditing(false)
   }
 
-  return [isAddingOrEditing, addOrEdit, cancelAddOrEdit] as const
+  return [isAddingOrEditing, addOrEdit, closeAddOrEdit] as const
 }
 
 export default useAddOrEdit

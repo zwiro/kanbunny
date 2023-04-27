@@ -12,14 +12,14 @@ import { useRef } from "react"
 import useClickOutside from "@/hooks/useClickOutside"
 
 interface AddTaskModalProps {
-  cancel?: () => void
+  close?: () => void
 }
 
-function AddTaskModal({ cancel }: AddTaskModalProps) {
+function AddTaskModal({ close }: AddTaskModalProps) {
   const [value, onChange] = useState<Date | null>(new Date())
 
   return (
-    <ModalForm cancel={cancel}>
+    <ModalForm close={close}>
       <h2 className="pb-4 text-center font-bold">add a new task</h2>
       <FormFieldContainer>
         <label htmlFor="task-name">task name</label>
@@ -51,7 +51,7 @@ function AddTaskModal({ cancel }: AddTaskModalProps) {
           className="w-fit"
         />
       </FormFieldContainer>
-      <AddButton handleClick={cancel}>
+      <AddButton handleClick={close}>
         add task <PlusIcon />
       </AddButton>
     </ModalForm>

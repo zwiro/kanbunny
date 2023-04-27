@@ -17,8 +17,8 @@ import useAddOrEdit from "@/hooks/useAddOrEdit"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
-  const [isEditingName, editName, cancelEditName] = useAddOrEdit()
-  const [isAdding, add, cancelAdd] = useAddOrEdit()
+  const [isEditingName, editName, closeEditName] = useAddOrEdit()
+  const [isAdding, add, closeAdd] = useAddOrEdit()
   const router = useRouter()
   const { data: session, status } = useSession({
     required: true,
@@ -54,7 +54,7 @@ export default function Home() {
               <AddEditForm
                 name="board-name"
                 placeholder="board name"
-                cancel={cancelEditName}
+                close={closeEditName}
               />
             </div>
           )}
@@ -71,7 +71,7 @@ export default function Home() {
             <AddEditForm
               name="list-name"
               placeholder="list name"
-              cancel={cancelAdd}
+              close={closeAdd}
             />
           </ListContainer>
         ) : (
