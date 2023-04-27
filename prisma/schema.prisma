@@ -31,7 +31,7 @@ model Board {
   project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   lists      List[]
   created_at DateTime @default(now())
-  color      String
+  color      String   @default("ff0000")
 
   @@index([projectId])
 }

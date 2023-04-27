@@ -137,8 +137,9 @@ function Project({ project }: ProjectProps) {
           <div className="flex items-center gap-2">
             <div className="h-4 w-4 rounded-full bg-red-500" />
             <AddEditForm
-              name="board-name"
+              name="name"
               placeholder="board name"
+              projectId={project.id}
               close={closeAdd}
             />
           </div>

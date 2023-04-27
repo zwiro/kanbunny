@@ -1,6 +1,7 @@
 import { z } from "zod"
 import { protectedProcedure, publicProcedure, createTRPCRouter } from "../trpc"
 import { projectSchema } from "@/components/AddProjectModal"
+import { boardSchema } from "@/components/AddEditForm"
 
 export const projectRouter = createTRPCRouter({
   user: protectedProcedure.query(async ({ ctx }) => {
@@ -28,6 +29,15 @@ export const projectRouter = createTRPCRouter({
         },
       })
       return project
+    }),
+  createBoard: protectedProcedure
+    .input(boardSchema)
+    .mutation(async ({ ctx, input }) => {
+      console.log(input)
+      const board = await ctx.prisma.board.create({
+        data: input,
+      })
+      return board
     }),
   delete: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.project.deleteMany()
