@@ -14,7 +14,7 @@ import TextInput from "./TextInput"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useInviteUser from "@/hooks/useInviteUser"
 import { trpc } from "@/utils/trpc"
-import { Prisma, Project } from "@prisma/client"
+import { Board, Prisma, Project } from "@prisma/client"
 import { LoadingDots } from "./LoadingDots"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -48,7 +48,11 @@ function SideMenu() {
         {userProjects.data
           ?.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
           .map((project) => (
-            <Project key={project.id} project={project} />
+            <Project
+              key={project.id}
+              project={project}
+              boards={project.boards}
+            />
           ))}
       </motion.aside>
       <AnimatePresence>
@@ -60,6 +64,7 @@ function SideMenu() {
 
 interface ProjectProps {
   project: Project
+  boards: Board[]
 }
 
 export const boardSchema = z.object({
@@ -67,7 +72,7 @@ export const boardSchema = z.object({
   projectId: z.string(),
 })
 
-function Project({ project }: ProjectProps) {
+function Project({ project, boards }: ProjectProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
@@ -80,6 +85,8 @@ function Project({ project }: ProjectProps) {
     },
   })
 
+  console.log(project)
+
   type BoardSchema = z.infer<typeof boardSchema>
 
   const methods = useForm<BoardSchema>({
@@ -91,6 +98,8 @@ function Project({ project }: ProjectProps) {
   const onSubmit: SubmitHandler<BoardSchema> = (data: any) => {
     createBoard.mutate({ name: data.name, projectId: project.id })
   }
+
+  // const boards = trpc.project.getBoards.useQuery({ projectId: project.id })
 
   const projectUsersAnimation = {
     initial: { height: 0, opacity: 0 },
@@ -179,25 +188,28 @@ function Project({ project }: ProjectProps) {
             )}
           </>
         )}
-        <Board />
-        <Board />
-        <Board />
-        <Board />
-        <Board />
-        <Board />
+        {boards.map((board: Board) => (
+          <Board key={board.id} {...board} />
+        ))}
       </ul>
     </section>
   )
 }
 
-function Board() {
+interface BoardProps {
+  name: string
+  color: string
+}
+
+function Board({ name, color }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
+
   return (
     <li className="group flex items-center gap-2 text-xl">
       <div
         onClick={editColor}
-        className="relative h-4 w-4 rounded-full bg-red-500"
+        className={`relative h-4 w-4 rounded-full bg-[#${color}]`}
       >
         <AnimatePresence>
           {isEditingColor && <ColorPicker close={closeEditColor} />}
@@ -205,7 +217,7 @@ function Board() {
       </div>
       {!isEditingName ? (
         <>
-          <p>board 1</p>
+          <p>{name}</p>
           <div
             className={`z-10 scale-0 transition-transform ${
               isEditingColor ? "group-hover:scale-0" : "group-hover:scale-100"

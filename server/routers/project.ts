@@ -7,6 +7,7 @@ export const projectRouter = createTRPCRouter({
   user: protectedProcedure.query(async ({ ctx }) => {
     const projects = await ctx.prisma.project.findMany({
       where: { users: { some: { id: ctx.session.user.id } } },
+      include: { boards: true },
     })
     return projects
   }),
@@ -33,12 +34,19 @@ export const projectRouter = createTRPCRouter({
   createBoard: protectedProcedure
     .input(boardSchema)
     .mutation(async ({ ctx, input }) => {
-      console.log(input)
       const board = await ctx.prisma.board.create({
         data: input,
       })
       return board
     }),
+  // getBoards: protectedProcedure
+  //   .input(z.object({ projectId: z.string() }))
+  //   .query(async ({ ctx, input }) => {
+  //     const boards = await ctx.prisma.board.findMany({
+  //       where: { projectId: input?.projectId },
+  //     })
+  //     return boards
+  //   }),
   delete: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.project.deleteMany()
   }),
