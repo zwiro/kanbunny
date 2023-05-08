@@ -85,9 +85,12 @@ function Project({ project, boards }: ProjectProps) {
 
   const createBoard = trpc.project.createBoard.useMutation({
     onSuccess() {
-      close()
+      utils.project.invalidate()
+      closeAdd()
     },
   })
+
+  // handle adding board - disable button and and spinner
 
   type BoardSchema = z.infer<typeof boardSchema>
 

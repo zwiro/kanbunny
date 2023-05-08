@@ -39,7 +39,7 @@ export const projectRouter = createTRPCRouter({
       })
       return board
     }),
-  // getBoards: protectedProcedure
+  // boards: protectedProcedure
   //   .input(z.object({ projectId: z.string() }))
   //   .query(async ({ ctx, input }) => {
   //     const boards = await ctx.prisma.board.findMany({
