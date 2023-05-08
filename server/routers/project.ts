@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { protectedProcedure, publicProcedure, createTRPCRouter } from "../trpc"
 import { projectSchema } from "@/components/AddProjectModal"
-import { boardSchema } from "@/components/AddEditForm"
+import { boardSchema } from "@/components/SideMenu"
 
 export const projectRouter = createTRPCRouter({
   user: protectedProcedure.query(async ({ ctx }) => {

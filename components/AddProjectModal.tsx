@@ -55,11 +55,6 @@ function AddProjectModal({ close }: AddProjectModalProps) {
         <FormFieldContainer>
           <label htmlFor="name">project name</label>
           <TextInput name="name" placeholder="social platform" />
-          {methods.formState.errors && (
-            <p role="alert" className="text-red-500">
-              {methods.formState.errors.name?.message}
-            </p>
-          )}
         </FormFieldContainer>
         <FormFieldContainer>
           <p>invite users</p>

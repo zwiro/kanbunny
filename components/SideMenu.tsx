@@ -16,6 +16,9 @@ import useInviteUser from "@/hooks/useInviteUser"
 import { trpc } from "@/utils/trpc"
 import { Prisma, Project } from "@prisma/client"
 import { LoadingDots } from "./LoadingDots"
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
 
 function SideMenu() {
   const [isAdding, add, closeAdd] = useAddOrEdit()
@@ -59,12 +62,35 @@ interface ProjectProps {
   project: Project
 }
 
+export const boardSchema = z.object({
+  name: z.string().min(1, { message: "board name is required" }),
+  projectId: z.string(),
+})
+
 function Project({ project }: ProjectProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
   const { user, invitedUsers, inviteUser, removeUser, handleChange } =
     useInviteUser()
+
+  const createBoard = trpc.project.createBoard.useMutation({
+    onSuccess() {
+      close()
+    },
+  })
+
+  type BoardSchema = z.infer<typeof boardSchema>
+
+  const methods = useForm<BoardSchema>({
+    defaultValues: { projectId: project.id },
+    resolver: zodResolver(boardSchema),
+  })
+
+  const utils = trpc.useContext()
+  const onSubmit: SubmitHandler<BoardSchema> = (data: any) => {
+    createBoard.mutate({ name: data.name, projectId: project.id })
+  }
 
   const projectUsersAnimation = {
     initial: { height: 0, opacity: 0 },
@@ -136,12 +162,14 @@ function Project({ project }: ProjectProps) {
         {isAdding && (
           <div className="flex items-center gap-2">
             <div className="h-4 w-4 rounded-full bg-red-500" />
-            <AddEditForm
-              name="name"
-              placeholder="board name"
-              projectId={project.id}
-              close={closeAdd}
-            />
+            <FormProvider {...methods}>
+              <AddEditForm
+                name="name"
+                placeholder="board name"
+                handleSubmit={methods.handleSubmit(onSubmit)}
+                close={closeAdd}
+              />
+            </FormProvider>
           </div>
         )}
         <Board />

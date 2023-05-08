@@ -1,7 +1,7 @@
 export default function FormFieldContainer({
   children,
 }: {
-  children: JSX.Element[]
+  children: JSX.Element[] | JSX.Element
 }) {
   return (
     <div className="field flex flex-col gap-2 border border-neutral-700 p-4 [&_input]:w-full [&_input]:text-base">
