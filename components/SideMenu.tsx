@@ -160,17 +160,24 @@ function Project({ project }: ProjectProps) {
       </AnimatePresence>
       <ul className="flex flex-col gap-2 py-4 lg:gap-4">
         {isAdding && (
-          <div className="flex items-center gap-2">
-            <div className="h-4 w-4 rounded-full bg-red-500" />
-            <FormProvider {...methods}>
-              <AddEditForm
-                name="name"
-                placeholder="board name"
-                handleSubmit={methods.handleSubmit(onSubmit)}
-                close={closeAdd}
-              />
-            </FormProvider>
-          </div>
+          <>
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 rounded-full bg-red-500" />
+              <FormProvider {...methods}>
+                <AddEditForm
+                  name="name"
+                  placeholder="board name"
+                  handleSubmit={methods.handleSubmit(onSubmit)}
+                  close={closeAdd}
+                />
+              </FormProvider>
+            </div>
+            {methods.formState.errors && (
+              <p role="alert" className="pl-6 text-base text-red-500">
+                {methods.formState.errors?.name?.message as string}
+              </p>
+            )}
+          </>
         )}
         <Board />
         <Board />
