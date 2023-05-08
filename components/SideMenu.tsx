@@ -45,15 +45,19 @@ function SideMenu() {
         ) : (
           <LoadingDots />
         )}
-        {userProjects.data
-          ?.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
-          .map((project) => (
-            <Project
-              key={project.id}
-              project={project}
-              boards={project.boards}
-            />
-          ))}
+        {userProjects.data?.length ? (
+          userProjects.data
+            ?.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+            .map((project) => (
+              <Project
+                key={project.id}
+                project={project}
+                boards={project.boards}
+              />
+            ))
+        ) : (
+          <p className="text-netural-500 text-center">no projects yet</p>
+        )}
       </motion.aside>
       <AnimatePresence>
         {isAdding && <AddProjectModal close={closeAdd} />}
@@ -85,8 +89,6 @@ function Project({ project, boards }: ProjectProps) {
     },
   })
 
-  console.log(project)
-
   type BoardSchema = z.infer<typeof boardSchema>
 
   const methods = useForm<BoardSchema>({
@@ -98,8 +100,6 @@ function Project({ project, boards }: ProjectProps) {
   const onSubmit: SubmitHandler<BoardSchema> = (data: any) => {
     createBoard.mutate({ name: data.name, projectId: project.id })
   }
-
-  // const boards = trpc.project.getBoards.useQuery({ projectId: project.id })
 
   const projectUsersAnimation = {
     initial: { height: 0, opacity: 0 },
@@ -188,9 +188,11 @@ function Project({ project, boards }: ProjectProps) {
             )}
           </>
         )}
-        {boards.map((board: Board) => (
-          <Board key={board.id} {...board} />
-        ))}
+        {boards.length ? (
+          boards.map((board: Board) => <Board key={board.id} {...board} />)
+        ) : (
+          <p className="text-base font-bold text-neutral-500">no boards yet</p>
+        )}
       </ul>
     </section>
   )
