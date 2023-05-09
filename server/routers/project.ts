@@ -7,7 +7,7 @@ export const projectRouter = createTRPCRouter({
   user: protectedProcedure.query(async ({ ctx }) => {
     const projects = await ctx.prisma.project.findMany({
       where: { users: { some: { id: ctx.session.user.id } } },
-      include: { boards: true },
+      include: { boards: true, invited_users: true },
     })
     return projects
   }),
@@ -39,14 +39,24 @@ export const projectRouter = createTRPCRouter({
       })
       return board
     }),
-  // boards: protectedProcedure
-  //   .input(z.object({ projectId: z.string() }))
-  //   .query(async ({ ctx, input }) => {
-  //     const boards = await ctx.prisma.board.findMany({
-  //       where: { projectId: input?.projectId },
-  //     })
-  //     return boards
-  //   }),
+  editUsers: protectedProcedure
+    .input(z.object({ projectId: z.string(), invites: z.array(z.string()) }))
+    .mutation(async ({ ctx, input }) => {
+      const invitedUsers = await ctx.prisma.user.findMany({
+        where: { name: { in: input.invites } },
+      })
+      const project = await ctx.prisma.project.update({
+        where: { id: input.projectId },
+        data: {
+          invited_users: {
+            set: invitedUsers
+              .filter((user) => user.id !== ctx.session.user.id)
+              .map((user) => ({ id: user.id })),
+          },
+        },
+      })
+      return project
+    }),
   delete: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.project.deleteMany()
   }),

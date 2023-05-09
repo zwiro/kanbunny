@@ -1,8 +1,8 @@
 import { useState } from "react"
 
-function useInviteUser() {
+function useInviteUser(initialState: string[] = []) {
   const [user, setUser] = useState<string>("")
-  const [invitedUsers, setInvitedUsers] = useState<string[]>([])
+  const [invitedUsers, setInvitedUsers] = useState<string[]>(initialState)
 
   const inviteUser = (e: React.MouseEvent) => {
     e.preventDefault()

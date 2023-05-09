@@ -5,16 +5,16 @@ import MenuButton from "./MenuButton"
 import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
-import AddProjectModal from "./AddProjectModal"
+import AddProjectModal, { projectSchema } from "./AddProjectModal"
 import useClickOutside from "@/hooks/useClickOutside"
-import { useContext, useRef, useState } from "react"
+import React, { FormEventHandler, useContext, useRef, useState } from "react"
 import LayoutContext from "@/context/LayoutContext"
 import ColorPicker from "./ColorPicker"
 import TextInput from "./TextInput"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useInviteUser from "@/hooks/useInviteUser"
 import { trpc } from "@/utils/trpc"
-import { Board, Prisma, Project } from "@prisma/client"
+import { Board, Prisma, Project, User } from "@prisma/client"
 import { LoadingDots } from "./LoadingDots"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -45,19 +45,20 @@ function SideMenu() {
         ) : (
           <LoadingDots />
         )}
-        {userProjects.data?.length ? (
-          userProjects.data
-            ?.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
-            .map((project) => (
-              <Project
-                key={project.id}
-                project={project}
-                boards={project.boards}
-              />
-            ))
-        ) : (
-          <p className="text-netural-500 text-center">no projects yet</p>
-        )}
+        {userProjects.data?.length
+          ? userProjects.data
+              ?.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
+              .map((project) => (
+                <Project
+                  key={project.id}
+                  project={project}
+                  boards={project.boards}
+                  invites={project.invited_users}
+                />
+              ))
+          : !userProjects.isLoading && (
+              <p className="text-netural-500 text-center">no projects yet</p>
+            )}
       </motion.aside>
       <AnimatePresence>
         {isAdding && <AddProjectModal close={closeAdd} />}
@@ -69,6 +70,7 @@ function SideMenu() {
 interface ProjectProps {
   project: Project
   boards: Board[]
+  invites: User[]
 }
 
 export const boardSchema = z.object({
@@ -76,32 +78,41 @@ export const boardSchema = z.object({
   projectId: z.string(),
 })
 
-function Project({ project, boards }: ProjectProps) {
+function Project({ project, boards, invites }: ProjectProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
   const { user, invitedUsers, inviteUser, removeUser, handleChange } =
-    useInviteUser()
-
-  const createBoard = trpc.project.createBoard.useMutation({
-    onSuccess() {
-      utils.project.invalidate()
-      closeAdd()
-    },
-  })
-
-  // handle adding board - disable button and and spinner
-
-  type BoardSchema = z.infer<typeof boardSchema>
-
+    useInviteUser([...invites.map((user) => user.name!)])
   const methods = useForm<BoardSchema>({
     defaultValues: { projectId: project.id },
     resolver: zodResolver(boardSchema),
   })
 
+  const createBoard = trpc.project.createBoard.useMutation({
+    onSuccess() {
+      utils.project.invalidate()
+      closeAdd()
+      methods.reset()
+    },
+  })
+
+  type BoardSchema = z.infer<typeof boardSchema>
+
+  const updateUsers = trpc.project.editUsers.useMutation({
+    onSuccess() {
+      utils.project.invalidate()
+    },
+  })
+
   const utils = trpc.useContext()
   const onSubmit: SubmitHandler<BoardSchema> = (data: any) => {
     createBoard.mutate({ name: data.name, projectId: project.id })
+  }
+
+  const handleSubmitUsers = (e: React.FormEvent) => {
+    e.preventDefault()
+    updateUsers.mutate({ projectId: project.id, invites: invitedUsers })
   }
 
   const projectUsersAnimation = {
@@ -117,7 +128,7 @@ function Project({ project, boards }: ProjectProps) {
           <p>{project.name}</p>
           <MenuButton>
             <MenuItem handleClick={add}>add board</MenuItem>
-            <MenuItem handleClick={editUsers}>add user</MenuItem>
+            <MenuItem handleClick={editUsers}>edit users</MenuItem>
             <MenuItem handleClick={editName}>edit project name</MenuItem>
             <MenuItem>delete project</MenuItem>
           </MenuButton>
@@ -137,36 +148,49 @@ function Project({ project, boards }: ProjectProps) {
             {...projectUsersAnimation}
             className="flex flex-col gap-2 pt-4 text-base"
           >
-            <form className="flex items-center gap-2">
-              <TextInput name="users" placeholder="johndoe21" />
-              <button onClick={inviteUser} className="group">
-                <PlusIcon />
-              </button>
-            </form>
-            <p>invited ({invitedUsers.length})</p>
-            <ul className="flex flex-wrap gap-2">
-              {invitedUsers.map((user, i) => (
-                <li
-                  key={`${user}-${i}`}
-                  onClick={() => removeUser(user)}
-                  className="border border-zinc-900 p-2"
+            <form onSubmit={handleSubmitUsers} className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <input
+                  id="user"
+                  type="text"
+                  placeholder="johndoe211"
+                  className={`w-44 border bg-zinc-900 p-1 text-xl`}
+                  value={user}
+                  onChange={handleChange}
+                />
+                <button onClick={inviteUser} className="group">
+                  <PlusIcon />
+                </button>
+              </div>
+              <p>invited ({invitedUsers.length})</p>
+              <ul className="flex flex-wrap gap-2">
+                {invitedUsers.map((user, i) => (
+                  <li
+                    key={`${user}-${i}`}
+                    onClick={() => removeUser(user)}
+                    className="cursor-pointer border border-zinc-900 bg-zinc-900 p-2 transition-colors hover:bg-transparent"
+                  >
+                    {user}
+                  </li>
+                ))}
+              </ul>
+              <div className="flex items-center gap-1">
+                <button
+                  type="submit"
+                  // disabled={!invitedUsers.length}
+                  className={`transition-transform hover:scale-110 disabled:hover:scale-100`}
                 >
-                  {user}
-                </li>
-              ))}
-            </ul>
-            <div className="flex items-center gap-1">
-              <button className="ml-auto transition-transform hover:scale-110">
-                <AiOutlineCheck size={20} />
-              </button>
-              <button
-                type="button"
-                onClick={closeEditUsers}
-                className="transition-transform hover:scale-110"
-              >
-                <AiOutlineClose size={20} />
-              </button>
-            </div>
+                  <AiOutlineCheck size={24} />
+                </button>
+                <button
+                  type="button"
+                  onClick={closeEditUsers}
+                  className="transition-transform hover:scale-110"
+                >
+                  <AiOutlineClose size={24} />
+                </button>
+              </div>
+            </form>
           </motion.div>
         )}
       </AnimatePresence>
@@ -181,6 +205,7 @@ function Project({ project, boards }: ProjectProps) {
                   placeholder="board name"
                   handleSubmit={methods.handleSubmit(onSubmit)}
                   close={closeAdd}
+                  isLoading={createBoard.isLoading}
                 />
               </FormProvider>
             </div>
@@ -192,7 +217,7 @@ function Project({ project, boards }: ProjectProps) {
           </>
         )}
         {boards.length ? (
-          boards.map((board: Board) => <Board key={board.id} {...board} />)
+          boards.map((board) => <Board key={board.id} {...board} />)
         ) : (
           <p className="text-base font-bold text-neutral-500">no boards yet</p>
         )}
@@ -214,7 +239,7 @@ function Board({ name, color }: BoardProps) {
     <li className="group flex items-center gap-2 text-xl">
       <div
         onClick={editColor}
-        className={`relative h-4 w-4 rounded-full bg-[#${color}]`}
+        className={`relative h-4 w-4 rounded-full bg-${color}-500`}
       >
         <AnimatePresence>
           {isEditingColor && <ColorPicker close={closeEditColor} />}

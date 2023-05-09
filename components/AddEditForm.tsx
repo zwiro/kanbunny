@@ -10,6 +10,7 @@ import { z } from "zod"
 import { trpc } from "@/utils/trpc"
 import { zodResolver } from "@hookform/resolvers/zod"
 import FormFieldContainer from "./FormFieldContainer"
+import { LoadingDots } from "./LoadingDots"
 
 interface AddEditFormProps {
   name: string
@@ -17,6 +18,7 @@ interface AddEditFormProps {
   close: () => void
   projectId?: string
   handleSubmit?: SubmitHandler<any>
+  isLoading?: boolean
 }
 
 function AddEditForm({
@@ -24,28 +26,35 @@ function AddEditForm({
   placeholder,
   close,
   handleSubmit,
+  isLoading,
 }: AddEditFormProps) {
   const { reset } = useFormContext()
 
   return (
     <form onSubmit={handleSubmit} className="flex items-center gap-1">
       <TextInput name={name} placeholder={placeholder} />
-      <button
-        type="submit"
-        className="ml-auto transition-transform hover:scale-110"
-      >
-        <AiOutlineCheck size={20} />
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          reset({ name: "" })
-          close()
-        }}
-        className="transition-transform hover:scale-110"
-      >
-        <AiOutlineClose size={20} />
-      </button>
+      {!isLoading ? (
+        <>
+          <button
+            type="submit"
+            className="ml-auto transition-transform hover:scale-110"
+          >
+            <AiOutlineCheck size={20} />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              reset({ name: "" })
+              close()
+            }}
+            className="transition-transform hover:scale-110"
+          >
+            <AiOutlineClose size={20} />
+          </button>
+        </>
+      ) : (
+        <LoadingDots />
+      )}
     </form>
   )
 }
