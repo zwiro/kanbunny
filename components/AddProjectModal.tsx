@@ -45,7 +45,10 @@ function AddProjectModal({ close }: AddProjectModalProps) {
   })
 
   const onSubmit: SubmitHandler<ProjectSchema> = (data: any) => {
-    createProject.mutate({ name: data.name, invited_users: invitedUsers })
+    createProject.mutate({
+      name: data.name,
+      invited_users: invitedUsers,
+    })
   }
 
   return (

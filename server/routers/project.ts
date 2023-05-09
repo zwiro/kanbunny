@@ -7,7 +7,7 @@ export const projectRouter = createTRPCRouter({
   user: protectedProcedure.query(async ({ ctx }) => {
     const projects = await ctx.prisma.project.findMany({
       where: { users: { some: { id: ctx.session.user.id } } },
-      include: { boards: true, invited_users: true },
+      include: { boards: true, users: true, invited_users: true },
     })
     return projects
   }),
@@ -40,10 +40,12 @@ export const projectRouter = createTRPCRouter({
       return board
     }),
   editUsers: protectedProcedure
-    .input(z.object({ projectId: z.string(), invites: z.array(z.string()) }))
+    .input(
+      z.object({ projectId: z.string(), participants: z.array(z.string()) })
+    )
     .mutation(async ({ ctx, input }) => {
       const invitedUsers = await ctx.prisma.user.findMany({
-        where: { name: { in: input.invites } },
+        where: { name: { in: input.participants } },
       })
       const project = await ctx.prisma.project.update({
         where: { id: input.projectId },
@@ -53,6 +55,21 @@ export const projectRouter = createTRPCRouter({
               .filter((user) => user.id !== ctx.session.user.id)
               .map((user) => ({ id: user.id })),
           },
+        },
+      })
+      return project
+    }),
+  editName: protectedProcedure
+    .input(
+      projectSchema
+        .omit({ invited_users: true })
+        .extend({ projectId: z.string() })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const project = await ctx.prisma.project.update({
+        where: { id: input.projectId },
+        data: {
+          name: input.name,
         },
       })
       return project

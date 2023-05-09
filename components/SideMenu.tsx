@@ -19,6 +19,7 @@ import { LoadingDots } from "./LoadingDots"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { useSession } from "next-auth/react"
 
 function SideMenu() {
   const [isAdding, add, closeAdd] = useAddOrEdit()
@@ -30,6 +31,8 @@ function SideMenu() {
   }
 
   const userProjects = trpc.project.user.useQuery()
+
+  const { data: session, status } = useSession()
 
   return (
     <>
@@ -53,7 +56,12 @@ function SideMenu() {
                   key={project.id}
                   project={project}
                   boards={project.boards}
-                  invites={project.invited_users}
+                  participants={[
+                    ...project.invited_users,
+                    ...project.users.filter(
+                      (user) => user.id !== session?.user.id
+                    ),
+                  ]}
                 />
               ))
           : !userProjects.isLoading && (
@@ -70,15 +78,15 @@ function SideMenu() {
 interface ProjectProps {
   project: Project
   boards: Board[]
-  invites: User[]
+  participants: User[]
 }
 
 export const boardSchema = z.object({
-  name: z.string().min(1, { message: "board name is required" }),
+  name: z.string().min(1, { message: "name is required" }),
   projectId: z.string(),
 })
 
-function Project({ project, boards, invites }: ProjectProps) {
+function Project({ project, boards, participants }: ProjectProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
@@ -89,9 +97,15 @@ function Project({ project, boards, invites }: ProjectProps) {
     removeUser,
     handleChange,
     resetUsers,
-  } = useInviteUser([...invites.map((user) => user.name!)])
-  const methods = useForm<BoardSchema>({
+  } = useInviteUser([...participants.map((user) => user.name!)])
+
+  const boardMethods = useForm<BoardSchema>({
     defaultValues: { projectId: project.id },
+    resolver: zodResolver(boardSchema),
+  })
+
+  const projectMethods = useForm<BoardSchema>({
+    defaultValues: { projectId: project.id, name: project.name },
     resolver: zodResolver(boardSchema),
   })
 
@@ -99,7 +113,7 @@ function Project({ project, boards, invites }: ProjectProps) {
     onSuccess() {
       utils.project.invalidate()
       closeAdd()
-      methods.reset()
+      boardMethods.reset()
     },
   })
 
@@ -112,6 +126,13 @@ function Project({ project, boards, invites }: ProjectProps) {
     },
   })
 
+  const updateName = trpc.project.editName.useMutation({
+    onSuccess() {
+      utils.project.invalidate()
+      closeEditName()
+    },
+  })
+
   const utils = trpc.useContext()
   const onSubmit: SubmitHandler<BoardSchema> = (data: any) => {
     createBoard.mutate({ name: data.name, projectId: project.id })
@@ -119,7 +140,11 @@ function Project({ project, boards, invites }: ProjectProps) {
 
   const handleSubmitUsers = (e: React.FormEvent) => {
     e.preventDefault()
-    updateUsers.mutate({ projectId: project.id, invites: invitedUsers })
+    updateUsers.mutate({ projectId: project.id, participants: invitedUsers })
+  }
+
+  const onSubmitName: SubmitHandler<BoardSchema> = (data: any) => {
+    updateName.mutate({ name: data.name, projectId: project.id })
   }
 
   const projectUsersAnimation = {
@@ -142,11 +167,20 @@ function Project({ project, boards, invites }: ProjectProps) {
         </div>
       ) : (
         <div className="pt-1.5">
-          <AddEditForm
-            name="project-name"
-            placeholder="project name"
-            close={closeEditName}
-          />
+          <FormProvider {...projectMethods}>
+            <AddEditForm
+              name="name"
+              placeholder="project name"
+              handleSubmit={projectMethods.handleSubmit(onSubmitName)}
+              defaultValue={project.name}
+              close={closeEditName}
+            />
+          </FormProvider>
+          {projectMethods.formState.errors && (
+            <p role="alert" className="text-base text-red-500">
+              {projectMethods.formState.errors?.name?.message as string}
+            </p>
+          )}
         </div>
       )}
       <AnimatePresence>
@@ -169,7 +203,7 @@ function Project({ project, boards, invites }: ProjectProps) {
                   <PlusIcon />
                 </button>
               </div>
-              <p>invited ({invitedUsers.length})</p>
+              <p>invited or participating ({invitedUsers.length})</p>
               <ul className="flex flex-wrap gap-2">
                 {invitedUsers.map((user, i) => (
                   <li
@@ -186,8 +220,7 @@ function Project({ project, boards, invites }: ProjectProps) {
                   <>
                     <button
                       type="submit"
-                      disabled={!invitedUsers.length}
-                      className={`transition-transform hover:scale-110 disabled:hover:scale-100`}
+                      className="transition-transform hover:scale-110 disabled:hover:scale-100"
                     >
                       <AiOutlineCheck size={24} />
                     </button>
@@ -214,19 +247,19 @@ function Project({ project, boards, invites }: ProjectProps) {
           <>
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 rounded-full bg-red-500" />
-              <FormProvider {...methods}>
+              <FormProvider {...boardMethods}>
                 <AddEditForm
                   name="name"
                   placeholder="board name"
-                  handleSubmit={methods.handleSubmit(onSubmit)}
+                  handleSubmit={boardMethods.handleSubmit(onSubmit)}
                   close={closeAdd}
                   isLoading={createBoard.isLoading}
                 />
               </FormProvider>
             </div>
-            {methods.formState.errors && (
+            {boardMethods.formState.errors && (
               <p role="alert" className="pl-6 text-base text-red-500">
-                {methods.formState.errors?.name?.message as string}
+                {boardMethods.formState.errors?.name?.message as string}
               </p>
             )}
           </>

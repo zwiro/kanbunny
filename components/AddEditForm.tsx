@@ -19,6 +19,7 @@ interface AddEditFormProps {
   projectId?: string
   handleSubmit?: SubmitHandler<any>
   isLoading?: boolean
+  defaultValue?: string
 }
 
 function AddEditForm({
@@ -27,24 +28,29 @@ function AddEditForm({
   close,
   handleSubmit,
   isLoading,
+  defaultValue,
 }: AddEditFormProps) {
   const { reset } = useFormContext()
 
   return (
     <form onSubmit={handleSubmit} className="flex items-center gap-1">
-      <TextInput name={name} placeholder={placeholder} />
+      <TextInput
+        name={name}
+        placeholder={placeholder}
+        defaultValue={defaultValue}
+      />
       {!isLoading ? (
         <>
           <button
             type="submit"
-            className="ml-auto transition-transform hover:scale-110"
+            className="transition-transform hover:scale-110"
           >
             <AiOutlineCheck size={20} />
           </button>
           <button
             type="button"
             onClick={() => {
-              reset({ name: "" })
+              reset({}, { keepDefaultValues: true })
               close()
             }}
             className="transition-transform hover:scale-110"
