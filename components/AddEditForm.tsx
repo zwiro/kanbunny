@@ -59,7 +59,9 @@ function AddEditForm({
           </button>
         </>
       ) : (
-        <LoadingDots />
+        <div className="mr-auto">
+          <LoadingDots />
+        </div>
       )}
     </form>
   )

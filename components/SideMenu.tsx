@@ -173,6 +173,7 @@ function Project({ project, boards, participants }: ProjectProps) {
               placeholder="project name"
               handleSubmit={projectMethods.handleSubmit(onSubmitName)}
               defaultValue={project.name}
+              isLoading={updateName.isLoading}
               close={closeEditName}
             />
           </FormProvider>
