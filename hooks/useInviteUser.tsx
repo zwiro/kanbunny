@@ -22,7 +22,18 @@ function useInviteUser(initialState: string[] = []) {
     setUser(e.target.value)
   }
 
-  return { user, invitedUsers, inviteUser, removeUser, handleChange }
+  const resetUsers = () => {
+    setInvitedUsers([])
+  }
+
+  return {
+    user,
+    invitedUsers,
+    inviteUser,
+    removeUser,
+    handleChange,
+    resetUsers,
+  }
 }
 
 export default useInviteUser

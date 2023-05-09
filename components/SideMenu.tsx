@@ -82,8 +82,14 @@ function Project({ project, boards, invites }: ProjectProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
-  const { user, invitedUsers, inviteUser, removeUser, handleChange } =
-    useInviteUser([...invites.map((user) => user.name!)])
+  const {
+    user,
+    invitedUsers,
+    inviteUser,
+    removeUser,
+    handleChange,
+    resetUsers,
+  } = useInviteUser([...invites.map((user) => user.name!)])
   const methods = useForm<BoardSchema>({
     defaultValues: { projectId: project.id },
     resolver: zodResolver(boardSchema),
@@ -102,6 +108,7 @@ function Project({ project, boards, invites }: ProjectProps) {
   const updateUsers = trpc.project.editUsers.useMutation({
     onSuccess() {
       utils.project.invalidate()
+      resetUsers()
     },
   })
 
@@ -175,20 +182,28 @@ function Project({ project, boards, invites }: ProjectProps) {
                 ))}
               </ul>
               <div className="flex items-center gap-1">
-                <button
-                  type="submit"
-                  // disabled={!invitedUsers.length}
-                  className={`transition-transform hover:scale-110 disabled:hover:scale-100`}
-                >
-                  <AiOutlineCheck size={24} />
-                </button>
-                <button
-                  type="button"
-                  onClick={closeEditUsers}
-                  className="transition-transform hover:scale-110"
-                >
-                  <AiOutlineClose size={24} />
-                </button>
+                {!updateUsers.isLoading ? (
+                  <>
+                    <button
+                      type="submit"
+                      disabled={!invitedUsers.length}
+                      className={`transition-transform hover:scale-110 disabled:hover:scale-100`}
+                    >
+                      <AiOutlineCheck size={24} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={closeEditUsers}
+                      className="transition-transform hover:scale-110"
+                    >
+                      <AiOutlineClose size={24} />
+                    </button>
+                  </>
+                ) : (
+                  <div className="mr-auto h-6">
+                    <LoadingDots />
+                  </div>
+                )}
               </div>
             </form>
           </motion.div>
