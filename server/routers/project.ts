@@ -44,14 +44,32 @@ export const projectRouter = createTRPCRouter({
       z.object({ projectId: z.string(), participants: z.array(z.string()) })
     )
     .mutation(async ({ ctx, input }) => {
+      const participatingUsers = await ctx.prisma.user.findMany({
+        where: {
+          AND: [
+            { projects_in: { some: { id: { in: input.projectId } } } },
+            { name: { in: input.participants } },
+          ],
+        },
+      })
       const invitedUsers = await ctx.prisma.user.findMany({
-        where: { name: { in: input.participants } },
+        where: {
+          AND: [
+            { projects_in: { none: { id: { in: input.projectId } } } },
+            { name: { in: input.participants } },
+          ],
+        },
       })
       const project = await ctx.prisma.project.update({
         where: { id: input.projectId },
         data: {
           invited_users: {
             set: invitedUsers
+              .filter((user) => user.id !== ctx.session.user.id)
+              .map((user) => ({ id: user.id })),
+          },
+          users: {
+            disconnect: participatingUsers
               .filter((user) => user.id !== ctx.session.user.id)
               .map((user) => ({ id: user.id })),
           },

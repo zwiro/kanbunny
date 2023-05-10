@@ -51,7 +51,7 @@ function AddTaskModal({ close }: AddTaskModalProps) {
           className="w-fit"
         />
       </FormFieldContainer>
-      <AddButton handleClick={close}>
+      <AddButton onClick={close}>
         add task <PlusIcon />
       </AddButton>
     </ModalForm>

@@ -26,6 +26,10 @@ function useInviteUser(initialState: string[] = []) {
     setInvitedUsers([])
   }
 
+  const setUsers = (users: string[]) => {
+    setInvitedUsers(users)
+  }
+
   return {
     user,
     invitedUsers,
@@ -33,6 +37,7 @@ function useInviteUser(initialState: string[] = []) {
     removeUser,
     handleChange,
     resetUsers,
+    setUsers,
   }
 }
 

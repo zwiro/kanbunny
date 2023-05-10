@@ -75,7 +75,7 @@ export default function Home() {
             />
           </ListContainer>
         ) : (
-          <AddButton handleClick={add}>
+          <AddButton onClick={add}>
             new list <PlusIcon />
           </AddButton>
         )}

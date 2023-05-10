@@ -91,7 +91,7 @@ function AddProjectModal({ close }: AddProjectModalProps) {
             ))}
           </ul>
         </FormFieldContainer>
-        <AddButton isLoading={createProject.isLoading}>
+        <AddButton disabled={createProject.isLoading}>
           add project
           <div className={`${createProject.isLoading && "animate-spin"}`}>
             <PlusIcon />

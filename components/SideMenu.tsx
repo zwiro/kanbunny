@@ -42,7 +42,7 @@ function SideMenu() {
         className="fixed bottom-0 left-0 top-16 w-11/12 overflow-y-scroll bg-zinc-800 px-24 py-8 text-2xl lg:px-36 lg:text-3xl [&>button]:my-0"
       >
         {!userProjects.isLoading ? (
-          <AddButton handleClick={add}>
+          <AddButton onClick={add}>
             new project <PlusIcon />
           </AddButton>
         ) : (
@@ -97,6 +97,7 @@ function Project({ project, boards, participants }: ProjectProps) {
     removeUser,
     handleChange,
     resetUsers,
+    setUsers,
   } = useInviteUser([...participants.map((user) => user.name!)])
 
   const boardMethods = useForm<BoardSchema>({
@@ -122,7 +123,6 @@ function Project({ project, boards, participants }: ProjectProps) {
   const updateUsers = trpc.project.editUsers.useMutation({
     onSuccess() {
       utils.project.invalidate()
-      resetUsers()
     },
   })
 
