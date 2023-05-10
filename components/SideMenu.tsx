@@ -113,7 +113,22 @@ function Project({ project, boards, participants }: ProjectProps) {
   })
 
   const createBoard = trpc.board.create.useMutation({
-    onSuccess() {
+    async onMutate(newBoard) {
+      await utils.project.user.cancel()
+      const prevData = utils.project.user.getData()
+      utils.project.user.setData(undefined, (old) =>
+        old?.map((p) =>
+          p.id === newBoard.projectId
+            ? { ...p, boards: [...p.boards, newBoard as Board] }
+            : p
+        )
+      )
+      return { prevData }
+    },
+    onError(err, newBoard, ctx) {
+      utils.project.user.setData(undefined, ctx?.prevData)
+    },
+    onSettled() {
       utils.project.user.invalidate()
       closeAdd()
       boardMethods.reset()
@@ -127,14 +142,40 @@ function Project({ project, boards, participants }: ProjectProps) {
   })
 
   const updateName = trpc.project.editName.useMutation({
-    onSuccess() {
+    async onMutate(updatedProject) {
+      await utils.project.user.cancel()
+      const prevData = utils.project.user.getData()
+      utils.project.user.setData(undefined, (old) =>
+        old?.map((p) =>
+          p.id === updatedProject.projectId
+            ? { ...p, name: updatedProject.name }
+            : p
+        )
+      )
+      return { prevData }
+    },
+    onError(err, updatedProject, ctx) {
+      utils.project.user.setData(undefined, ctx?.prevData)
+    },
+    onSettled() {
       utils.project.user.invalidate()
       closeEditName()
     },
   })
 
   const deleteProject = trpc.project.delete.useMutation({
-    onSuccess() {
+    async onMutate(deletedProjectId) {
+      await utils.project.user.cancel()
+      const prevData = utils.project.user.getData()
+      utils.project.user.setData(undefined, (old) =>
+        old?.filter((p) => p.id !== deletedProjectId)
+      )
+      return { prevData }
+    },
+    onError(err, newProjects, ctx) {
+      utils.project.user.setData(undefined, ctx?.prevData)
+    },
+    onSettled() {
       utils.project.user.invalidate()
     },
   })
@@ -297,13 +338,53 @@ function Board({ name, color, id, projectId }: BoardProps) {
   const utils = trpc.useContext()
 
   const deleteBoard = trpc.board.delete.useMutation({
-    onSuccess() {
+    async onMutate(deletedBoardId) {
+      await utils.project.user.cancel()
+      const prevData = utils.project.user.getData()
+      utils.project.user.setData(undefined, (old) =>
+        old?.map((p) =>
+          p.id === projectId
+            ? {
+                ...p,
+                boards: p.boards.filter((b) => b.id !== deletedBoardId),
+              }
+            : p
+        )
+      )
+      return { prevData }
+    },
+    onError(err, updatedBoard, ctx) {
+      utils.project.user.setData(undefined, ctx?.prevData)
+    },
+    onSettled() {
       utils.project.user.invalidate()
     },
   })
 
   const updateName = trpc.board.editName.useMutation({
-    onSuccess() {
+    async onMutate(updatedBoard) {
+      await utils.project.user.cancel()
+      const prevData = utils.project.user.getData()
+      utils.project.user.setData(undefined, (old) =>
+        old?.map((p) =>
+          p.id === projectId
+            ? {
+                ...p,
+                boards: p.boards.map((b) =>
+                  b.id === updatedBoard.id
+                    ? { ...b, name: updatedBoard.name }
+                    : b
+                ),
+              }
+            : p
+        )
+      )
+      return { prevData }
+    },
+    onError(err, updatedBoard, ctx) {
+      utils.project.user.setData(undefined, ctx?.prevData)
+    },
+    onSettled() {
       utils.project.user.invalidate()
       closeEditName()
     },
