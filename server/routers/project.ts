@@ -95,6 +95,23 @@ export const projectRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
+      const users = await ctx.prisma.user.findMany({
+        where: {
+          OR: [
+            { projects_in: { some: { id: input } } },
+            { invites: { some: { id: input } } },
+          ],
+        },
+      })
+      users.map(async (user) => {
+        await ctx.prisma.user.update({
+          where: { id: user.id },
+          data: {
+            projects_in: { disconnect: { id: input } },
+            invites: { disconnect: { id: input } },
+          },
+        })
+      })
       return await ctx.prisma.project.delete({
         where: { id: input },
       })
