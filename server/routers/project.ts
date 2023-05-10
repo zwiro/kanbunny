@@ -12,6 +12,14 @@ export const projectRouter = createTRPCRouter({
     })
     return projects
   }),
+  getById: protectedProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: input },
+      })
+      return project
+    }),
   create: protectedProcedure
     .input(projectSchema)
     .mutation(async ({ ctx, input }) => {
@@ -31,14 +39,6 @@ export const projectRouter = createTRPCRouter({
         },
       })
       return project
-    }),
-  createBoard: protectedProcedure
-    .input(boardSchema)
-    .mutation(async ({ ctx, input }) => {
-      const board = await ctx.prisma.board.create({
-        data: input,
-      })
-      return board
     }),
   editUsers: protectedProcedure
     .input(
@@ -92,17 +92,6 @@ export const projectRouter = createTRPCRouter({
         },
       })
       return project
-    }),
-  editColor: protectedProcedure
-    .input(colorSchema)
-    .mutation(async ({ ctx, input }) => {
-      const board = await ctx.prisma.board.update({
-        where: { id: input.id },
-        data: {
-          color: input.color,
-        },
-      })
-      return board
     }),
   delete: protectedProcedure
     .input(z.string())

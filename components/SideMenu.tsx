@@ -110,9 +110,9 @@ function Project({ project, boards, participants }: ProjectProps) {
     resolver: zodResolver(boardSchema),
   })
 
-  const createBoard = trpc.project.createBoard.useMutation({
+  const createBoard = trpc.board.create.useMutation({
     onSuccess() {
-      utils.project.invalidate()
+      utils.project.user.invalidate()
       closeAdd()
       boardMethods.reset()
     },
@@ -122,20 +122,20 @@ function Project({ project, boards, participants }: ProjectProps) {
 
   const updateUsers = trpc.project.editUsers.useMutation({
     onSuccess() {
-      utils.project.invalidate()
+      utils.project.user.invalidate()
     },
   })
 
   const updateName = trpc.project.editName.useMutation({
     onSuccess() {
-      utils.project.invalidate()
+      utils.project.user.invalidate()
       closeEditName()
     },
   })
 
   const deleteProject = trpc.project.delete.useMutation({
     onSuccess() {
-      utils.project.invalidate()
+      utils.project.user.invalidate()
     },
   })
 
@@ -287,9 +287,10 @@ interface BoardProps {
   name: string
   color: string
   id: string
+  projectId: string
 }
 
-function Board({ name, color, id }: BoardProps) {
+function Board({ name, color, id, projectId }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
 
@@ -300,7 +301,9 @@ function Board({ name, color, id }: BoardProps) {
         className={`relative h-4 w-4 cursor-pointer rounded-full bg-${color}-500`}
       >
         <AnimatePresence>
-          {isEditingColor && <ColorPicker id={id} close={closeEditColor} />}
+          {isEditingColor && (
+            <ColorPicker id={id} projectId={projectId} close={closeEditColor} />
+          )}
         </AnimatePresence>
       </div>
       {!isEditingName ? (
