@@ -294,6 +294,14 @@ function Board({ name, color, id, projectId }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
 
+  const utils = trpc.useContext()
+
+  const deleteBoard = trpc.board.delete.useMutation({
+    onSuccess() {
+      utils.project.user.invalidate()
+    },
+  })
+
   return (
     <li className="group flex items-center gap-2 text-xl">
       <div
@@ -308,7 +316,7 @@ function Board({ name, color, id, projectId }: BoardProps) {
       </div>
       {!isEditingName ? (
         <>
-          <p>{name}</p>
+          <p>{!deleteBoard.isLoading ? name : <LoadingDots />}</p>
           <div
             className={`z-10 scale-0 transition-transform ${
               isEditingColor ? "group-hover:scale-0" : "group-hover:scale-100"
@@ -317,7 +325,9 @@ function Board({ name, color, id, projectId }: BoardProps) {
             <MenuButton>
               <MenuItem handleClick={editName}>edit board name</MenuItem>
               <MenuItem handleClick={editColor}>change color</MenuItem>
-              <MenuItem>delete board</MenuItem>
+              <MenuItem handleClick={() => deleteBoard.mutate(id)}>
+                delete board
+              </MenuItem>
             </MenuButton>
           </div>
         </>

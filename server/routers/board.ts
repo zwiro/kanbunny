@@ -24,4 +24,12 @@ export const boardRouter = createTRPCRouter({
       })
       return board
     }),
+  delete: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const board = await ctx.prisma.board.delete({
+        where: { id: input },
+      })
+      return board
+    }),
 })
