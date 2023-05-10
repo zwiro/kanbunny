@@ -286,9 +286,10 @@ function Project({ project, boards, participants }: ProjectProps) {
 interface BoardProps {
   name: string
   color: string
+  id: string
 }
 
-function Board({ name, color }: BoardProps) {
+function Board({ name, color, id }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
 
@@ -296,10 +297,10 @@ function Board({ name, color }: BoardProps) {
     <li className="group flex items-center gap-2 text-xl">
       <div
         onClick={editColor}
-        className={`relative h-4 w-4 rounded-full bg-${color}-500`}
+        className={`relative h-4 w-4 cursor-pointer rounded-full bg-${color}-500`}
       >
         <AnimatePresence>
-          {isEditingColor && <ColorPicker close={closeEditColor} />}
+          {isEditingColor && <ColorPicker id={id} close={closeEditColor} />}
         </AnimatePresence>
       </div>
       {!isEditingName ? (

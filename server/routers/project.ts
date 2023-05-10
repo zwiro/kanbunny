@@ -2,6 +2,7 @@ import { z } from "zod"
 import { protectedProcedure, publicProcedure, createTRPCRouter } from "../trpc"
 import { projectSchema } from "@/components/AddProjectModal"
 import { boardSchema } from "@/components/SideMenu"
+import { colorSchema } from "@/components/ColorPicker"
 
 export const projectRouter = createTRPCRouter({
   user: protectedProcedure.query(async ({ ctx }) => {
@@ -91,6 +92,17 @@ export const projectRouter = createTRPCRouter({
         },
       })
       return project
+    }),
+  editColor: protectedProcedure
+    .input(colorSchema)
+    .mutation(async ({ ctx, input }) => {
+      const board = await ctx.prisma.board.update({
+        where: { id: input.id },
+        data: {
+          color: input.color,
+        },
+      })
+      return board
     }),
   delete: protectedProcedure
     .input(z.string())
