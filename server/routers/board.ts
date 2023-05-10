@@ -24,6 +24,17 @@ export const boardRouter = createTRPCRouter({
       })
       return board
     }),
+  editName: protectedProcedure
+    .input(boardSchema.extend({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const board = await ctx.prisma.board.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+        },
+      })
+      return board
+    }),
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {

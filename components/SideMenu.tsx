@@ -86,6 +86,8 @@ export const boardSchema = z.object({
   projectId: z.string(),
 })
 
+type BoardSchema = z.infer<typeof boardSchema>
+
 function Project({ project, boards, participants }: ProjectProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
@@ -117,8 +119,6 @@ function Project({ project, boards, participants }: ProjectProps) {
       boardMethods.reset()
     },
   })
-
-  type BoardSchema = z.infer<typeof boardSchema>
 
   const updateUsers = trpc.project.editUsers.useMutation({
     onSuccess() {
@@ -302,6 +302,22 @@ function Board({ name, color, id, projectId }: BoardProps) {
     },
   })
 
+  const updateName = trpc.board.editName.useMutation({
+    onSuccess() {
+      utils.project.user.invalidate()
+      closeEditName()
+    },
+  })
+
+  const boardMethods = useForm<BoardSchema & { id: string }>({
+    defaultValues: { name, id, projectId },
+    resolver: zodResolver(boardSchema.extend({ id: z.string() })),
+  })
+
+  const onSubmit: SubmitHandler<BoardSchema & { id: string }> = (data: any) => {
+    updateName.mutate({ name: data.name, id, projectId })
+  }
+
   return (
     <li className="group flex items-center gap-2 text-xl">
       <div
@@ -332,12 +348,21 @@ function Board({ name, color, id, projectId }: BoardProps) {
           </div>
         </>
       ) : (
-        <div className="">
-          <AddEditForm
-            name="board-name"
-            placeholder="board name"
-            close={closeEditName}
-          />
+        <div>
+          <FormProvider {...boardMethods}>
+            <AddEditForm
+              name="name"
+              placeholder="board name"
+              close={closeEditName}
+              handleSubmit={boardMethods.handleSubmit(onSubmit)}
+              isLoading={updateName.isLoading}
+            />
+          </FormProvider>
+          {boardMethods.formState.errors && (
+            <p role="alert" className="text-base text-red-500">
+              {boardMethods.formState.errors?.name?.message as string}
+            </p>
+          )}
         </div>
       )}
     </li>
