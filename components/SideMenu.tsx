@@ -133,6 +133,12 @@ function Project({ project, boards, participants }: ProjectProps) {
     },
   })
 
+  const deleteProject = trpc.project.delete.useMutation({
+    onSuccess() {
+      utils.project.invalidate()
+    },
+  })
+
   const utils = trpc.useContext()
   const onSubmit: SubmitHandler<BoardSchema> = (data: any) => {
     createBoard.mutate({ name: data.name, projectId: project.id })
@@ -157,12 +163,14 @@ function Project({ project, boards, participants }: ProjectProps) {
     <section className="my-4 border-b border-neutral-700">
       {!isEditingName ? (
         <div className="flex items-center gap-4">
-          <p>{project.name}</p>
+          <p>{!deleteProject.isLoading ? project.name : <LoadingDots />}</p>
           <MenuButton>
             <MenuItem handleClick={add}>add board</MenuItem>
             <MenuItem handleClick={editUsers}>edit users</MenuItem>
             <MenuItem handleClick={editName}>edit project name</MenuItem>
-            <MenuItem>delete project</MenuItem>
+            <MenuItem handleClick={() => deleteProject.mutate(project.id)}>
+              delete project
+            </MenuItem>
           </MenuButton>
         </div>
       ) : (
