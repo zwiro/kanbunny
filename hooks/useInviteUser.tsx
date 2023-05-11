@@ -22,12 +22,17 @@ function useInviteUser(initialState: string[] = []) {
     setUser(e.target.value)
   }
 
+  const setAllUsers = (state: string[]) => {
+    setInvitedUsers(state)
+  }
+
   return {
     user,
     invitedUsers,
     inviteUser,
     removeUser,
     handleChange,
+    setAllUsers,
   }
 }
 

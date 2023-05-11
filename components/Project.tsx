@@ -14,6 +14,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import Board from "./Boards"
+import { on } from "events"
 
 interface ProjectProps {
   project: Project
@@ -29,11 +30,23 @@ export const boardAndProjectSchema = z.object({
 type BoardAndProjectSchema = z.infer<typeof boardAndProjectSchema>
 
 function Project({ project, boards, participants }: ProjectProps) {
+  const users = trpc.project.getUsers.useQuery(project.id, {
+    onSuccess(data) {
+      setAllUsers(data?.map((user) => user.name!))
+    },
+  })
+
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
-  const { user, invitedUsers, inviteUser, removeUser, handleChange } =
-    useInviteUser([...participants.map((user) => user.name!)])
+  const {
+    user,
+    invitedUsers,
+    inviteUser,
+    removeUser,
+    handleChange,
+    setAllUsers,
+  } = useInviteUser()
 
   const boardMethods = useForm<BoardAndProjectSchema>({
     defaultValues: { projectId: project.id },
@@ -48,7 +61,8 @@ function Project({ project, boards, participants }: ProjectProps) {
 
   const updateUsers = trpc.project.editUsers.useMutation({
     onSuccess() {
-      utils.project.getByUser.invalidate()
+      utils.project.getUsers.invalidate()
+      // resetUsers([...participants.map((user) => user.name!)])
     },
   })
 
