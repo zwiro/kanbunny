@@ -1,13 +1,10 @@
 import PlusIcon from "./PlusIcon"
-import AddButton from "./AddButton"
 import { AnimatePresence, motion } from "framer-motion"
 import MenuButton from "./MenuButton"
 import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
-import AddProjectModal from "./AddProjectModal"
 import React from "react"
-import ColorPicker from "./ColorPicker"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useInviteUser from "@/hooks/useInviteUser"
 import { trpc } from "@/utils/trpc"
@@ -16,7 +13,6 @@ import { LoadingDots } from "./LoadingDots"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { useSession } from "next-auth/react"
 import Board from "./Boards"
 
 interface ProjectProps {
@@ -25,12 +21,12 @@ interface ProjectProps {
   participants: User[]
 }
 
-export const boardSchema = z.object({
+export const boardAndProjectSchema = z.object({
   name: z.string().min(1, { message: "name is required" }),
   projectId: z.string(),
 })
 
-type BoardSchema = z.infer<typeof boardSchema>
+type BoardAndProjectSchema = z.infer<typeof boardAndProjectSchema>
 
 function Project({ project, boards, participants }: ProjectProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
@@ -39,41 +35,16 @@ function Project({ project, boards, participants }: ProjectProps) {
   const { user, invitedUsers, inviteUser, removeUser, handleChange } =
     useInviteUser([...participants.map((user) => user.name!)])
 
-  const boardMethods = useForm<BoardSchema>({
+  const boardMethods = useForm<BoardAndProjectSchema>({
     defaultValues: { projectId: project.id },
-    resolver: zodResolver(boardSchema),
+    resolver: zodResolver(boardAndProjectSchema),
   })
-
-  const projectMethods = useForm<BoardSchema>({
+  const projectMethods = useForm<BoardAndProjectSchema>({
     defaultValues: { projectId: project.id, name: project.name },
-    resolver: zodResolver(boardSchema),
+    resolver: zodResolver(boardAndProjectSchema),
   })
 
-  const createBoard = trpc.board.create.useMutation({
-    async onMutate(newBoard) {
-      await utils.project.getByUser.cancel()
-      const prevData = utils.project.getByUser.getData()
-      utils.project.getByUser.setData(undefined, (old) =>
-        old?.map((p) =>
-          p.id === newBoard.projectId
-            ? {
-                ...p,
-                boards: [...p.boards, { ...newBoard, color: "red" } as Board],
-              }
-            : p
-        )
-      )
-      return { prevData }
-    },
-    onError(err, newBoard, ctx) {
-      utils.project.getByUser.setData(undefined, ctx?.prevData)
-    },
-    onSettled() {
-      utils.project.getByUser.invalidate()
-      closeAdd()
-      boardMethods.reset()
-    },
-  })
+  const utils = trpc.useContext()
 
   const updateUsers = trpc.project.editUsers.useMutation({
     onSuccess() {
@@ -120,18 +91,43 @@ function Project({ project, boards, participants }: ProjectProps) {
     },
   })
 
-  const utils = trpc.useContext()
-  const onSubmit: SubmitHandler<BoardSchema> = (data: any) => {
+  const createBoard = trpc.board.create.useMutation({
+    async onMutate(newBoard) {
+      await utils.project.getByUser.cancel()
+      const prevData = utils.project.getByUser.getData()
+      utils.project.getByUser.setData(undefined, (old) =>
+        old?.map((p) =>
+          p.id === newBoard.projectId
+            ? {
+                ...p,
+                boards: [...p.boards, { ...newBoard, color: "red" } as Board],
+              }
+            : p
+        )
+      )
+      return { prevData }
+    },
+    onError(err, newBoard, ctx) {
+      utils.project.getByUser.setData(undefined, ctx?.prevData)
+    },
+    onSettled() {
+      utils.project.getByUser.invalidate()
+      closeAdd()
+      boardMethods.reset()
+    },
+  })
+
+  const onSubmit: SubmitHandler<BoardAndProjectSchema> = (data: any) => {
     createBoard.mutate({ name: data.name, projectId: project.id })
+  }
+
+  const onSubmitName: SubmitHandler<BoardAndProjectSchema> = (data: any) => {
+    updateName.mutate({ name: data.name, projectId: project.id })
   }
 
   const handleSubmitUsers = (e: React.FormEvent) => {
     e.preventDefault()
     updateUsers.mutate({ projectId: project.id, participants: invitedUsers })
-  }
-
-  const onSubmitName: SubmitHandler<BoardSchema> = (data: any) => {
-    updateName.mutate({ name: data.name, projectId: project.id })
   }
 
   const projectUsersAnimation = {
@@ -144,7 +140,7 @@ function Project({ project, boards, participants }: ProjectProps) {
     <section className="my-4 border-b border-neutral-700">
       {!isEditingName ? (
         <div className="flex items-center gap-4">
-          <p>{!deleteProject.isLoading ? project.name : <LoadingDots />}</p>
+          <p>{project.name}</p>
           <MenuButton>
             <MenuItem handleClick={add}>add board</MenuItem>
             <MenuItem handleClick={editUsers}>edit users</MenuItem>
@@ -185,7 +181,7 @@ function Project({ project, boards, participants }: ProjectProps) {
                   id="user"
                   type="text"
                   placeholder="johndoe211"
-                  className={`w-44 border bg-zinc-900 p-1 text-xl`}
+                  className="w-44 border bg-zinc-900 p-1 text-xl"
                   value={user}
                   onChange={handleChange}
                 />

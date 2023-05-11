@@ -1,12 +1,12 @@
 import { z } from "zod"
 import { protectedProcedure, publicProcedure, createTRPCRouter } from "../trpc"
 import { projectSchema } from "@/components/AddProjectModal"
-import { boardSchema } from "@/components/Project"
+import { boardAndProjectSchema } from "@/components/Project"
 import { colorSchema } from "@/components/ColorPicker"
 
 export const boardRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(boardSchema)
+    .input(boardAndProjectSchema)
     .mutation(async ({ ctx, input }) => {
       const board = await ctx.prisma.board.create({
         data: input,
@@ -25,7 +25,7 @@ export const boardRouter = createTRPCRouter({
       return board
     }),
   editName: protectedProcedure
-    .input(boardSchema.extend({ id: z.string() }))
+    .input(boardAndProjectSchema.extend({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const board = await ctx.prisma.board.update({
         where: { id: input.id },
