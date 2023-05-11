@@ -14,6 +14,7 @@ import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import ListContainer from "@/components/ListContainer"
 import AddTaskModal from "@/components/AddTaskModal"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
+import { trpc } from "@/utils/trpc"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
@@ -23,6 +24,8 @@ export default function Home() {
   const { data: session, status } = useSession({
     required: true,
   })
+
+  const userProjects = trpc.project.getByUser.useQuery()
 
   const bgBlurAnimation = {
     initial: { backdropFilter: "blur(0px)" },
@@ -85,7 +88,10 @@ export default function Home() {
         {isSideMenuOpen && (
           <>
             <motion.div {...bgBlurAnimation} className="fixed inset-0" />
-            <SideMenu />
+            <SideMenu
+              data={userProjects.data}
+              isLoading={userProjects.isLoading}
+            />
           </>
         )}
       </AnimatePresence>

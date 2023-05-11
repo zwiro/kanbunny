@@ -8,13 +8,23 @@ import { trpc } from "@/utils/trpc"
 import { LoadingDots } from "./LoadingDots"
 import { useSession } from "next-auth/react"
 import Project from "./Project"
+import type { Board, User } from "@prisma/client"
 
-function SideMenu() {
+interface SideMenuProps {
+  data:
+    | (Project & {
+        boards: Board[]
+        invited_users: User[]
+        users: User[]
+      })[]
+    | undefined
+  isLoading: boolean
+}
+
+function SideMenu({ data, isLoading }: SideMenuProps) {
   const { data: session } = useSession()
 
   const [isAdding, add, closeAdd] = useAddOrEdit()
-
-  const userProjects = trpc.project.getByUser.useQuery()
 
   const sideMenuAnimation = {
     initial: { x: "-100vw" },
@@ -30,15 +40,15 @@ function SideMenu() {
         {...sideMenuAnimation}
         className="fixed bottom-0 left-0 top-16 w-11/12 overflow-y-scroll bg-zinc-800 px-24 py-8 text-2xl lg:px-36 lg:text-3xl [&>button]:my-0"
       >
-        {!userProjects.isLoading ? (
+        {!isLoading ? (
           <AddButton onClick={add}>
             new project <PlusIcon />
           </AddButton>
         ) : (
           <LoadingDots />
         )}
-        {!!userProjects.data?.length &&
-          userProjects.data?.map((project) => (
+        {!!data?.length &&
+          data?.map((project) => (
             <Project
               key={project.id}
               project={project}
@@ -49,7 +59,7 @@ function SideMenu() {
               ]}
             />
           ))}
-        {!userProjects.data?.length && !userProjects.isLoading && (
+        {!data?.length && !isLoading && (
           <p className="text-netural-500 text-center">no projects yet</p>
         )}
       </motion.aside>
