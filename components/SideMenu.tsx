@@ -10,11 +10,11 @@ import { useSession } from "next-auth/react"
 import Project from "./Project"
 
 function SideMenu() {
+  const { data: session } = useSession()
+
   const [isAdding, add, closeAdd] = useAddOrEdit()
 
   const userProjects = trpc.project.getByUser.useQuery()
-
-  const { data: session } = useSession()
 
   const sideMenuAnimation = {
     initial: { x: "-100vw" },

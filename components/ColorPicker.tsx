@@ -1,6 +1,6 @@
 import useClickOutside from "@/hooks/useClickOutside"
 import { useRef } from "react"
-import { motion } from "framer-motion"
+import { color, motion } from "framer-motion"
 import { z } from "zod"
 import { trpc } from "@/utils/trpc"
 
@@ -15,6 +15,8 @@ export const colorSchema = z.object({
   id: z.string(),
   projectId: z.string(),
 })
+
+type ColorSchema = z.infer<typeof colorSchema>
 
 function ColorPicker({ close, id, projectId }: ColorPickerProps) {
   const pickerRef = useRef(null)
@@ -57,31 +59,39 @@ function ColorPicker({ close, id, projectId }: ColorPickerProps) {
     },
   })
 
+  const pickColor = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (e.target instanceof HTMLButtonElement) {
+      const color = e.target.dataset.color as ColorSchema["color"]
+      editColor.mutate({ id, projectId, color })
+    }
+  }
+
   return (
     <motion.div
       {...pickerAnimation}
       ref={pickerRef}
       className="absolute -left-2 -top-2 flex gap-2 bg-zinc-900 p-2"
+      onClick={pickColor}
     >
-      <div
-        onClick={() => editColor.mutate({ id, projectId, color: "red" })}
+      <button
         className="relative h-4 w-4 rounded-full bg-red-500 hover:brightness-125"
+        data-color={colorSchema.shape.color.enum.red}
       />
-      <div
-        onClick={() => editColor.mutate({ id, projectId, color: "blue" })}
+      <button
         className="relative h-4 w-4 rounded-full bg-blue-500 hover:brightness-125"
+        data-color={colorSchema.shape.color.enum.blue}
       />
-      <div
-        onClick={() => editColor.mutate({ id, projectId, color: "green" })}
+      <button
         className="relative h-4 w-4 rounded-full bg-green-500 hover:brightness-125"
+        data-color={colorSchema.shape.color.enum.green}
       />
-      <div
-        onClick={() => editColor.mutate({ id, projectId, color: "yellow" })}
+      <button
         className="relative h-4 w-4 rounded-full bg-yellow-500 hover:brightness-125"
+        data-color={colorSchema.shape.color.enum.yellow}
       />
-      <div
-        onClick={() => editColor.mutate({ id, projectId, color: "pink" })}
+      <button
         className="relative h-4 w-4 rounded-full bg-pink-500 hover:brightness-125"
+        data-color={colorSchema.shape.color.enum.pink}
       />
     </motion.div>
   )
