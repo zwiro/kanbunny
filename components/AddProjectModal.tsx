@@ -1,20 +1,13 @@
-import { useState } from "react"
 import AddButton from "./AddButton"
 import FormFieldContainer from "./FormFieldContainer"
 import ModalForm from "./ModalForm"
 import PlusIcon from "./PlusIcon"
 import TextInput from "./TextInput"
 import useInviteUser from "@/hooks/useInviteUser"
-import {
-  useForm,
-  FormProvider,
-  useFormContext,
-  SubmitHandler,
-} from "react-hook-form"
+import { useForm, FormProvider, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { trpc } from "@/utils/trpc"
-import { Prisma, User } from "@prisma/client"
 
 interface AddProjectModalProps {
   close: () => void
@@ -25,9 +18,15 @@ export const projectSchema = z.object({
   invited_users: z.array(z.string()).optional(),
 })
 
+type ProjectSchema = z.infer<typeof projectSchema>
+
 function AddProjectModal({ close }: AddProjectModalProps) {
   const { user, invitedUsers, inviteUser, removeUser, handleChange } =
     useInviteUser()
+
+  const methods = useForm<ProjectSchema>({
+    resolver: zodResolver(projectSchema),
+  })
 
   const utils = trpc.useContext()
 
@@ -36,12 +35,6 @@ function AddProjectModal({ close }: AddProjectModalProps) {
       utils.project.getByUser.invalidate()
       close()
     },
-  })
-
-  type ProjectSchema = z.infer<typeof projectSchema>
-
-  const methods = useForm<ProjectSchema>({
-    resolver: zodResolver(projectSchema),
   })
 
   const onSubmit: SubmitHandler<ProjectSchema> = (data: any) => {
