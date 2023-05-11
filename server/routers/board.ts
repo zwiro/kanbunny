@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { protectedProcedure, publicProcedure, createTRPCRouter } from "../trpc"
 import { projectSchema } from "@/components/AddProjectModal"
-import { boardSchema } from "@/components/SideMenu"
+import { boardSchema } from "@/components/Project"
 import { colorSchema } from "@/components/ColorPicker"
 
 export const boardRouter = createTRPCRouter({

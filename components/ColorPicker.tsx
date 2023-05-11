@@ -3,7 +3,6 @@ import { useRef } from "react"
 import { motion } from "framer-motion"
 import { z } from "zod"
 import { trpc } from "@/utils/trpc"
-import { boardSchema } from "./SideMenu"
 
 interface ColorPickerProps {
   close: () => void
@@ -31,9 +30,9 @@ function ColorPicker({ close, id, projectId }: ColorPickerProps) {
 
   const editColor = trpc.board.editColor.useMutation({
     async onMutate(updatedBoard) {
-      await utils.project.user.cancel()
-      const prevData = utils.project.user.getData()
-      utils.project.user.setData(undefined, (old) =>
+      await utils.project.getByUser.cancel()
+      const prevData = utils.project.getByUser.getData()
+      utils.project.getByUser.setData(undefined, (old) =>
         old?.map((p) =>
           p.id === projectId
             ? {
@@ -50,11 +49,11 @@ function ColorPicker({ close, id, projectId }: ColorPickerProps) {
       return { prevData }
     },
     onError(err, updatedBoard, ctx) {
-      utils.project.user.setData(undefined, ctx?.prevData)
+      utils.project.getByUser.setData(undefined, ctx?.prevData)
     },
     onSettled: () => {
       close()
-      utils.project.user.invalidate()
+      utils.project.getByUser.invalidate()
     },
   })
 

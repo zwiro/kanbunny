@@ -33,7 +33,7 @@ function AddProjectModal({ close }: AddProjectModalProps) {
 
   const createProject = trpc.project.create.useMutation({
     onSuccess() {
-      utils.project.user.invalidate()
+      utils.project.getByUser.invalidate()
       close()
     },
   })
