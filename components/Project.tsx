@@ -4,7 +4,7 @@ import MenuButton from "./MenuButton"
 import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
-import React from "react"
+import React, { useContext } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useInviteUser from "@/hooks/useInviteUser"
 import { trpc } from "@/utils/trpc"
@@ -15,9 +15,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import Board from "./Boards"
 import { on } from "events"
+import ChosenBoardContext from "@/context/ChosenBoardContext"
 
 interface ProjectProps {
-  project: Project
+  project: Project & { boards: Board[] }
   boards: Board[]
   participants: User[]
 }
@@ -48,6 +49,8 @@ function Project({ project, boards, participants }: ProjectProps) {
     setAllUsers,
   } = useInviteUser()
 
+  const { chosenBoardId, chooseOpenedBoard } = useContext(ChosenBoardContext)
+
   const boardMethods = useForm<BoardAndProjectSchema>({
     defaultValues: { projectId: project.id },
     resolver: zodResolver(boardAndProjectSchema),
@@ -62,7 +65,6 @@ function Project({ project, boards, participants }: ProjectProps) {
   const updateUsers = trpc.project.editUsers.useMutation({
     onSuccess() {
       utils.project.getUsers.invalidate()
-      // resetUsers([...participants.map((user) => user.name!)])
     },
   })
 
@@ -154,7 +156,14 @@ function Project({ project, boards, participants }: ProjectProps) {
     <section className="my-4 border-b border-neutral-700">
       {!isEditingName ? (
         <div className="flex items-center gap-4">
-          <p>{project.name}</p>
+          <p
+            className={` border-b-2 border-transparent ${
+              project.boards.map((b) => b.id).includes(chosenBoardId!) &&
+              "border-white"
+            }`}
+          >
+            {project.name}
+          </p>
           <MenuButton>
             <MenuItem handleClick={add}>add board</MenuItem>
             <MenuItem handleClick={editUsers}>edit users</MenuItem>

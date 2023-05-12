@@ -15,6 +15,9 @@ import ListContainer from "@/components/ListContainer"
 import AddTaskModal from "@/components/AddTaskModal"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
 import { trpc } from "@/utils/trpc"
+import ChosenBoardContext, {
+  ChosenBoardProvider,
+} from "@/context/ChosenBoardContext"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
@@ -34,68 +37,70 @@ export default function Home() {
   }
 
   return (
-    <div
-      onClick={() => {
-        closeSideMenu()
-      }}
-      className="flex flex-col"
-    >
-      <div>
-        <div className="flex items-center gap-4">
-          {!isEditingName ? (
-            <>
-              <h1 className="text-2xl font-bold">board name</h1>
-              <MenuButton direction="right">
-                <MenuItem handleClick={editName}>edit board name</MenuItem>
-                <MenuItem handleClick={add}>add list</MenuItem>
-                <MenuItem>change color</MenuItem>
-                <MenuItem>delete board</MenuItem>
-              </MenuButton>
-            </>
-          ) : (
-            <div className="[&>form>input]:py-1">
-              <AddEditForm
-                name="board-name"
-                placeholder="board name"
-                close={closeEditName}
-              />
-            </div>
-          )}
-          <Filters />
+    <ChosenBoardProvider>
+      <div
+        onClick={() => {
+          closeSideMenu()
+        }}
+        className="flex flex-col"
+      >
+        <div>
+          <div className="flex items-center gap-4">
+            {!isEditingName ? (
+              <>
+                <h1 className="text-2xl font-bold">board name</h1>
+                <MenuButton direction="right">
+                  <MenuItem handleClick={editName}>edit board name</MenuItem>
+                  <MenuItem handleClick={add}>add list</MenuItem>
+                  <MenuItem>change color</MenuItem>
+                  <MenuItem>delete board</MenuItem>
+                </MenuButton>
+              </>
+            ) : (
+              <div className="[&>form>input]:py-1">
+                <AddEditForm
+                  name="board-name"
+                  placeholder="board name"
+                  close={closeEditName}
+                />
+              </div>
+            )}
+            <Filters />
+          </div>
+          <p className="text-slate-300">owner: zwiro</p>
         </div>
-        <p className="text-slate-300">owner: zwiro</p>
-      </div>
-      <div className="flex min-h-[16rem] gap-4 overflow-x-scroll lg:gap-8 xl:gap-16">
-        <List />
-        <List />
-        <List />
-        {isAdding ? (
-          <ListContainer>
-            <AddEditForm
-              name="list-name"
-              placeholder="list name"
-              close={closeAdd}
-            />
-          </ListContainer>
-        ) : (
-          <AddButton onClick={add}>
-            new list <PlusIcon />
-          </AddButton>
-        )}
-      </div>
+        <div className="flex min-h-[16rem] gap-4 overflow-x-scroll lg:gap-8 xl:gap-16">
+          <List />
+          <List />
+          <List />
+          {isAdding ? (
+            <ListContainer>
+              <AddEditForm
+                name="list-name"
+                placeholder="list name"
+                close={closeAdd}
+              />
+            </ListContainer>
+          ) : (
+            <AddButton onClick={add}>
+              new list <PlusIcon />
+            </AddButton>
+          )}
+        </div>
 
-      <AnimatePresence>
-        {isSideMenuOpen && (
-          <>
-            <motion.div {...bgBlurAnimation} className="fixed inset-0" />
-            <SideMenu
-              data={userProjects.data}
-              isLoading={userProjects.isLoading}
-            />
-          </>
-        )}
-      </AnimatePresence>
-    </div>
+        <AnimatePresence>
+          {isSideMenuOpen && (
+            <>
+              <motion.div {...bgBlurAnimation} className="fixed inset-0" />
+              <SideMenu
+                data={userProjects.data}
+                isLoading={userProjects.isLoading}
+              />
+            </>
+          )}
+        </AnimatePresence>
+      </div>
+    </ChosenBoardProvider>
   )
 }
 

@@ -3,7 +3,7 @@ import MenuButton from "./MenuButton"
 import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
-import React from "react"
+import React, { useContext } from "react"
 import ColorPicker from "./ColorPicker"
 import { trpc } from "@/utils/trpc"
 import type { Board } from "@prisma/client"
@@ -11,6 +11,7 @@ import { LoadingDots } from "./LoadingDots"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import ChosenBoardContext from "@/context/ChosenBoardContext"
 
 interface BoardProps {
   name: string
@@ -30,6 +31,7 @@ type BoardSchema = z.infer<typeof boardSchema>
 function Board({ name, color, id, projectId }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
+  const { chosenBoardId, chooseOpenedBoard } = useContext(ChosenBoardContext)
 
   const boardMethods = useForm<BoardSchema>({
     defaultValues: { name, id, projectId },
@@ -96,7 +98,12 @@ function Board({ name, color, id, projectId }: BoardProps) {
   }
 
   return (
-    <li className="group flex items-center gap-2 text-xl">
+    <li
+      onClick={() => chooseOpenedBoard(id)}
+      className={`group flex cursor-pointer items-center gap-2 px-2 text-xl hover:bg-zinc-900/40 ${
+        chosenBoardId === id && "bg-zinc-900 hover:bg-zinc-900/100"
+      } `}
+    >
       <div
         onClick={editColor}
         className={`relative h-4 w-4 cursor-pointer rounded-full bg-${color}-500`}
