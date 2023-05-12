@@ -6,16 +6,17 @@ import useAddOrEdit from "@/hooks/useAddOrEdit"
 import React, { useContext } from "react"
 import ColorPicker from "./ColorPicker"
 import { trpc } from "@/utils/trpc"
-import type { Board } from "@prisma/client"
+import type { Board, Color } from "@prisma/client"
 import { LoadingDots } from "./LoadingDots"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import ChosenBoardContext from "@/context/ChosenBoardContext"
+import LayoutContext from "@/context/LayoutContext"
+import ColorDot from "./ColorDot"
 
 interface BoardProps {
   name: string
-  color: string
+  color: Color
   id: string
   projectId: string
 }
@@ -31,7 +32,7 @@ type BoardSchema = z.infer<typeof boardSchema>
 function Board({ name, color, id, projectId }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
-  const { chosenBoardId, chooseOpenedBoard } = useContext(ChosenBoardContext)
+  const { chosenBoardId, chooseOpenedBoard } = useContext(LayoutContext)
 
   const boardMethods = useForm<BoardSchema>({
     defaultValues: { name, id, projectId },
@@ -100,20 +101,17 @@ function Board({ name, color, id, projectId }: BoardProps) {
   return (
     <li
       onClick={() => chooseOpenedBoard(id)}
-      className={`group flex cursor-pointer items-center gap-2 px-2 text-xl hover:bg-zinc-900/40 ${
+      className={`group flex cursor-pointer items-center gap-2 px-2 text-xl transition-colors hover:bg-zinc-900/40 ${
         chosenBoardId === id && "bg-zinc-900 hover:bg-zinc-900/100"
       } `}
     >
-      <div
-        onClick={editColor}
-        className={`relative h-4 w-4 cursor-pointer rounded-full bg-${color}-500`}
-      >
+      <ColorDot editColor={editColor} color={color}>
         <AnimatePresence>
           {isEditingColor && (
             <ColorPicker id={id} projectId={projectId} close={closeEditColor} />
           )}
         </AnimatePresence>
-      </div>
+      </ColorDot>
       {!isEditingName ? (
         <>
           <p>{!deleteBoard.isLoading ? name : <LoadingDots />}</p>

@@ -12,8 +12,14 @@ import useClickOutside from "@/hooks/useClickOutside"
 import { useRef } from "react"
 import ColorPicker from "./ColorPicker"
 import UserCheckbox from "./UserCheckbox"
+import { List as ListType, Task } from "@prisma/client"
+import ColorDot from "./ColorDot"
 
-function List() {
+interface ListProps extends ListType {
+  tasks: Task[]
+}
+
+function List({ name, color, tasks }: ListProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
@@ -21,17 +27,14 @@ function List() {
   return (
     <section className="mt-4 flex h-min min-w-[18rem] flex-col gap-4 border border-neutral-800 bg-zinc-800 p-4">
       <div className="flex items-center gap-2">
-        <div
-          onClick={editColor}
-          className="relative h-4 w-4 rounded-full bg-blue-500"
-        >
+        <ColorDot editColor={editColor} color={color}>
           <AnimatePresence>
             {isEditingColor && <ColorPicker close={closeEditColor} />}
           </AnimatePresence>
-        </div>
+        </ColorDot>
         {!isEditingName ? (
           <>
-            <h2 className="text-xl">to do</h2>
+            <h2 className="text-xl">{name}</h2>
             <button
               onClick={add}
               className={`group py-2 ${isEditingColor && "scale-0"} `}
@@ -55,18 +58,9 @@ function List() {
           />
         )}
       </div>
-      <Task />
-      <Task />
-      <Task />
-      <Task />
-      <Task />
-      <Task />
-      <Task />
-      <Task />
-      <Task />
-      <Task />
-      <Task />
-      <Task />
+      {tasks.map((task) => (
+        <Task key={task.id} {...task} />
+      ))}
       <AnimatePresence>
         {isAdding && <AddTaskModal close={closeAdd} />}
       </AnimatePresence>
@@ -74,7 +68,7 @@ function List() {
   )
 }
 
-function Task() {
+function Task({ name }: Task) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
 
@@ -89,7 +83,7 @@ function Task() {
       <div className="group flex items-center justify-between border-l-8 border-neutral-900 bg-zinc-700 p-2">
         {!isEditingName ? (
           <>
-            <p>task 1</p>
+            <p>{name}</p>
             <div className="scale-0 transition-transform group-hover:scale-100">
               <MenuButton>
                 <MenuItem handleClick={editName}>edit task name</MenuItem>

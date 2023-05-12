@@ -6,6 +6,21 @@ import { colorSchema } from "@/components/ColorPicker"
 import { boardSchema } from "@/components/Boards"
 
 export const boardRouter = createTRPCRouter({
+  getById: protectedProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const board = await ctx.prisma.board.findUnique({
+        where: {
+          id: input,
+        },
+        select: {
+          name: true,
+          lists: { include: { tasks: true } },
+          project: { select: { owner: { select: { name: true } } } },
+        },
+      })
+      return board
+    }),
   create: protectedProcedure
     .input(boardAndProjectSchema)
     .mutation(async ({ ctx, input }) => {

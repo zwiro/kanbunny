@@ -51,7 +51,7 @@ model List {
   board      Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
   tasks      Task[]
   created_at DateTime @default(now())
-  color      String
+  color      Color    @default(blue)
 
   @@index([boardId])
 }

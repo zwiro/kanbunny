@@ -1,13 +1,24 @@
 import { createContext, useState } from "react"
 
-const LayoutContext = createContext({
+interface LayoutContextType {
+  isSideMenuOpen: boolean
+  toggleSideMenu: () => void
+  closeSideMenu: () => void
+  chosenBoardId: string | null
+  chooseOpenedBoard: (boardId: string) => void
+}
+
+const LayoutContext = createContext<LayoutContextType>({
   isSideMenuOpen: false,
   toggleSideMenu: () => {},
   closeSideMenu: () => {},
+  chosenBoardId: null,
+  chooseOpenedBoard: () => {},
 })
 
 export function LayoutProvider({ children }: { children: JSX.Element }) {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
+
   const toggleSideMenu = () => {
     setIsSideMenuOpen((prevOpen) => !prevOpen)
   }
@@ -15,10 +26,18 @@ export function LayoutProvider({ children }: { children: JSX.Element }) {
     setIsSideMenuOpen(false)
   }
 
+  const [chosenBoardId, setChosenBoardId] = useState<string | null>(null)
+
+  const chooseOpenedBoard = (boardId: string) => {
+    setChosenBoardId(boardId)
+  }
+
   const value = {
     isSideMenuOpen,
     toggleSideMenu,
     closeSideMenu,
+    chosenBoardId,
+    chooseOpenedBoard,
   }
 
   return (

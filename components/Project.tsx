@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import Board from "./Boards"
 import { on } from "events"
-import ChosenBoardContext from "@/context/ChosenBoardContext"
+import LayoutContext from "@/context/LayoutContext"
 
 interface ProjectProps {
   project: Project & { boards: Board[] }
@@ -49,7 +49,7 @@ function Project({ project, boards, participants }: ProjectProps) {
     setAllUsers,
   } = useInviteUser()
 
-  const { chosenBoardId, chooseOpenedBoard } = useContext(ChosenBoardContext)
+  const { chosenBoardId, chooseOpenedBoard } = useContext(LayoutContext)
 
   const boardMethods = useForm<BoardAndProjectSchema>({
     defaultValues: { projectId: project.id },
@@ -157,9 +157,9 @@ function Project({ project, boards, participants }: ProjectProps) {
       {!isEditingName ? (
         <div className="flex items-center gap-4">
           <p
-            className={` border-b-2 border-transparent ${
+            className={`relative after:absolute after:-bottom-1 after:left-0 after:z-10 after:h-1 after:w-0 after:bg-white after:transition-all ${
               project.boards.map((b) => b.id).includes(chosenBoardId!) &&
-              "border-white"
+              "after:w-[100%]"
             }`}
           >
             {project.name}
@@ -273,9 +273,9 @@ function Project({ project, boards, participants }: ProjectProps) {
             )}
           </>
         )}
-        {boards.length ? (
-          boards.map((board) => <Board key={board.id} {...board} />)
-        ) : (
+        {!!boards.length &&
+          boards.map((board) => <Board key={board.id} {...board} />)}
+        {!boards.length && (
           <p className="text-base font-bold text-neutral-500">no boards yet</p>
         )}
       </ul>
