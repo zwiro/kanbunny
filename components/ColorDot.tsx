@@ -3,9 +3,9 @@ import ColorPicker from "./ColorPicker"
 import { Color } from "@prisma/client"
 
 interface ColorDotProps {
-  editColor: () => void
+  editColor?: () => void
   color: Color
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 function ColorDot({ editColor, color, children }: ColorDotProps) {

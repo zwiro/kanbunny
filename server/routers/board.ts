@@ -15,6 +15,9 @@ export const boardRouter = createTRPCRouter({
         },
         select: {
           name: true,
+          color: true,
+          id: true,
+          projectId: true,
           lists: { include: { tasks: true } },
           project: { select: { owner: { select: { name: true } } } },
         },

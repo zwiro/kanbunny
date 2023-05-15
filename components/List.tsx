@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import MenuButton from "./MenuButton"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
@@ -14,15 +14,42 @@ import ColorPicker from "./ColorPicker"
 import UserCheckbox from "./UserCheckbox"
 import { List as ListType, Task } from "@prisma/client"
 import ColorDot from "./ColorDot"
+import { trpc } from "@/utils/trpc"
+import LayoutContext from "@/context/LayoutContext"
 
 interface ListProps extends ListType {
   tasks: Task[]
 }
 
-function List({ name, color, tasks }: ListProps) {
+function List({ name, color, tasks, id }: ListProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
+  const { chosenBoardId } = useContext(LayoutContext)
+
+  const utils = trpc.useContext()
+
+  const deleteList = trpc.list.delete.useMutation({
+    async onMutate(deletedListId) {
+      await utils.board.getById.cancel()
+      const prevData = utils.board.getById.getData()
+      utils.board.getById.setData(
+        chosenBoardId!,
+        (old) =>
+          ({
+            ...old,
+            lists: old?.lists!.filter((list) => list.id !== deletedListId),
+          } as any)
+      )
+      return { prevData }
+    },
+    onError(err, updatedBoard, ctx) {
+      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+    },
+    onSettled() {
+      utils.board.getById.invalidate()
+    },
+  })
 
   return (
     <section className="mt-4 flex h-min min-w-[18rem] flex-col gap-4 border border-neutral-800 bg-zinc-800 p-4">
@@ -46,7 +73,9 @@ function List({ name, color, tasks }: ListProps) {
                 <MenuItem handleClick={add}>add task</MenuItem>
                 <MenuItem handleClick={editName}>edit list name</MenuItem>
                 <MenuItem handleClick={editColor}>change color</MenuItem>
-                <MenuItem>delete list</MenuItem>
+                <MenuItem handleClick={() => deleteList.mutate(id)}>
+                  delete list
+                </MenuItem>
               </MenuButton>
             </div>
           </>

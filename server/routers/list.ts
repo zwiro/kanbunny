@@ -15,4 +15,12 @@ export const listRouter = createTRPCRouter({
       })
       return list
     }),
+  delete: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const list = await ctx.prisma.list.delete({
+        where: { id: input },
+      })
+      return list
+    }),
 })

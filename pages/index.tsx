@@ -18,6 +18,9 @@ import { trpc } from "@/utils/trpc"
 import { z } from "zod"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { BoardSchema } from "@/components/Boards"
+import ColorDot from "@/components/ColorDot"
+import ColorPicker from "@/components/ColorPicker"
 
 export const listSchema = z.object({
   name: z.string().min(1, { message: "list name is required" }),
@@ -27,8 +30,10 @@ export const listSchema = z.object({
 type ListSchema = z.infer<typeof listSchema>
 
 export default function Home() {
-  const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
+  const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
+    useContext(LayoutContext)
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
+  const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
   const router = useRouter()
   const { data: session, status } = useSession({
@@ -62,19 +67,19 @@ export default function Home() {
     },
     onSettled() {
       utils.board.getById.invalidate()
-      methods.reset()
+      listMethods.reset()
       closeAdd()
     },
   })
 
-  const methods = useForm<ListSchema>({
+  const listMethods = useForm<ListSchema>({
     defaultValues: { boardId: chosenBoardId },
     resolver: zodResolver(listSchema),
   })
 
   useEffect(() => {
-    methods.reset({ boardId: chosenBoardId })
-  }, [chosenBoardId, methods])
+    listMethods.reset({ boardId: chosenBoardId })
+  }, [chosenBoardId, listMethods])
 
   const onSubmit: SubmitHandler<ListSchema> = (data: any) => {
     createList.mutate({
@@ -100,25 +105,14 @@ export default function Home() {
         <>
           <div>
             <div className="flex items-center gap-4">
-              {!isEditingName ? (
-                <>
-                  <h1 className="text-2xl font-bold">{board.data?.name}</h1>
-                  <MenuButton direction="right">
-                    <MenuItem handleClick={editName}>edit board name</MenuItem>
-                    <MenuItem handleClick={add}>add list</MenuItem>
-                    <MenuItem>change color</MenuItem>
-                    <MenuItem>delete board</MenuItem>
-                  </MenuButton>
-                </>
-              ) : (
-                <div className="[&>form>input]:py-1">
-                  <AddEditForm
-                    name="board-name"
-                    placeholder="board name"
-                    close={closeEditName}
-                  />
-                </div>
-              )}
+              <div className="flex items-center gap-1">
+                <ColorDot color={board.data?.color!} />
+                <h1 className="text-2xl font-bold">{board.data?.name}</h1>
+              </div>
+              <MenuButton direction="right">
+                <MenuItem handleClick={add}>add list</MenuItem>
+                <MenuItem handleClick={toggleSideMenu}>more options</MenuItem>
+              </MenuButton>
               <Filters />
             </div>
             <p className="text-slate-300">
@@ -132,18 +126,18 @@ export default function Home() {
             {isAdding ? (
               <>
                 <ListContainer>
-                  <FormProvider {...methods}>
+                  <FormProvider {...listMethods}>
                     <AddEditForm
                       name="name"
                       placeholder="list name"
                       close={closeAdd}
-                      handleSubmit={methods.handleSubmit(onSubmit)}
+                      handleSubmit={listMethods.handleSubmit(onSubmit)}
                     />
                   </FormProvider>
                 </ListContainer>
-                {methods.formState.errors && (
+                {listMethods.formState.errors && (
                   <p role="alert" className="text-base text-red-500">
-                    {methods.formState.errors?.name?.message as string}
+                    {listMethods.formState.errors?.name?.message as string}
                   </p>
                 )}
               </>

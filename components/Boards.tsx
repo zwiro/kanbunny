@@ -27,7 +27,7 @@ export const boardSchema = z.object({
   id: z.string(),
 })
 
-type BoardSchema = z.infer<typeof boardSchema>
+export type BoardSchema = z.infer<typeof boardSchema>
 
 function Board({ name, color, id, projectId }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
