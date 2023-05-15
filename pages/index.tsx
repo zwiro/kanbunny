@@ -66,9 +66,9 @@ export default function Home() {
       utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
     },
     onSettled() {
-      utils.board.getById.invalidate()
       listMethods.reset()
       closeAdd()
+      utils.board.getById.invalidate()
     },
   })
 
@@ -132,6 +132,7 @@ export default function Home() {
                       placeholder="list name"
                       close={closeAdd}
                       handleSubmit={listMethods.handleSubmit(onSubmit)}
+                      isLoading={createList.isLoading}
                     />
                   </FormProvider>
                 </ListContainer>

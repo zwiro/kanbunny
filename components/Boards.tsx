@@ -70,6 +70,35 @@ function Board({ name, color, id, projectId }: BoardProps) {
     },
   })
 
+  const updateColor = trpc.board.editColor.useMutation({
+    async onMutate(updatedBoard) {
+      await utils.project.getByUser.cancel()
+      const prevData = utils.project.getByUser.getData()
+      utils.project.getByUser.setData(undefined, (old) =>
+        old?.map((p) =>
+          p.id === projectId
+            ? {
+                ...p,
+                boards: p.boards.map((b) =>
+                  b.id === updatedBoard.id
+                    ? { ...b, color: updatedBoard.color }
+                    : b
+                ),
+              }
+            : p
+        )
+      )
+      return { prevData }
+    },
+    onError(err, updatedBoard, ctx) {
+      utils.project.getByUser.setData(undefined, ctx?.prevData)
+    },
+    onSettled: () => {
+      closeEditColor()
+      utils.project.getByUser.invalidate()
+    },
+  })
+
   const deleteBoard = trpc.board.delete.useMutation({
     async onMutate(deletedBoardId) {
       await utils.project.getByUser.cancel()
@@ -108,7 +137,11 @@ function Board({ name, color, id, projectId }: BoardProps) {
       <ColorDot editColor={editColor} color={color}>
         <AnimatePresence>
           {isEditingColor && (
-            <ColorPicker id={id} projectId={projectId} close={closeEditColor} />
+            <ColorPicker
+              id={id}
+              close={closeEditColor}
+              editColor={updateColor}
+            />
           )}
         </AnimatePresence>
       </ColorDot>

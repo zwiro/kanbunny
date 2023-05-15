@@ -21,13 +21,38 @@ interface ListProps extends ListType {
   tasks: Task[]
 }
 
-function List({ name, color, tasks, id }: ListProps) {
+function List({ name, color, tasks, id, boardId }: ListProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
   const { chosenBoardId } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
+
+  const updateColor = trpc.list.editColor.useMutation({
+    async onMutate(updatedList) {
+      await utils.board.getById.cancel()
+      const prevData = utils.board.getById.getData()
+      utils.board.getById.setData(
+        boardId,
+        (old) =>
+          ({
+            ...old,
+            lists: old?.lists!.map((l) =>
+              l.id === updatedList.id ? { ...l, color: updatedList.color } : l
+            ),
+          } as any)
+      )
+      return { prevData }
+    },
+    onError(err, updatedList, ctx) {
+      utils.board.getById.setData(boardId, ctx?.prevData)
+    },
+    onSettled: () => {
+      utils.board.getById.invalidate(boardId)
+      closeEditColor()
+    },
+  })
 
   const deleteList = trpc.list.delete.useMutation({
     async onMutate(deletedListId) {
@@ -43,11 +68,11 @@ function List({ name, color, tasks, id }: ListProps) {
       )
       return { prevData }
     },
-    onError(err, updatedBoard, ctx) {
+    onError(err, updatedList, ctx) {
       utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
     },
     onSettled() {
-      utils.board.getById.invalidate()
+      utils.board.getById.invalidate(boardId)
     },
   })
 
@@ -56,7 +81,13 @@ function List({ name, color, tasks, id }: ListProps) {
       <div className="flex items-center gap-2">
         <ColorDot editColor={editColor} color={color}>
           <AnimatePresence>
-            {isEditingColor && <ColorPicker close={closeEditColor} />}
+            {isEditingColor && (
+              <ColorPicker
+                close={closeEditColor}
+                editColor={updateColor}
+                id={id}
+              />
+            )}
           </AnimatePresence>
         </ColorDot>
         {!isEditingName ? (

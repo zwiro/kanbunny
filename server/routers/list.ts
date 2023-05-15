@@ -15,6 +15,18 @@ export const listRouter = createTRPCRouter({
       })
       return list
     }),
+  editColor: protectedProcedure
+    .input(colorSchema)
+    .mutation(async ({ ctx, input }) => {
+      console.log(input)
+      const list = await ctx.prisma.list.update({
+        where: { id: input.id },
+        data: {
+          color: input.color,
+        },
+      })
+      return list
+    }),
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
