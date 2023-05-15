@@ -16,6 +16,7 @@ import { z } from "zod"
 import Board from "./Boards"
 import { on } from "events"
 import LayoutContext from "@/context/LayoutContext"
+import UserCheckbox from "./UserCheckbox"
 
 interface ProjectProps {
   project: Project & { boards: Board[] }

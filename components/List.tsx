@@ -122,7 +122,7 @@ function List({ name, color, tasks, id, boardId }: ListProps) {
         <Task key={task.id} {...task} />
       ))}
       <AnimatePresence>
-        {isAdding && <AddTaskModal close={closeAdd} />}
+        {isAdding && <AddTaskModal close={closeAdd} listId={id} />}
       </AnimatePresence>
     </section>
   )

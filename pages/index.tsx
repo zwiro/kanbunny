@@ -124,8 +124,8 @@ export default function Home() {
             {!!board.data?.lists.length &&
               board.data?.lists.map((list) => <List key={list.id} {...list} />)}
             {isAdding ? (
-              <>
-                <ListContainer>
+              <ListContainer>
+                <div className="flex flex-col">
                   <FormProvider {...listMethods}>
                     <AddEditForm
                       name="name"
@@ -135,13 +135,13 @@ export default function Home() {
                       isLoading={createList.isLoading}
                     />
                   </FormProvider>
-                </ListContainer>
-                {listMethods.formState.errors && (
-                  <p role="alert" className="text-base text-red-500">
-                    {listMethods.formState.errors?.name?.message as string}
-                  </p>
-                )}
-              </>
+                  {listMethods.formState.errors && (
+                    <p role="alert" className="text-base text-red-500">
+                      {listMethods.formState.errors?.name?.message as string}
+                    </p>
+                  )}
+                </div>
+              </ListContainer>
             ) : (
               <AddButton onClick={add}>
                 new list <PlusIcon />
