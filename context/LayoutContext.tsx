@@ -4,7 +4,7 @@ interface LayoutContextType {
   isSideMenuOpen: boolean
   toggleSideMenu: () => void
   closeSideMenu: () => void
-  chosenBoardId: string | null
+  chosenBoardId: string | undefined
   chooseOpenedBoard: (boardId: string) => void
 }
 
@@ -12,7 +12,7 @@ const LayoutContext = createContext<LayoutContextType>({
   isSideMenuOpen: false,
   toggleSideMenu: () => {},
   closeSideMenu: () => {},
-  chosenBoardId: null,
+  chosenBoardId: undefined,
   chooseOpenedBoard: () => {},
 })
 
@@ -26,7 +26,9 @@ export function LayoutProvider({ children }: { children: JSX.Element }) {
     setIsSideMenuOpen(false)
   }
 
-  const [chosenBoardId, setChosenBoardId] = useState<string | null>(null)
+  const [chosenBoardId, setChosenBoardId] = useState<string | undefined>(
+    undefined
+  )
 
   const chooseOpenedBoard = (boardId: string) => {
     setChosenBoardId(boardId)

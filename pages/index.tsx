@@ -16,6 +16,8 @@ import AddTaskModal from "@/components/AddTaskModal"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
 import { trpc } from "@/utils/trpc"
 import { z } from "zod"
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 export const listSchema = z.object({
   name: z.string().min(1, { message: "list name is required" }),
@@ -34,15 +36,58 @@ export default function Home() {
   })
   const { chosenBoardId } = useContext(LayoutContext)
 
+  const utils = trpc.useContext()
+
   const userProjects = trpc.project.getByUser.useQuery()
   const board = trpc.board.getById.useQuery(chosenBoardId!)
+  const createList = trpc.list.create.useMutation({
+    async onMutate(createdList) {
+      await utils.board.getById.cancel()
+      const prevData = utils.board.getById.getData()
+      utils.board.getById.setData(
+        chosenBoardId!,
+        (old) =>
+          ({
+            ...old,
+            lists: [
+              ...old?.lists!,
+              { ...createdList, tasks: [], color: "blue" },
+            ],
+          } as any)
+      )
+      return { prevData }
+    },
+    onError(err, createdList, ctx) {
+      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+    },
+    onSettled() {
+      utils.board.getById.invalidate()
+      methods.reset()
+      closeAdd()
+    },
+  })
+
+  const methods = useForm<ListSchema>({
+    defaultValues: { boardId: chosenBoardId },
+    resolver: zodResolver(listSchema),
+  })
+
+  useEffect(() => {
+    methods.reset({ boardId: chosenBoardId })
+  }, [chosenBoardId, methods])
+
+  const onSubmit: SubmitHandler<ListSchema> = (data: any) => {
+    createList.mutate({
+      name: data.name,
+      boardId: chosenBoardId!,
+    })
+  }
 
   const bgBlurAnimation = {
     initial: { backdropFilter: "blur(0px)" },
     animate: { backdropFilter: "blur(10px)" },
     exit: { backdropFilter: "blur(0px)" },
   }
-  console.log(board.data?.lists)
 
   return (
     <div
@@ -85,13 +130,23 @@ export default function Home() {
             {!!board.data?.lists.length &&
               board.data?.lists.map((list) => <List key={list.id} {...list} />)}
             {isAdding ? (
-              <ListContainer>
-                <AddEditForm
-                  name="list-name"
-                  placeholder="list name"
-                  close={closeAdd}
-                />
-              </ListContainer>
+              <>
+                <ListContainer>
+                  <FormProvider {...methods}>
+                    <AddEditForm
+                      name="name"
+                      placeholder="list name"
+                      close={closeAdd}
+                      handleSubmit={methods.handleSubmit(onSubmit)}
+                    />
+                  </FormProvider>
+                </ListContainer>
+                {methods.formState.errors && (
+                  <p role="alert" className="text-base text-red-500">
+                    {methods.formState.errors?.name?.message as string}
+                  </p>
+                )}
+              </>
             ) : (
               <AddButton onClick={add}>
                 new list <PlusIcon />
