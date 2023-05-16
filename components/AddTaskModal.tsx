@@ -24,7 +24,7 @@ interface AddTaskModalProps {
 export const taskSchema = z.object({
   name: z.string().min(1, { message: "task name is required" }),
   assigned_to: z.array(z.string()).optional(),
-  // due_to: z.date(),
+  due_to: z.date().optional(),
   listId: z.string(),
 })
 
@@ -64,12 +64,12 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
       name: data.name,
       assigned_to: assignedUsers,
       listId,
-      due_to: new Date(date!).toISOString(),
+      due_to: date!,
     })
   }
 
   console.log(methods.formState.errors)
-  console.log(date?.toISOString())
+  console.log(date)
 
   return (
     <FormProvider {...methods}>
