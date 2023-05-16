@@ -16,10 +16,21 @@ import { List as ListType, Task } from "@prisma/client"
 import ColorDot from "./ColorDot"
 import { trpc } from "@/utils/trpc"
 import LayoutContext from "@/context/LayoutContext"
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 interface ListProps extends ListType {
   tasks: Task[]
 }
+
+export const listSchema = z.object({
+  name: z.string().min(1, { message: "list name is required" }),
+  boardId: z.string(),
+  id: z.string(),
+})
+
+export type ListSchema = z.infer<typeof listSchema>
 
 function List({ name, color, tasks, id, boardId }: ListProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
@@ -28,6 +39,36 @@ function List({ name, color, tasks, id, boardId }: ListProps) {
   const { chosenBoardId } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
+
+  const listMethods = useForm<ListSchema>({
+    defaultValues: { name, id, boardId },
+    resolver: zodResolver(listSchema),
+  })
+
+  const updateName = trpc.list.editName.useMutation({
+    async onMutate(updatedList) {
+      await utils.board.getById.cancel()
+      const prevData = utils.board.getById.getData()
+      utils.board.getById.setData(
+        boardId,
+        (old) =>
+          ({
+            ...old,
+            lists: old?.lists!.map((l) =>
+              l.id === updatedList.id ? { ...l, name: updatedList.name } : l
+            ),
+          } as any)
+      )
+      return { prevData }
+    },
+    onError(err, updatedList, ctx) {
+      utils.board.getById.setData(boardId, ctx?.prevData)
+    },
+    onSettled: () => {
+      utils.board.getById.invalidate(boardId)
+      closeEditName()
+    },
+  })
 
   const updateColor = trpc.list.editColor.useMutation({
     async onMutate(updatedList) {
@@ -76,6 +117,10 @@ function List({ name, color, tasks, id, boardId }: ListProps) {
     },
   })
 
+  const onSubmit: SubmitHandler<ListSchema> = (data: any) => {
+    updateName.mutate({ name: data.name, id, boardId })
+  }
+
   return (
     <section className="mt-4 flex h-min min-w-[18rem] flex-col gap-4 border border-neutral-800 bg-zinc-800 p-4">
       <div className="flex items-center gap-2">
@@ -111,11 +156,14 @@ function List({ name, color, tasks, id, boardId }: ListProps) {
             </div>
           </>
         ) : (
-          <AddEditForm
-            name="list-name"
-            placeholder="list name"
-            close={closeEditName}
-          />
+          <FormProvider {...listMethods}>
+            <AddEditForm
+              name="name"
+              placeholder="list name"
+              close={closeEditName}
+              handleSubmit={listMethods.handleSubmit(onSubmit)}
+            />
+          </FormProvider>
         )}
       </div>
       {tasks.map((task) => (

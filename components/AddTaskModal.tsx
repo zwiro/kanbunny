@@ -68,9 +68,6 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
     })
   }
 
-  console.log(methods.formState.errors)
-  console.log(date)
-
   return (
     <FormProvider {...methods}>
       <ModalForm close={close} handleSubmit={methods.handleSubmit(onSubmit)}>
