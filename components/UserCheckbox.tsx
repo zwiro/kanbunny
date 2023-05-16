@@ -1,6 +1,6 @@
 interface UserCheckboxProps {
   name: string
-  assignUser?: (user: string) => void
+  assignUser: (user: string) => void
 }
 
 function UserCheckbox({ name, assignUser }: UserCheckboxProps) {
@@ -10,7 +10,7 @@ function UserCheckbox({ name, assignUser }: UserCheckboxProps) {
         type="checkbox"
         id={name}
         name={name}
-        onChange={assignUser ? () => assignUser(name) : undefined}
+        onChange={() => assignUser(name)}
         className="peer hidden"
       />
       <label

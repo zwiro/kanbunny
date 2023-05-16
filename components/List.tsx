@@ -19,6 +19,7 @@ import LayoutContext from "@/context/LayoutContext"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import useAssignUser from "@/hooks/useAssignUser"
 
 interface ListProps extends ListType {
   tasks: Task[]
@@ -180,6 +181,7 @@ export const editTaskSchema = z.object({
   name: z.string(),
   id: z.string(),
   listId: z.string(),
+  assigned_to: z.array(z.string()).optional(),
 })
 
 type TaskSchema = z.infer<typeof editTaskSchema>
@@ -188,6 +190,7 @@ function Task({ name, id, listId }: Task) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
   const { chosenBoardId } = useContext(LayoutContext)
+  const { assignedUsers, assignUser } = useAssignUser()
 
   const utils = trpc.useContext()
 
@@ -227,6 +230,13 @@ function Task({ name, id, listId }: Task) {
     onSettled() {
       utils.board.getById.invalidate(chosenBoardId!)
       closeEditName()
+    },
+  })
+
+  const updateUsers = trpc.task.editUsers.useMutation({
+    onSettled() {
+      utils.board.getById.invalidate(chosenBoardId!)
+      closeEditUsers()
     },
   })
 
@@ -274,11 +284,25 @@ function Task({ name, id, listId }: Task) {
           <motion.div {...taskAnimation}>
             <div className="flex flex-wrap gap-2">
               {users.data?.map((user) => (
-                <UserCheckbox key={user.id} name={user.name!} />
+                <UserCheckbox
+                  key={user.id}
+                  name={user.name!}
+                  assignUser={assignUser}
+                />
               ))}
             </div>
             <div className="flex items-center gap-1">
-              <button className="ml-auto transition-transform hover:scale-110">
+              <button
+                onClick={() =>
+                  updateUsers.mutate({
+                    id,
+                    name,
+                    listId,
+                    assigned_to: assignedUsers,
+                  })
+                }
+                className="ml-auto transition-transform hover:scale-110"
+              >
                 <AiOutlineCheck size={20} />
               </button>
               <button
