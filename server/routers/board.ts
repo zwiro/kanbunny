@@ -24,6 +24,16 @@ export const boardRouter = createTRPCRouter({
       })
       return board
     }),
+  getUsers: protectedProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const users = await ctx.prisma.user.findMany({
+        where: {
+          projects_in: { some: { boards: { some: { id: input } } } },
+        },
+      })
+      return users
+    }),
   create: protectedProcedure
     .input(boardAndProjectSchema)
     .mutation(async ({ ctx, input }) => {

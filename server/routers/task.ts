@@ -11,8 +11,16 @@ export const taskRouter = createTRPCRouter({
   create: protectedProcedure
     .input(taskSchema)
     .mutation(async ({ ctx, input }) => {
+      const users = await ctx.prisma.user.findMany({
+        where: {
+          name: { in: input.assigned_to },
+        },
+      })
       const task = await ctx.prisma.task.create({
-        data: input,
+        data: {
+          ...input,
+          assigned_to: { connect: users.map((user) => ({ id: user.id })) },
+        },
       })
       return task
     }),

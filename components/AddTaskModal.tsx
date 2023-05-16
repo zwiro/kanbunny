@@ -23,38 +23,37 @@ interface AddTaskModalProps {
 
 export const taskSchema = z.object({
   name: z.string().min(1, { message: "task name is required" }),
-  assigned_users: z.array(z.string()).optional(),
-  due_to: z.date(),
+  assigned_to: z.array(z.string()).optional(),
+  // due_to: z.date(),
   listId: z.string(),
 })
 
 type TaskSchema = z.infer<typeof taskSchema>
 
 function AddTaskModal({ close, listId }: AddTaskModalProps) {
-  const [value, onChange] = useState<Date | null>(new Date())
+  const [date, onChange] = useState<Date | null>(new Date())
   const { chosenBoardId } = useContext(LayoutContext)
+  const [assignedUsers, setAssignedUsers] = useState<string[]>([])
+
+  const users = trpc.board.getUsers.useQuery(chosenBoardId!)
 
   const methods = useForm<TaskSchema>({
     defaultValues: { listId },
     resolver: zodResolver(taskSchema),
   })
 
+  const assignUser = (user: string) => {
+    if (assignedUsers.includes(user)) {
+      setAssignedUsers((prevUsers) => prevUsers.filter((u) => u !== user))
+    } else {
+      setAssignedUsers((prevUsers) => [...prevUsers, user])
+    }
+  }
+
   const utils = trpc.useContext()
 
   const createTask = trpc.task.create.useMutation({
-    // async onMutate(createdTask) {
-    //   await utils.board.getById.cancel()
-    //   const prevData = utils.board.getById.getData()
-    //   utils.board.getById.setData(
-    //     chosenBoardId!,
-    //     (old) => old.
-    //   )
-    //   return { prevData }
-    // },
-    // onError(err, createdTask, ctx) {
-    //   utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
-    // },
-    onSettled: () => {
+    onSuccess: () => {
       utils.board.getById.invalidate(chosenBoardId!)
       close()
     },
@@ -63,37 +62,47 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
   const onSubmit: SubmitHandler<TaskSchema> = (data) => {
     createTask.mutate({
       name: data.name,
+      assigned_to: assignedUsers,
+      listId,
+      due_to: new Date(date!).toISOString(),
     })
   }
 
-  // handle assigned users and finish (fetch users assigned to project and show then handle adding them to the task)
+  console.log(methods.formState.errors)
+  console.log(date?.toISOString())
 
   return (
     <FormProvider {...methods}>
       <ModalForm close={close} handleSubmit={methods.handleSubmit(onSubmit)}>
         <h2 className="pb-4 text-center font-bold">add a new task</h2>
         <FormFieldContainer>
-          <label htmlFor="task-name">task name</label>
+          <label htmlFor="name">task name</label>
           <div className="[&>input]:w-full [&>input]:text-base">
-            <TextInput name="task-name" placeholder="add dark theme" />
+            <TextInput name="name" placeholder="add dark theme" />
           </div>
+          {methods.formState.errors && (
+            <p role="alert" className="text-red-500">
+              {methods.formState.errors?.name?.message}
+            </p>
+          )}
         </FormFieldContainer>
         <FormFieldContainer>
           <p>assign users</p>
           <div className="flex flex-wrap gap-2">
-            <UserCheckbox name="janek" />
-            <UserCheckbox name="john" />
-            <UserCheckbox name="bobby" />
-            <UserCheckbox name="adam" />
-            <UserCheckbox name="jimmy" />
-            <UserCheckbox name="daniel" />
+            {users.data?.map((user) => (
+              <UserCheckbox
+                key={user.id}
+                name={user.name!}
+                assignUser={assignUser}
+              />
+            ))}
           </div>
         </FormFieldContainer>
         <FormFieldContainer>
           <label htmlFor="datetime">due to</label>
           <DateTimePicker
             onChange={onChange}
-            value={value}
+            value={date}
             disableClock
             minDate={new Date()}
             clearIcon={null}
@@ -102,9 +111,19 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
             className="w-fit"
           />
         </FormFieldContainer>
-        <AddButton onClick={close}>
-          add task <PlusIcon />
+        <AddButton disabled={createTask.isLoading}>
+          add task
+          <div className={`${createTask.isLoading && "animate-spin"}`}>
+            <PlusIcon />
+          </div>
         </AddButton>
+        <>
+          {createTask.error && (
+            <p role="alert" className="text-center text-red-500">
+              something went wrong
+            </p>
+          )}
+        </>
       </ModalForm>
     </FormProvider>
   )
