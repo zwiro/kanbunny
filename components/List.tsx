@@ -176,9 +176,65 @@ function List({ name, color, tasks, id, boardId }: ListProps) {
   )
 }
 
-function Task({ name }: Task) {
+export const editTaskSchema = z.object({
+  name: z.string(),
+  id: z.string(),
+  listId: z.string(),
+})
+
+type TaskSchema = z.infer<typeof editTaskSchema>
+
+function Task({ name, id, listId }: Task) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
+  const { chosenBoardId } = useContext(LayoutContext)
+
+  const utils = trpc.useContext()
+
+  const taskMethods = useForm<TaskSchema>({
+    defaultValues: { name, id, listId },
+    resolver: zodResolver(editTaskSchema),
+  })
+
+  const updateName = trpc.task.editName.useMutation({
+    async onMutate(updatedTask) {
+      await utils.board.getById.cancel()
+      const prevData = utils.board.getById.getData()
+      utils.board.getById.setData(
+        chosenBoardId!,
+        (old) =>
+          ({
+            ...old,
+            lists: old?.lists.map((l) =>
+              l.id === listId
+                ? {
+                    ...l,
+                    tasks: l.tasks.map((t) =>
+                      t.id === updatedTask.id
+                        ? { ...t, name: updatedTask.name }
+                        : t
+                    ),
+                  }
+                : l
+            ),
+          } as any)
+      )
+      return { prevData }
+    },
+    onError(err, updatedTask, ctx) {
+      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+    },
+    onSettled() {
+      utils.board.getById.invalidate(chosenBoardId!)
+      closeEditName()
+    },
+  })
+
+  const onSubmit: SubmitHandler<TaskSchema> = (data: any) => {
+    updateName.mutate({ name: data.name, id, listId })
+  }
+
+  console.log(taskMethods.formState.errors)
 
   const taskAnimation = {
     initial: { height: 0, opacity: 0, padding: 0 },
@@ -202,11 +258,14 @@ function Task({ name }: Task) {
           </>
         ) : (
           <div className="[&>form>input]:py-1.5 [&>form>input]:text-base">
-            <AddEditForm
-              name="task name"
-              placeholder="task name"
-              close={closeEditName}
-            />
+            <FormProvider {...taskMethods}>
+              <AddEditForm
+                name="name"
+                placeholder="task name"
+                close={closeEditName}
+                handleSubmit={taskMethods.handleSubmit(onSubmit)}
+              />
+            </FormProvider>
           </div>
         )}
       </div>

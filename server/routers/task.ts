@@ -6,6 +6,7 @@ import { colorSchema } from "@/components/ColorPicker"
 import { boardSchema } from "@/components/Boards"
 import { listSchema } from "@/pages"
 import { taskSchema } from "@/components/AddTaskModal"
+import { editTaskSchema } from "@/components/List"
 
 export const taskRouter = createTRPCRouter({
   create: protectedProcedure
@@ -24,17 +25,16 @@ export const taskRouter = createTRPCRouter({
       })
       return task
     }),
-  editColor: protectedProcedure
-    .input(colorSchema)
+  editName: protectedProcedure
+    .input(editTaskSchema)
     .mutation(async ({ ctx, input }) => {
-      console.log(input)
-      const list = await ctx.prisma.list.update({
+      const task = await ctx.prisma.task.update({
         where: { id: input.id },
         data: {
-          color: input.color,
+          name: input.name,
         },
       })
-      return list
+      return task
     }),
   delete: protectedProcedure
     .input(z.string())
