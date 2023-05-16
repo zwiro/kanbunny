@@ -12,7 +12,7 @@ import useClickOutside from "@/hooks/useClickOutside"
 import { useRef } from "react"
 import ColorPicker from "./ColorPicker"
 import UserCheckbox from "./UserCheckbox"
-import { List as ListType, Task } from "@prisma/client"
+import type { List as ListType, Task as TaskType, User } from "@prisma/client"
 import ColorDot from "./ColorDot"
 import { trpc } from "@/utils/trpc"
 import LayoutContext from "@/context/LayoutContext"
@@ -21,8 +21,12 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useAssignUser from "@/hooks/useAssignUser"
 
+interface TaskWithAssignedTo extends TaskType {
+  assigned_to: User[]
+}
+
 interface ListProps extends ListType {
-  tasks: Task[]
+  tasks: TaskWithAssignedTo[]
 }
 
 export const editListSchema = z.object({
@@ -186,7 +190,7 @@ export const editTaskSchema = z.object({
 
 type TaskSchema = z.infer<typeof editTaskSchema>
 
-function Task({ name, id, listId }: Task) {
+function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
   const { chosenBoardId } = useContext(LayoutContext)
@@ -284,7 +288,12 @@ function Task({ name, id, listId }: Task) {
       <div className="group flex items-center justify-between border-l-8 border-neutral-900 bg-zinc-700 p-2">
         {!isEditingName ? (
           <>
-            <p>{name}</p>
+            <div className="flex flex-col">
+              <p>{name}</p>
+              {assigned_to.map((user) => (
+                <li key={user.id}>{user.name}</li>
+              ))}
+            </div>
             <div className="scale-0 transition-transform group-hover:scale-100">
               <MenuButton>
                 <MenuItem handleClick={editName}>edit task name</MenuItem>
