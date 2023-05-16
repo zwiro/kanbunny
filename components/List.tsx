@@ -234,6 +234,33 @@ function Task({ name, id, listId }: Task) {
   })
 
   const updateUsers = trpc.task.editUsers.useMutation({
+    async onMutate(updatedTask) {
+      await utils.board.getById.cancel()
+      const prevData = utils.board.getById.getData()
+      utils.board.getById.setData(
+        chosenBoardId!,
+        (old) =>
+          ({
+            ...old,
+            lists: old?.lists.map((l) =>
+              l.id === listId
+                ? {
+                    ...l,
+                    tasks: l.tasks.map((t) =>
+                      t.id === updatedTask.id
+                        ? { ...t, assigned_to: updatedTask.assigned_to }
+                        : t
+                    ),
+                  }
+                : l
+            ),
+          } as any)
+      )
+      return { prevData }
+    },
+    onError(err, updatedTask, ctx) {
+      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+    },
     onSettled() {
       utils.board.getById.invalidate(chosenBoardId!)
       closeEditUsers()
