@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { trpc } from "@/utils/trpc"
 import LayoutContext from "@/context/LayoutContext"
+import useAssignUser from "@/hooks/useAssignUser"
 
 interface AddTaskModalProps {
   close: () => void
@@ -33,7 +34,7 @@ type TaskSchema = z.infer<typeof taskSchema>
 function AddTaskModal({ close, listId }: AddTaskModalProps) {
   const [date, onChange] = useState<Date | null>(new Date())
   const { chosenBoardId } = useContext(LayoutContext)
-  const [assignedUsers, setAssignedUsers] = useState<string[]>([])
+  const { assignedUsers, assignUser } = useAssignUser()
 
   const users = trpc.board.getUsers.useQuery(chosenBoardId!)
 
@@ -41,14 +42,6 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
     defaultValues: { listId },
     resolver: zodResolver(taskSchema),
   })
-
-  const assignUser = (user: string) => {
-    if (assignedUsers.includes(user)) {
-      setAssignedUsers((prevUsers) => prevUsers.filter((u) => u !== user))
-    } else {
-      setAssignedUsers((prevUsers) => [...prevUsers, user])
-    }
-  }
 
   const utils = trpc.useContext()
 

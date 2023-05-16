@@ -234,7 +234,7 @@ function Task({ name, id, listId }: Task) {
     updateName.mutate({ name: data.name, id, listId })
   }
 
-  console.log(taskMethods.formState.errors)
+  const users = trpc.board.getUsers.useQuery(chosenBoardId!)
 
   const taskAnimation = {
     initial: { height: 0, opacity: 0, padding: 0 },
@@ -273,12 +273,9 @@ function Task({ name, id, listId }: Task) {
         {isEditingUsers && (
           <motion.div {...taskAnimation}>
             <div className="flex flex-wrap gap-2">
-              <UserCheckbox name="janek" />
-              <UserCheckbox name="john" />
-              <UserCheckbox name="bobby" />
-              <UserCheckbox name="adam" />
-              <UserCheckbox name="jimmy" />
-              <UserCheckbox name="daniel" />
+              {users.data?.map((user) => (
+                <UserCheckbox key={user.id} name={user.name!} />
+              ))}
             </div>
             <div className="flex items-center gap-1">
               <button className="ml-auto transition-transform hover:scale-110">
