@@ -4,7 +4,8 @@ import { projectSchema } from "@/components/AddProjectModal"
 import { boardAndProjectSchema } from "@/components/Project"
 import { colorSchema } from "@/components/ColorPicker"
 import { boardSchema } from "@/components/Boards"
-import { listSchema } from "@/components/List"
+import { listSchema } from "@/pages"
+import { editListSchema } from "@/components/List"
 
 export const listRouter = createTRPCRouter({
   create: protectedProcedure
@@ -16,7 +17,7 @@ export const listRouter = createTRPCRouter({
       return list
     }),
   editName: protectedProcedure
-    .input(listSchema)
+    .input(editListSchema)
     .mutation(async ({ ctx, input }) => {
       const list = await ctx.prisma.list.update({
         where: { id: input.id },

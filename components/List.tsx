@@ -24,13 +24,13 @@ interface ListProps extends ListType {
   tasks: Task[]
 }
 
-export const listSchema = z.object({
+export const editListSchema = z.object({
   name: z.string().min(1, { message: "list name is required" }),
   boardId: z.string(),
   id: z.string(),
 })
 
-export type ListSchema = z.infer<typeof listSchema>
+type ListSchema = z.infer<typeof editListSchema>
 
 function List({ name, color, tasks, id, boardId }: ListProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
@@ -42,7 +42,7 @@ function List({ name, color, tasks, id, boardId }: ListProps) {
 
   const listMethods = useForm<ListSchema>({
     defaultValues: { name, id, boardId },
-    resolver: zodResolver(listSchema),
+    resolver: zodResolver(editListSchema),
   })
 
   const updateName = trpc.list.editName.useMutation({
