@@ -20,6 +20,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useAssignUser from "@/hooks/useAssignUser"
+import { editListSchema, editTaskSchema } from "@/types/schemas"
 
 interface TaskWithAssignedTo extends TaskType {
   assigned_to: User[]
@@ -28,12 +29,6 @@ interface TaskWithAssignedTo extends TaskType {
 interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]
 }
-
-export const editListSchema = z.object({
-  name: z.string().min(1, { message: "list name is required" }),
-  boardId: z.string(),
-  id: z.string(),
-})
 
 type ListSchema = z.infer<typeof editListSchema>
 
@@ -181,13 +176,6 @@ function List({ name, color, tasks, id, boardId }: ListProps) {
   )
 }
 
-export const editTaskSchema = z.object({
-  name: z.string(),
-  id: z.string(),
-  listId: z.string(),
-  assigned_to: z.array(z.string()).optional(),
-})
-
 type TaskSchema = z.infer<typeof editTaskSchema>
 
 function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
@@ -283,6 +271,8 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
     exit: { height: 0, opacity: 0, padding: 0 },
   }
 
+  //style displaying users, add to api endpoint to delete user
+
   return (
     <>
       <div className="group flex items-center justify-between border-l-8 border-neutral-900 bg-zinc-700 p-2">
@@ -290,9 +280,13 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
           <>
             <div className="flex flex-col">
               <p>{name}</p>
-              {assigned_to.map((user) => (
-                <li key={user.id}>{user.name}</li>
-              ))}
+              <ul className="flex flex-wrap gap-1">
+                {assigned_to.map((user) => (
+                  <li key={user.id} className="text-sm text-neutral-500">
+                    {user.name}
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="scale-0 transition-transform group-hover:scale-100">
               <MenuButton>

@@ -6,7 +6,7 @@ import { colorSchema } from "@/components/ColorPicker"
 import { boardSchema } from "@/components/Boards"
 import { listSchema } from "@/pages"
 import { taskSchema } from "@/components/AddTaskModal"
-import { editTaskSchema } from "@/components/List"
+import { editTaskSchema } from "@/types/schemas"
 
 export const taskRouter = createTRPCRouter({
   create: protectedProcedure

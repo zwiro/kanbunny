@@ -5,7 +5,7 @@ import { boardAndProjectSchema } from "@/components/Project"
 import { colorSchema } from "@/components/ColorPicker"
 import { boardSchema } from "@/components/Boards"
 import { listSchema } from "@/pages"
-import { editListSchema } from "@/components/List"
+import { editListSchema } from "@/types/schemas"
 
 export const listRouter = createTRPCRouter({
   create: protectedProcedure
