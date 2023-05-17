@@ -14,6 +14,7 @@ import { trpc } from "@/utils/trpc"
 import LayoutContext from "@/context/LayoutContext"
 import useAssignUser from "@/hooks/useAssignUser"
 import { taskSchema } from "@/types/schemas"
+import { User } from "@prisma/client"
 
 interface AddTaskModalProps {
   close: () => void
@@ -72,7 +73,7 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
         <FormFieldContainer>
           <p>assign users</p>
           <div className="flex flex-wrap gap-2">
-            {users.data?.map((user) => (
+            {users.data?.map((user: User) => (
               <UserCheckbox
                 key={user.id}
                 name={user.name!}
