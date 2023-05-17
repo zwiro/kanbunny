@@ -1,5 +1,4 @@
-import { useSession } from "next-auth/react"
-import { useEffect, useState, useContext } from "react"
+import { useEffect, useContext } from "react"
 import { useRouter } from "next/router"
 import PlusIcon from "@/components/PlusIcon"
 import List from "@/components/List"
@@ -10,35 +9,21 @@ import MenuItem from "@/components/MenuItem"
 import MenuButton from "@/components/MenuButton"
 import AddButton from "@/components/AddButton"
 import AddEditForm from "@/components/AddEditForm"
-import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import ListContainer from "@/components/ListContainer"
-import AddTaskModal from "@/components/AddTaskModal"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
 import { trpc } from "@/utils/trpc"
 import { z } from "zod"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { BoardSchema } from "@/components/Boards"
 import ColorDot from "@/components/ColorDot"
-import ColorPicker from "@/components/ColorPicker"
-
-export const listSchema = z.object({
-  name: z.string().min(1, { message: "list name is required" }),
-  boardId: z.string(),
-})
-
-type ListSchema = z.infer<typeof listSchema>
+import { listSchema } from "@/types/schemas"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
     useContext(LayoutContext)
-  const [isEditingName, editName, closeEditName] = useAddOrEdit()
-  const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
+
   const [isAdding, add, closeAdd] = useAddOrEdit()
-  const router = useRouter()
-  const { data: session, status } = useSession({
-    required: true,
-  })
+
   const { chosenBoardId } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
@@ -71,6 +56,8 @@ export default function Home() {
       utils.board.getById.invalidate()
     },
   })
+
+  type ListSchema = z.infer<typeof listSchema>
 
   const listMethods = useForm<ListSchema>({
     defaultValues: { boardId: chosenBoardId },

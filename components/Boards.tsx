@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import LayoutContext from "@/context/LayoutContext"
 import ColorDot from "./ColorDot"
+import { boardSchema } from "@/types/schemas"
 
 interface BoardProps {
   name: string
@@ -21,23 +22,11 @@ interface BoardProps {
   projectId: string
 }
 
-export const boardSchema = z.object({
-  name: z.string().min(1, { message: "board name is required" }),
-  projectId: z.string(),
-  id: z.string(),
-})
-
-export type BoardSchema = z.infer<typeof boardSchema>
-
 function Board({ name, color, id, projectId }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
-  const { chosenBoardId, chooseOpenedBoard } = useContext(LayoutContext)
 
-  const boardMethods = useForm<BoardSchema>({
-    defaultValues: { name, id, projectId },
-    resolver: zodResolver(boardSchema),
-  })
+  const { chosenBoardId, chooseOpenedBoard } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
 
@@ -123,8 +112,15 @@ function Board({ name, color, id, projectId }: BoardProps) {
     },
   })
 
+  type BoardSchema = z.infer<typeof boardSchema>
+
+  const boardMethods = useForm<BoardSchema>({
+    defaultValues: { name, id },
+    resolver: zodResolver(boardSchema),
+  })
+
   const onSubmit: SubmitHandler<BoardSchema> = (data: any) => {
-    updateName.mutate({ name: data.name, id, projectId })
+    updateName.mutate({ name: data.name, id })
   }
 
   return (

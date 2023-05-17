@@ -14,9 +14,8 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import Board from "./Boards"
-import { on } from "events"
 import LayoutContext from "@/context/LayoutContext"
-import UserCheckbox from "./UserCheckbox"
+import { boardAndProjectSchema } from "@/types/schemas"
 
 interface ProjectProps {
   project: Project & { boards: Board[] }
@@ -24,15 +23,10 @@ interface ProjectProps {
   participants: User[]
 }
 
-export const boardAndProjectSchema = z.object({
-  name: z.string().min(1, { message: "name is required" }),
-  projectId: z.string(),
-})
-
 type BoardAndProjectSchema = z.infer<typeof boardAndProjectSchema>
 
-function Project({ project, boards, participants }: ProjectProps) {
-  const users = trpc.project.getUsers.useQuery(project.id, {
+function Project({ project, boards }: ProjectProps) {
+  trpc.project.getUsers.useQuery(project.id, {
     onSuccess(data) {
       setAllUsers(data?.map((user) => user.name!))
     },
@@ -40,6 +34,7 @@ function Project({ project, boards, participants }: ProjectProps) {
 
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
+
   const [isAdding, add, closeAdd] = useAddOrEdit()
   const {
     user,
@@ -50,16 +45,7 @@ function Project({ project, boards, participants }: ProjectProps) {
     setAllUsers,
   } = useInviteUser()
 
-  const { chosenBoardId, chooseOpenedBoard } = useContext(LayoutContext)
-
-  const boardMethods = useForm<BoardAndProjectSchema>({
-    defaultValues: { projectId: project.id },
-    resolver: zodResolver(boardAndProjectSchema),
-  })
-  const projectMethods = useForm<BoardAndProjectSchema>({
-    defaultValues: { projectId: project.id, name: project.name },
-    resolver: zodResolver(boardAndProjectSchema),
-  })
+  const { chosenBoardId } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
 
@@ -132,6 +118,16 @@ function Project({ project, boards, participants }: ProjectProps) {
       closeAdd()
       boardMethods.reset()
     },
+  })
+
+  const boardMethods = useForm<BoardAndProjectSchema>({
+    defaultValues: { projectId: project.id },
+    resolver: zodResolver(boardAndProjectSchema),
+  })
+
+  const projectMethods = useForm<BoardAndProjectSchema>({
+    defaultValues: { projectId: project.id, name: project.name },
+    resolver: zodResolver(boardAndProjectSchema),
   })
 
   const onSubmit: SubmitHandler<BoardAndProjectSchema> = (data: any) => {

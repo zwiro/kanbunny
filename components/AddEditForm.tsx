@@ -1,15 +1,6 @@
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import TextInput from "./TextInput"
-import {
-  FormProvider,
-  SubmitHandler,
-  useForm,
-  useFormContext,
-} from "react-hook-form"
-import { z } from "zod"
-import { trpc } from "@/utils/trpc"
-import { zodResolver } from "@hookform/resolvers/zod"
-import FormFieldContainer from "./FormFieldContainer"
+import { SubmitHandler, useFormContext } from "react-hook-form"
 import { LoadingDots } from "./LoadingDots"
 
 interface AddEditFormProps {

@@ -1,8 +1,6 @@
 import { z } from "zod"
-import { protectedProcedure, publicProcedure, createTRPCRouter } from "../trpc"
-import { projectSchema } from "@/components/AddProjectModal"
-import { boardAndProjectSchema } from "@/components/Project"
-import { colorSchema } from "@/components/ColorPicker"
+import { protectedProcedure, createTRPCRouter } from "../trpc"
+import { projectSchema } from "@/types/schemas"
 
 export const projectRouter = createTRPCRouter({
   getByUser: protectedProcedure.query(async ({ ctx }) => {

@@ -8,6 +8,7 @@ import { LoadingDots } from "./LoadingDots"
 
 function Navbar() {
   const { data: session, status } = useSession()
+
   const router = useRouter()
 
   const { toggleSideMenu } = useContext(LayoutContext)

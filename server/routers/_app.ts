@@ -1,5 +1,4 @@
-import { z } from "zod"
-import { protectedProcedure, createTRPCRouter } from "../trpc"
+import { createTRPCRouter } from "../trpc"
 import { projectRouter } from "./project"
 import { boardRouter } from "./board"
 import { listRouter } from "./list"

@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react"
 import { AnimatePresence } from "framer-motion"
-import useClickOutside from "@/hooks/useClickOutside"
 import { motion } from "framer-motion"
 
 interface MenuButtonProps {

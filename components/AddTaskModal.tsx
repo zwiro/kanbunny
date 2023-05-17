@@ -16,32 +16,21 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { trpc } from "@/utils/trpc"
 import LayoutContext from "@/context/LayoutContext"
 import useAssignUser from "@/hooks/useAssignUser"
+import { taskSchema } from "@/types/schemas"
 
 interface AddTaskModalProps {
   close: () => void
   listId: string
 }
 
-export const taskSchema = z.object({
-  name: z.string().min(1, { message: "task name is required" }),
-  assigned_to: z.array(z.string()).optional(),
-  due_to: z.date().optional(),
-  listId: z.string(),
-})
-
-type TaskSchema = z.infer<typeof taskSchema>
-
 function AddTaskModal({ close, listId }: AddTaskModalProps) {
   const [date, onChange] = useState<Date | null>(new Date())
+
   const { chosenBoardId } = useContext(LayoutContext)
+
   const { assignedUsers, assignUser } = useAssignUser()
 
   const users = trpc.board.getUsers.useQuery(chosenBoardId!)
-
-  const methods = useForm<TaskSchema>({
-    defaultValues: { listId },
-    resolver: zodResolver(taskSchema),
-  })
 
   const utils = trpc.useContext()
 
@@ -50,6 +39,13 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
       utils.board.getById.invalidate(chosenBoardId!)
       close()
     },
+  })
+
+  type TaskSchema = z.infer<typeof taskSchema>
+
+  const methods = useForm<TaskSchema>({
+    defaultValues: { listId },
+    resolver: zodResolver(taskSchema),
   })
 
   const onSubmit: SubmitHandler<TaskSchema> = (data) => {

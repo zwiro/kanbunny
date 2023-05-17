@@ -1,10 +1,7 @@
 import { z } from "zod"
-import { protectedProcedure, publicProcedure, createTRPCRouter } from "../trpc"
-import { projectSchema } from "@/components/AddProjectModal"
-import { boardAndProjectSchema } from "@/components/Project"
-import { colorSchema } from "@/components/ColorPicker"
-import { boardSchema } from "@/components/Boards"
-import { listSchema } from "@/pages"
+import { protectedProcedure, createTRPCRouter } from "../trpc"
+import { colorSchema } from "@/types/schemas"
+import { listSchema } from "@/types/schemas"
 import { editListSchema } from "@/types/schemas"
 
 export const listRouter = createTRPCRouter({
