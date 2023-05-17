@@ -190,7 +190,8 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
 
   const assignedToIds = assigned_to.map((u) => u.id)
 
-  const { assignedUsers, assignUser } = useAssignUser(assignedToIds)
+  const { assignedUsers, assignUser, assignUsers } =
+    useAssignUser(assignedToIds)
 
   const utils = trpc.useContext()
 
@@ -200,34 +201,34 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
   })
 
   const updateName = trpc.task.editName.useMutation({
-    async onMutate(updatedTask) {
-      await utils.board.getById.cancel()
-      const prevData = utils.board.getById.getData()
-      utils.board.getById.setData(
-        chosenBoardId!,
-        (old) =>
-          ({
-            ...old,
-            lists: old?.lists.map((l) =>
-              l.id === listId
-                ? {
-                    ...l,
-                    tasks: l.tasks.map((t) =>
-                      t.id === updatedTask.id
-                        ? { ...t, name: updatedTask.name }
-                        : t
-                    ),
-                  }
-                : l
-            ),
-          } as any)
-      )
-      return { prevData }
-    },
-    onError(err, updatedTask, ctx) {
-      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
-    },
-    onSettled() {
+    // async onMutate(updatedTask) {
+    //   await utils.board.getById.cancel()
+    //   const prevData = utils.board.getById.getData()
+    //   utils.board.getById.setData(
+    //     chosenBoardId!,
+    //     (old) =>
+    //       ({
+    //         ...old,
+    //         lists: old?.lists.map((l) =>
+    //           l.id === listId
+    //             ? {
+    //                 ...l,
+    //                 tasks: l.tasks.map((t) =>
+    //                   t.id === updatedTask.id
+    //                     ? { ...t, assigned_to: updatedTask.assigned_to }
+    //                     : t
+    //                 ),
+    //               }
+    //             : l
+    //         ),
+    //       } as any)
+    //   )
+    //   return { prevData }
+    // },
+    // onError(err, updatedTask, ctx) {
+    //   utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+    // },
+    onSuccess() {
       utils.board.getById.invalidate(chosenBoardId!)
       closeEditName()
     },
@@ -237,6 +238,22 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
     async onMutate(updatedTask) {
       await utils.board.getById.cancel()
       const prevData = utils.board.getById.getData()
+
+      return { prevData }
+    },
+    onError(err, updatedTask, ctx) {
+      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+    },
+    onSettled() {
+      utils.board.getById.invalidate(chosenBoardId!)
+      closeEditUsers()
+    },
+  })
+
+  const deleteTask = trpc.task.delete.useMutation({
+    async onMutate(deletedTaskId) {
+      await utils.board.getById.cancel()
+      const prevData = utils.board.getById.getData()
       utils.board.getById.setData(
         chosenBoardId!,
         (old) =>
@@ -246,11 +263,7 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
               l.id === listId
                 ? {
                     ...l,
-                    tasks: l.tasks.map((t) =>
-                      t.id === updatedTask.id
-                        ? { ...t, assigned_to: updatedTask.assigned_to }
-                        : t
-                    ),
+                    tasks: l.tasks.filter((t) => t.id !== deletedTaskId),
                   }
                 : l
             ),
@@ -258,12 +271,11 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
       )
       return { prevData }
     },
-    onError(err, updatedTask, ctx) {
+    onError(err, deletedTaskId, ctx) {
       utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
     },
     onSettled() {
       utils.board.getById.invalidate(chosenBoardId!)
-      closeEditUsers()
     },
   })
 
@@ -288,8 +300,6 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
     })
   }
 
-  console.log(assignedUsers)
-
   return (
     <>
       <div className="group flex items-center justify-between border-l-8 border-neutral-900 bg-zinc-700 p-2">
@@ -309,7 +319,9 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
               <MenuButton>
                 <MenuItem handleClick={editName}>edit task name</MenuItem>
                 <MenuItem handleClick={editUsers}>assign user</MenuItem>
-                <MenuItem>delete task</MenuItem>
+                <MenuItem handleClick={() => deleteTask.mutate(id)}>
+                  delete task
+                </MenuItem>
               </MenuButton>
             </div>
           </>
@@ -353,6 +365,7 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
                     assigned_to: assignedUsers,
                   })
                 }
+                disabled={updateUsers.isLoading}
                 className="ml-auto transition-transform hover:scale-110"
               >
                 <AiOutlineCheck size={20} />

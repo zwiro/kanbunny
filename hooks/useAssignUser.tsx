@@ -11,9 +11,14 @@ function useAssignUser(initialState: string[] = []) {
     }
   }
 
+  const assignUsers = (users: string[]) => {
+    setAssignedUsers(users)
+  }
+
   return {
     assignUser,
     assignedUsers,
+    assignUsers,
   }
 }
 

@@ -55,7 +55,7 @@ export const taskRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
-      const list = await ctx.prisma.list.delete({
+      const list = await ctx.prisma.task.delete({
         where: { id: input },
       })
       return list
