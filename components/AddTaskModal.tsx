@@ -14,7 +14,7 @@ import { trpc } from "@/utils/trpc"
 import LayoutContext from "@/context/LayoutContext"
 import useAssignUser from "@/hooks/useAssignUser"
 import { taskSchema } from "@/types/schemas"
-import { User } from "@prisma/client"
+import type { User } from "@prisma/client"
 
 interface AddTaskModalProps {
   close: () => void
