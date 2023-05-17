@@ -12,7 +12,12 @@ import useClickOutside from "@/hooks/useClickOutside"
 import { useRef } from "react"
 import ColorPicker from "./ColorPicker"
 import UserCheckbox from "./UserCheckbox"
-import type { List as ListType, Task as TaskType, User } from "@prisma/client"
+import type {
+  List as ListType,
+  Prisma,
+  Task as TaskType,
+  User,
+} from "@prisma/client"
 import ColorDot from "./ColorDot"
 import { trpc } from "@/utils/trpc"
 import LayoutContext from "@/context/LayoutContext"
@@ -22,9 +27,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import useAssignUser from "@/hooks/useAssignUser"
 import { editListSchema, editTaskSchema } from "@/types/schemas"
 
-interface TaskWithAssignedTo extends TaskType {
-  assigned_to: User[]
-}
+type TaskWithAssignedTo = Prisma.TaskGetPayload<{
+  include: { assigned_to: true }
+}>
 
 interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]
@@ -182,7 +187,10 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
   const { chosenBoardId } = useContext(LayoutContext)
-  const { assignedUsers, assignUser } = useAssignUser()
+
+  const assignedToIds = assigned_to.map((u) => u.id)
+
+  const { assignedUsers, assignUser } = useAssignUser(assignedToIds)
 
   const utils = trpc.useContext()
 
@@ -271,7 +279,16 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
     exit: { height: 0, opacity: 0, padding: 0 },
   }
 
-  //style displaying users, add to api endpoint to delete user
+  const onSubmitUsers: SubmitHandler<TaskSchema> = (data: any) => {
+    updateUsers.mutate({
+      assigned_to: assignedUsers,
+      id,
+      listId,
+      name,
+    })
+  }
+
+  console.log(assignedUsers)
 
   return (
     <>
@@ -279,7 +296,7 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
         {!isEditingName ? (
           <>
             <div className="flex flex-col">
-              <p>{name}</p>
+              <p className="font-bold">{name}</p>
               <ul className="flex flex-wrap gap-1">
                 {assigned_to.map((user) => (
                   <li key={user.id} className="text-sm text-neutral-500">
@@ -311,13 +328,18 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
       </div>
       <AnimatePresence>
         {isEditingUsers && (
-          <motion.div {...taskAnimation}>
+          <motion.form
+            onSubmit={taskMethods.handleSubmit(onSubmitUsers)}
+            {...taskAnimation}
+          >
             <div className="flex flex-wrap gap-2">
               {users.data?.map((user) => (
                 <UserCheckbox
                   key={user.id}
                   name={user.name!}
+                  id={user.id}
                   assignUser={assignUser}
+                  isAssigned={assignedToIds.includes(user.id)}
                 />
               ))}
             </div>
@@ -343,7 +365,7 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
                 <AiOutlineClose size={20} />
               </button>
             </div>
-          </motion.div>
+          </motion.form>
         )}
       </AnimatePresence>
     </>

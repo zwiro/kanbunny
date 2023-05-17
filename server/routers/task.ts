@@ -14,7 +14,7 @@ export const taskRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const users = await ctx.prisma.user.findMany({
         where: {
-          name: { in: input.assigned_to },
+          id: { in: input.assigned_to },
         },
       })
       const task = await ctx.prisma.task.create({
@@ -41,13 +41,13 @@ export const taskRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const users = await ctx.prisma.user.findMany({
         where: {
-          name: { in: input.assigned_to },
+          id: { in: input.assigned_to },
         },
       })
       const task = await ctx.prisma.task.update({
         where: { id: input.id },
         data: {
-          assigned_to: { connect: users.map((user) => ({ id: user.id })) },
+          assigned_to: { set: users.map((user) => ({ id: user.id })) },
         },
       })
       return task

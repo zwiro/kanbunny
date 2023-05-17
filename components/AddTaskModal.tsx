@@ -83,6 +83,7 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
               <UserCheckbox
                 key={user.id}
                 name={user.name!}
+                id={user.id}
                 assignUser={assignUser}
               />
             ))}
