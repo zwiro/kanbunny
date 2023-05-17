@@ -3,7 +3,7 @@ import { useRef } from "react"
 import { motion } from "framer-motion"
 import { z } from "zod"
 import { UseTRPCMutationResult } from "@trpc/react-query/shared"
-import { Board, List } from "@prisma/client"
+import type { Board, List } from "@prisma/client"
 import { colorSchema } from "@/types/schemas"
 
 interface ColorPickerProps {

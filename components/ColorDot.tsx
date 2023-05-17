@@ -1,4 +1,4 @@
-import { Color } from "@prisma/client"
+import type { Color } from "@prisma/client"
 
 interface ColorDotProps {
   editColor?: () => void
