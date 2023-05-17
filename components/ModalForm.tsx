@@ -1,7 +1,6 @@
 import useClickOutside from "@/hooks/useClickOutside"
 import { motion } from "framer-motion"
 import { useRef } from "react"
-import { useFormContext } from "react-hook-form"
 
 const modalVariant = {
   hidden: {

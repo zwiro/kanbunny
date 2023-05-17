@@ -1,5 +1,3 @@
-import { AnimatePresence } from "framer-motion"
-import ColorPicker from "./ColorPicker"
 import { Color } from "@prisma/client"
 
 interface ColorDotProps {

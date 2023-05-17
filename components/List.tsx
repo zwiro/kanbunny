@@ -1,23 +1,15 @@
-import { useContext, useState } from "react"
+import { useContext } from "react"
 import MenuButton from "./MenuButton"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import AddEditForm from "./AddEditForm"
-import ListContainer from "./ListContainer"
 import AddTaskModal from "./AddTaskModal"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
 import { AnimatePresence, motion } from "framer-motion"
-import useClickOutside from "@/hooks/useClickOutside"
-import { useRef } from "react"
 import ColorPicker from "./ColorPicker"
 import UserCheckbox from "./UserCheckbox"
-import type {
-  List as ListType,
-  Prisma,
-  Task as TaskType,
-  User,
-} from "@prisma/client"
+import type { List as ListType, Prisma, Task } from "@prisma/client"
 import ColorDot from "./ColorDot"
 import { trpc } from "@/utils/trpc"
 import LayoutContext from "@/context/LayoutContext"
@@ -35,20 +27,14 @@ interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]
 }
 
-type ListSchema = z.infer<typeof editListSchema>
-
 function List({ name, color, tasks, id, boardId }: ListProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
+
   const { chosenBoardId } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
-
-  const listMethods = useForm<ListSchema>({
-    defaultValues: { name, id, boardId },
-    resolver: zodResolver(editListSchema),
-  })
 
   const updateName = trpc.list.editName.useMutation({
     async onMutate(updatedList) {
@@ -120,6 +106,13 @@ function List({ name, color, tasks, id, boardId }: ListProps) {
     onSettled() {
       utils.board.getById.invalidate(boardId)
     },
+  })
+
+  type ListSchema = z.infer<typeof editListSchema>
+
+  const listMethods = useForm<ListSchema>({
+    defaultValues: { name, id, boardId },
+    resolver: zodResolver(editListSchema),
   })
 
   const onSubmit: SubmitHandler<ListSchema> = (data: any) => {

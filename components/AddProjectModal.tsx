@@ -8,25 +8,15 @@ import { useForm, FormProvider, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { trpc } from "@/utils/trpc"
+import { projectSchema } from "@/types/schemas"
 
 interface AddProjectModalProps {
   close: () => void
 }
 
-export const projectSchema = z.object({
-  name: z.string().min(1, { message: "project name is required" }),
-  invited_users: z.array(z.string()).optional(),
-})
-
-type ProjectSchema = z.infer<typeof projectSchema>
-
 function AddProjectModal({ close }: AddProjectModalProps) {
   const { user, invitedUsers, inviteUser, removeUser, handleChange } =
     useInviteUser()
-
-  const methods = useForm<ProjectSchema>({
-    resolver: zodResolver(projectSchema),
-  })
 
   const utils = trpc.useContext()
 
@@ -35,6 +25,12 @@ function AddProjectModal({ close }: AddProjectModalProps) {
       utils.project.getByUser.invalidate()
       close()
     },
+  })
+
+  type ProjectSchema = z.infer<typeof projectSchema>
+
+  const methods = useForm<ProjectSchema>({
+    resolver: zodResolver(projectSchema),
   })
 
   const onSubmit: SubmitHandler<ProjectSchema> = (data: any) => {

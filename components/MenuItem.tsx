@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react"
-
 interface MenuItemProps {
   children: string
   handleClick?: () => void
