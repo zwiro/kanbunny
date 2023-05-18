@@ -1,4 +1,4 @@
-import { useEffect, useContext } from "react"
+import { useEffect, useContext, useState } from "react"
 import { useRouter } from "next/router"
 import PlusIcon from "@/components/PlusIcon"
 import List from "@/components/List"
@@ -29,7 +29,11 @@ export default function Home() {
   const utils = trpc.useContext()
 
   const userProjects = trpc.project.getByUser.useQuery()
-  const board = trpc.board.getById.useQuery(chosenBoardId!)
+
+  const board = trpc.board.getById.useQuery(chosenBoardId!, {
+    enabled: !!chosenBoardId,
+  })
+
   const createList = trpc.list.create.useMutation({
     async onMutate(createdList) {
       await utils.board.getById.cancel()
@@ -66,7 +70,7 @@ export default function Home() {
 
   useEffect(() => {
     listMethods.reset({ boardId: chosenBoardId })
-  }, [chosenBoardId, listMethods])
+  }, [chosenBoardId, listMethods, board.data])
 
   const onSubmit: SubmitHandler<ListSchema> = (data: any) => {
     createList.mutate({
