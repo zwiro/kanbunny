@@ -32,7 +32,7 @@ export const boardRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const users = await ctx.prisma.user.findMany({
         where: {
-          projects_in: { some: { boards: { some: { id: input } } } },
+          projects_in: { some: { userId: input } },
         },
       })
       return users

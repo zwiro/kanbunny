@@ -34,6 +34,8 @@ export default function Home() {
     enabled: !!chosenBoardId,
   })
 
+  console.log(userProjects.data)
+
   const createList = trpc.list.create.useMutation({
     async onMutate(createdList) {
       await utils.board.getById.cancel()

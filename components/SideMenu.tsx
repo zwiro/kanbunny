@@ -7,14 +7,15 @@ import React from "react"
 import { LoadingDots } from "./LoadingDots"
 import { useSession } from "next-auth/react"
 import Project from "./Project"
-import type { Board, User } from "@prisma/client"
+import type { Board, ProjectUser, User } from "@prisma/client"
 
 interface SideMenuProps {
   data:
     | (Project & {
+        owner: User
         boards: Board[]
+        users: ProjectUser[]
         invited_users: User[]
-        users: User[]
       })[]
     | undefined
   isLoading: boolean

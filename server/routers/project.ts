@@ -4,12 +4,21 @@ import { projectSchema } from "@/types/schemas"
 
 export const projectRouter = createTRPCRouter({
   getByUser: protectedProcedure.query(async ({ ctx }) => {
-    const projects = await ctx.prisma.project.findMany({
-      where: { users: { some: { id: ctx.session.user.id } } },
-      orderBy: { created_at: "desc" },
-      include: { boards: true, users: true, invited_users: true },
+    const projects = await ctx.prisma.projectUser.findMany({
+      where: { userId: ctx.session.user.id },
+      orderBy: { order: "desc" },
+      select: {
+        project: {
+          include: {
+            boards: true,
+            invited_users: true,
+            owner: true,
+            users: true,
+          },
+        },
+      },
     })
-    return projects
+    return projects.map((project) => project.project)
   }),
   getById: protectedProcedure
     .input(z.string())
@@ -36,6 +45,11 @@ export const projectRouter = createTRPCRouter({
   create: protectedProcedure
     .input(projectSchema)
     .mutation(async ({ ctx, input }) => {
+      const highestOrderProject = await ctx.prisma.projectUser.findFirst({
+        where: { userId: ctx.session.user.id },
+        orderBy: { order: "desc" },
+      })
+      const order = highestOrderProject ? highestOrderProject.order + 1 : 0
       const invitedUsers = await ctx.prisma.user.findMany({
         where: { name: { in: input.invited_users } },
       })
@@ -43,7 +57,12 @@ export const projectRouter = createTRPCRouter({
         data: {
           name: input.name,
           ownerId: ctx.session.user.id,
-          users: { connect: { id: ctx.session.user.id } },
+          users: {
+            create: {
+              user: { connect: { id: ctx.session.user.id } },
+              order: order,
+            },
+          },
           invited_users: {
             connect: invitedUsers
               .filter((user) => user.id !== ctx.session.user.id)

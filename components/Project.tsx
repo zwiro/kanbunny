@@ -8,7 +8,7 @@ import React, { useContext } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useInviteUser from "@/hooks/useInviteUser"
 import { trpc } from "@/utils/trpc"
-import type { Project, User } from "@prisma/client"
+import type { Project, ProjectUser, User } from "@prisma/client"
 import { LoadingDots } from "./LoadingDots"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -20,7 +20,7 @@ import { boardAndProjectSchema } from "@/types/schemas"
 interface ProjectProps {
   project: Project & { boards: Board[] }
   boards: Board[]
-  participants: User[]
+  participants: (User | ProjectUser)[]
 }
 
 type BoardAndProjectSchema = z.infer<typeof boardAndProjectSchema>
