@@ -31,6 +31,14 @@ function ColorPicker({ close, id, editColor }: ColorPickerProps) {
     exit: { opacity: 0 },
   }
 
+  // const colorClasses = {
+  //   red: "bg-red-500",
+  //   blue: "bg-blue-500",
+  //   green: "bg-green-500",
+  //   yellow: "bg-yellow-500",
+  //   pink: "bg-pink-500",
+  // }
+
   return (
     <motion.div
       {...pickerAnimation}
