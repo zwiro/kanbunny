@@ -16,16 +16,19 @@ import { z } from "zod"
 import Board from "./Boards"
 import LayoutContext from "@/context/LayoutContext"
 import { boardAndProjectSchema } from "@/types/schemas"
+import { GoGrabber } from "react-icons/go"
+import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
 
 interface ProjectProps {
   project: Project & { boards: Board[] }
   boards: Board[]
   participants: (User | ProjectUser)[]
+  dragHandleProps: DraggableProvidedDragHandleProps | null
 }
 
 type BoardAndProjectSchema = z.infer<typeof boardAndProjectSchema>
 
-function Project({ project, boards }: ProjectProps) {
+function Project({ project, boards, dragHandleProps }: ProjectProps) {
   trpc.project.getUsers.useQuery(project.id, {
     onSuccess(data) {
       setAllUsers(data?.map((user) => user.name!))
@@ -169,6 +172,10 @@ function Project({ project, boards }: ProjectProps) {
               delete project
             </MenuItem>
           </MenuButton>
+
+          <div {...dragHandleProps} className="ml-auto cursor-grab">
+            <GoGrabber />
+          </div>
         </div>
       ) : (
         <div className="pt-1.5">

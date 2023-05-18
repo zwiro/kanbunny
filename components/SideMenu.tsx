@@ -8,6 +8,15 @@ import { LoadingDots } from "./LoadingDots"
 import { useSession } from "next-auth/react"
 import Project from "./Project"
 import type { Board, ProjectUser, User } from "@prisma/client"
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "@hello-pangea/dnd"
+import { trpc } from "@/utils/trpc"
+import getProjectOrder from "@/utils/getProjectOrder"
+import { get } from "http"
 
 interface SideMenuProps {
   data:
@@ -33,6 +42,25 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
     transition: { type: "tween" },
   }
 
+  const utils = trpc.useContext()
+
+  const reorder = trpc.project.reorder.useMutation({
+    onSuccess() {
+      utils.project.getByUser.invalidate()
+    },
+  })
+
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination } = result
+    if (!result.destination) {
+      return
+    }
+    reorder.mutate({
+      projectOneIndex: source.index,
+      projectTwoIndex: destination!.index,
+    })
+  }
+
   return (
     <>
       <motion.aside
@@ -47,18 +75,43 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
         ) : (
           <LoadingDots />
         )}
-        {!!data?.length &&
-          data?.map((project) => (
-            <Project
-              key={project.id}
-              project={project}
-              boards={project.boards}
-              participants={[
-                ...project.invited_users,
-                ...project.users.filter((user) => user.id !== session?.user.id),
-              ]}
-            />
-          ))}
+        <DragDropContext onDragEnd={onDragEnd}>
+          {!!data?.length && (
+            <Droppable droppableId="projects">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {data?.map((project, index) => (
+                    <Draggable
+                      key={project.id}
+                      draggableId={project.id}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                        >
+                          <Project
+                            project={project}
+                            boards={project.boards}
+                            participants={[
+                              ...project.invited_users,
+                              ...project.users.filter(
+                                (user) => user.id !== session?.user.id
+                              ),
+                            ]}
+                            dragHandleProps={provided.dragHandleProps}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          )}
+        </DragDropContext>
         {!data?.length && !isLoading && (
           <p className="text-netural-500 text-center">no projects yet</p>
         )}

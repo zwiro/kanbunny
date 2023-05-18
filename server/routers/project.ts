@@ -13,7 +13,7 @@ export const projectRouter = createTRPCRouter({
             boards: true,
             invited_users: true,
             owner: true,
-            users: true,
+            users: { select: { order: true } },
           },
         },
       },
@@ -41,6 +41,15 @@ export const projectRouter = createTRPCRouter({
         },
       })
       return users
+    }),
+  getOrder: protectedProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const order = await ctx.prisma.projectUser.findFirst({
+        where: { projectId: input },
+        select: { order: true },
+      })
+      return order
     }),
   create: protectedProcedure
     .input(projectSchema)
@@ -124,6 +133,33 @@ export const projectRouter = createTRPCRouter({
         },
       })
       return project
+    }),
+  reorder: protectedProcedure
+    .input(
+      z.object({ projectOneIndex: z.number(), projectTwoIndex: z.number() })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userProjectOne = await ctx.prisma.projectUser.findFirst({
+        where: { order: input.projectOneIndex },
+      })
+
+      const userProjectTwo = await ctx.prisma.projectUser.findFirst({
+        where: { order: input.projectTwoIndex },
+      })
+      const orderOne = userProjectOne?.order
+      const orderTwo = userProjectTwo?.order
+
+      await ctx.prisma.projectUser.update({
+        where: { id: userProjectOne?.id },
+        data: { order: orderTwo },
+      })
+
+      await ctx.prisma.projectUser.update({
+        where: { id: userProjectTwo?.id },
+        data: { order: orderOne },
+      })
+
+      return { success: true }
     }),
   delete: protectedProcedure
     .input(z.string())
