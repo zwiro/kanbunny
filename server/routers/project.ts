@@ -6,20 +6,26 @@ export const projectRouter = createTRPCRouter({
   getByUser: protectedProcedure.query(async ({ ctx }) => {
     const projects = await ctx.prisma.projectUser.findMany({
       where: { userId: ctx.session.user.id },
-      orderBy: { order: "asc" },
+      // orderBy: { order: "asc" },
       select: {
         project: {
           include: {
             boards: true,
             invited_users: true,
             owner: true,
-            users: { select: { order: true } },
+            users: {
+              where: { userId: ctx.session.user.id },
+              select: { order: true },
+            },
           },
         },
       },
     })
-
-    return projects.map((project) => project.project)
+    const modifiedProjects = projects.map((project) => ({
+      ...project.project,
+      order: project.project.users[0].order,
+    }))
+    return modifiedProjects
   }),
   getById: protectedProcedure
     .input(z.string())
@@ -142,7 +148,11 @@ export const projectRouter = createTRPCRouter({
     }),
   reorder: protectedProcedure
     .input(
-      z.object({ projectOneIndex: z.number(), projectTwoIndex: z.number() })
+      z.object({
+        projectOneIndex: z.number(),
+        projectTwoIndex: z.number(),
+        draggableId: z.string(),
+      })
     )
     .mutation(async ({ ctx, input }) => {
       const projectDragged = await ctx.prisma.projectUser.findFirst({

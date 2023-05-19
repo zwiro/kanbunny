@@ -153,160 +153,138 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
     exit: { height: 0, opacity: 0 },
   }
 
-  const order = trpc.project.getOrder.useQuery(project.id)
-
   return (
-    <Draggable
-      key={project.id}
-      draggableId={project.id}
-      index={order.data?.order!}
-    >
-      {(provided) => (
-        <section
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          className="draggable my-4 border-b border-neutral-700"
-        >
-          {!isEditingName ? (
-            <div className="flex items-center gap-4">
-              <p
-                className={`relative after:absolute after:-bottom-1 after:left-0 after:z-10 after:h-1 after:w-0 after:bg-white after:transition-all ${
-                  project.boards.map((b) => b.id).includes(chosenBoardId!) &&
-                  "after:w-[100%]"
-                }`}
-              >
-                {project.name}
-              </p>
-              <MenuButton>
-                <MenuItem handleClick={add}>add board</MenuItem>
-                <MenuItem handleClick={editUsers}>edit users</MenuItem>
-                <MenuItem handleClick={editName}>edit project name</MenuItem>
-                <MenuItem handleClick={() => deleteProject.mutate(project.id)}>
-                  delete project
-                </MenuItem>
-              </MenuButton>
+    <section className="my-4 border-b border-neutral-700">
+      {!isEditingName ? (
+        <div className="flex items-center gap-4">
+          <p
+            className={`relative after:absolute after:-bottom-1 after:left-0 after:z-10 after:h-1 after:w-0 after:bg-white after:transition-all ${
+              project.boards.map((b) => b.id).includes(chosenBoardId!) &&
+              "after:w-[100%]"
+            }`}
+          >
+            {project.name}
+          </p>
+          <MenuButton>
+            <MenuItem handleClick={add}>add board</MenuItem>
+            <MenuItem handleClick={editUsers}>edit users</MenuItem>
+            <MenuItem handleClick={editName}>edit project name</MenuItem>
+            <MenuItem handleClick={() => deleteProject.mutate(project.id)}>
+              delete project
+            </MenuItem>
+          </MenuButton>
 
-              <div
-                {...provided.dragHandleProps}
-                className="ml-auto cursor-grab"
-              >
-                <GoGrabber />
+          <div {...dragHandleProps} className="ml-auto cursor-grab">
+            <GoGrabber />
+          </div>
+        </div>
+      ) : (
+        <div className="pt-1.5">
+          <FormProvider {...projectMethods}>
+            <AddEditForm
+              name="name"
+              placeholder="project name"
+              handleSubmit={projectMethods.handleSubmit(onSubmitName)}
+              defaultValue={project.name}
+              isLoading={updateName.isLoading}
+              close={closeEditName}
+            />
+          </FormProvider>
+          {projectMethods.formState.errors && (
+            <p role="alert" className="text-base text-red-500">
+              {projectMethods.formState.errors?.name?.message as string}
+            </p>
+          )}
+        </div>
+      )}
+      <AnimatePresence>
+        {isEditingUsers && (
+          <motion.div
+            {...projectUsersAnimation}
+            className="flex flex-col gap-2 pt-4 text-base"
+          >
+            <form onSubmit={handleSubmitUsers} className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <input
+                  id="user"
+                  type="text"
+                  placeholder="johndoe211"
+                  className="w-44 border bg-zinc-900 p-1 text-xl"
+                  value={user}
+                  onChange={handleChange}
+                />
+                <button onClick={inviteUser} className="group">
+                  <PlusIcon />
+                </button>
               </div>
-            </div>
-          ) : (
-            <div className="pt-1.5">
-              <FormProvider {...projectMethods}>
+              <p>invited or participating ({invitedUsers.length})</p>
+              <ul className="flex flex-wrap gap-2">
+                {invitedUsers.map((user, i) => (
+                  <li
+                    key={`${user}-${i}`}
+                    onClick={() => removeUser(user)}
+                    className="cursor-pointer border border-zinc-900 bg-zinc-900 p-2 transition-colors hover:bg-transparent"
+                  >
+                    {user}
+                  </li>
+                ))}
+              </ul>
+              <div className="flex items-center gap-1">
+                {!updateUsers.isLoading ? (
+                  <>
+                    <button
+                      type="submit"
+                      className="transition-transform hover:scale-110 disabled:hover:scale-100"
+                    >
+                      <AiOutlineCheck size={24} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={closeEditUsers}
+                      className="transition-transform hover:scale-110"
+                    >
+                      <AiOutlineClose size={24} />
+                    </button>
+                  </>
+                ) : (
+                  <div className="mr-auto h-6">
+                    <LoadingDots />
+                  </div>
+                )}
+              </div>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <ul className="flex flex-col gap-2 py-4 lg:gap-4">
+        {isAdding && (
+          <>
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 rounded-full bg-red-500" />
+              <FormProvider {...boardMethods}>
                 <AddEditForm
                   name="name"
-                  placeholder="project name"
-                  handleSubmit={projectMethods.handleSubmit(onSubmitName)}
-                  defaultValue={project.name}
-                  isLoading={updateName.isLoading}
-                  close={closeEditName}
+                  placeholder="board name"
+                  handleSubmit={boardMethods.handleSubmit(onSubmit)}
+                  close={closeAdd}
+                  isLoading={createBoard.isLoading}
                 />
               </FormProvider>
-              {projectMethods.formState.errors && (
-                <p role="alert" className="text-base text-red-500">
-                  {projectMethods.formState.errors?.name?.message as string}
-                </p>
-              )}
             </div>
-          )}
-          <AnimatePresence>
-            {isEditingUsers && (
-              <motion.div
-                {...projectUsersAnimation}
-                className="flex flex-col gap-2 pt-4 text-base"
-              >
-                <form
-                  onSubmit={handleSubmitUsers}
-                  className="flex flex-col gap-2"
-                >
-                  <div className="flex items-center gap-2">
-                    <input
-                      id="user"
-                      type="text"
-                      placeholder="johndoe211"
-                      className="w-44 border bg-zinc-900 p-1 text-xl"
-                      value={user}
-                      onChange={handleChange}
-                    />
-                    <button onClick={inviteUser} className="group">
-                      <PlusIcon />
-                    </button>
-                  </div>
-                  <p>invited or participating ({invitedUsers.length})</p>
-                  <ul className="flex flex-wrap gap-2">
-                    {invitedUsers.map((user, i) => (
-                      <li
-                        key={`${user}-${i}`}
-                        onClick={() => removeUser(user)}
-                        className="cursor-pointer border border-zinc-900 bg-zinc-900 p-2 transition-colors hover:bg-transparent"
-                      >
-                        {user}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex items-center gap-1">
-                    {!updateUsers.isLoading ? (
-                      <>
-                        <button
-                          type="submit"
-                          className="transition-transform hover:scale-110 disabled:hover:scale-100"
-                        >
-                          <AiOutlineCheck size={24} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={closeEditUsers}
-                          className="transition-transform hover:scale-110"
-                        >
-                          <AiOutlineClose size={24} />
-                        </button>
-                      </>
-                    ) : (
-                      <div className="mr-auto h-6">
-                        <LoadingDots />
-                      </div>
-                    )}
-                  </div>
-                </form>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <ul className="flex flex-col gap-2 py-4 lg:gap-4">
-            {isAdding && (
-              <>
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 rounded-full bg-red-500" />
-                  <FormProvider {...boardMethods}>
-                    <AddEditForm
-                      name="name"
-                      placeholder="board name"
-                      handleSubmit={boardMethods.handleSubmit(onSubmit)}
-                      close={closeAdd}
-                      isLoading={createBoard.isLoading}
-                    />
-                  </FormProvider>
-                </div>
-                {boardMethods.formState.errors && (
-                  <p role="alert" className="pl-6 text-base text-red-500">
-                    {boardMethods.formState.errors?.name?.message as string}
-                  </p>
-                )}
-              </>
-            )}
-            {!!boards.length &&
-              boards.map((board) => <Board key={board.id} {...board} />)}
-            {!boards.length && (
-              <p className="text-base font-bold text-neutral-500">
-                no boards yet
+            {boardMethods.formState.errors && (
+              <p role="alert" className="pl-6 text-base text-red-500">
+                {boardMethods.formState.errors?.name?.message as string}
               </p>
             )}
-          </ul>
-        </section>
-      )}
-    </Draggable>
+          </>
+        )}
+        {!!boards.length &&
+          boards.map((board) => <Board key={board.id} {...board} />)}
+        {!boards.length && (
+          <p className="text-base font-bold text-neutral-500">no boards yet</p>
+        )}
+      </ul>
+    </section>
   )
 }
 
