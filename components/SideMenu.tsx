@@ -45,14 +45,15 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
   const utils = trpc.useContext()
 
   const reorder = trpc.project.reorder.useMutation({
-    onSuccess() {
+    onSettled() {
       utils.project.getByUser.invalidate()
+      utils.project.getOrder.invalidate()
     },
   })
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result
-    if (!result.destination) {
+    if (!result.destination || source?.index === destination?.index) {
       return
     }
     reorder.mutate({
@@ -60,6 +61,8 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
       projectTwoIndex: destination!.index,
     })
   }
+
+  // add animation, optimistic update
 
   return (
     <>
@@ -80,31 +83,32 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
             <Droppable droppableId="projects">
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {data?.map((project, index) => (
-                    <Draggable
+                  {data?.map((project) => (
+                    // <Draggable
+                    //   key={project.id}
+                    //   draggableId={project.id}
+                    //   index={getProjectOrder(project.id, data.length)}
+                    // >
+                    //   {(provided) => (
+                    //     <div
+                    //       ref={provided.innerRef}
+                    //       {...provided.draggableProps}
+                    //     >
+                    <Project
                       key={project.id}
-                      draggableId={project.id}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                        >
-                          <Project
-                            project={project}
-                            boards={project.boards}
-                            participants={[
-                              ...project.invited_users,
-                              ...project.users.filter(
-                                (user) => user.id !== session?.user.id
-                              ),
-                            ]}
-                            dragHandleProps={provided.dragHandleProps}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
+                      project={project}
+                      boards={project.boards}
+                      participants={[
+                        ...project.invited_users,
+                        ...project.users.filter(
+                          (user) => user.id !== session?.user.id
+                        ),
+                      ]}
+                      // dragHandleProps={provided.dragHandleProps}
+                    />
+                    //     </div>
+                    //   )}
+                    // </Draggable>
                   ))}
                   {provided.placeholder}
                 </div>

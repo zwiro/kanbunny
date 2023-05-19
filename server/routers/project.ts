@@ -6,7 +6,7 @@ export const projectRouter = createTRPCRouter({
   getByUser: protectedProcedure.query(async ({ ctx }) => {
     const projects = await ctx.prisma.projectUser.findMany({
       where: { userId: ctx.session.user.id },
-      orderBy: { order: "desc" },
+      orderBy: { order: "asc" },
       select: {
         project: {
           include: {
@@ -18,6 +18,7 @@ export const projectRouter = createTRPCRouter({
         },
       },
     })
+
     return projects.map((project) => project.project)
   }),
   getById: protectedProcedure
@@ -51,14 +52,15 @@ export const projectRouter = createTRPCRouter({
       })
       return order
     }),
+  getLength: protectedProcedure.query(async ({ ctx }) => {
+    const length = await ctx.prisma.projectUser.count({
+      where: { userId: ctx.session.user.id },
+    })
+    return length
+  }),
   create: protectedProcedure
     .input(projectSchema)
     .mutation(async ({ ctx, input }) => {
-      const highestOrderProject = await ctx.prisma.projectUser.findFirst({
-        where: { userId: ctx.session.user.id },
-        orderBy: { order: "desc" },
-      })
-      const order = highestOrderProject ? highestOrderProject.order + 1 : 0
       const invitedUsers = await ctx.prisma.user.findMany({
         where: { name: { in: input.invited_users } },
       })
@@ -69,7 +71,7 @@ export const projectRouter = createTRPCRouter({
           users: {
             create: {
               user: { connect: { id: ctx.session.user.id } },
-              order: order,
+              order: 0,
             },
           },
           invited_users: {
@@ -78,6 +80,10 @@ export const projectRouter = createTRPCRouter({
               .map((user) => ({ id: user.id })),
           },
         },
+      })
+      await ctx.prisma.projectUser.updateMany({
+        where: { NOT: { projectId: project.id } },
+        data: { order: { increment: 1 } },
       })
       return project
     }),
@@ -139,25 +145,40 @@ export const projectRouter = createTRPCRouter({
       z.object({ projectOneIndex: z.number(), projectTwoIndex: z.number() })
     )
     .mutation(async ({ ctx, input }) => {
-      const userProjectOne = await ctx.prisma.projectUser.findFirst({
+      const projectDragged = await ctx.prisma.projectUser.findFirst({
         where: { order: input.projectOneIndex },
       })
 
-      const userProjectTwo = await ctx.prisma.projectUser.findFirst({
-        where: { order: input.projectTwoIndex },
-      })
-      const orderOne = userProjectOne?.order
-      const orderTwo = userProjectTwo?.order
-
       await ctx.prisma.projectUser.update({
-        where: { id: userProjectOne?.id },
-        data: { order: orderTwo },
+        where: { id: projectDragged?.id },
+        data: { order: input.projectTwoIndex },
       })
 
-      await ctx.prisma.projectUser.update({
-        where: { id: userProjectTwo?.id },
-        data: { order: orderOne },
-      })
+      if (input.projectOneIndex > input.projectTwoIndex) {
+        await ctx.prisma.projectUser.updateMany({
+          where: {
+            AND: [
+              { order: { gte: input.projectTwoIndex } },
+              { order: { lte: input.projectOneIndex } },
+              { NOT: { id: projectDragged?.id } },
+            ],
+          },
+          data: { order: { increment: 1 } },
+        })
+      }
+
+      if (input.projectOneIndex < input.projectTwoIndex) {
+        await ctx.prisma.projectUser.updateMany({
+          where: {
+            AND: [
+              { order: { lte: input.projectTwoIndex } },
+              { order: { gte: input.projectOneIndex } },
+              { NOT: { id: projectDragged?.id } },
+            ],
+          },
+          data: { order: { decrement: 1 } },
+        })
+      }
 
       return { success: true }
     }),
