@@ -10,7 +10,7 @@ function ColorDot({ editColor, color, children }: ColorDotProps) {
   return (
     <div
       onClick={editColor}
-      className={`relative h-4 w-4 cursor-pointer rounded-full bg-${color}-500`}
+      className={`relative h-4 w-4 cursor-pointer bg-${color}-500`}
     >
       {children}
     </div>

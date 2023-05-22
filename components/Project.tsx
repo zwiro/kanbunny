@@ -13,12 +13,14 @@ import { LoadingDots } from "./LoadingDots"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import Board from "./Boards"
+import Board from "./Board"
 import LayoutContext from "@/context/LayoutContext"
 import { boardAndProjectSchema } from "@/types/schemas"
 import { GoGrabber } from "react-icons/go"
 import { Draggable, DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
 import getProjectOrder from "@/utils/getProjectOrder"
+import useExpand from "@/hooks/useExpand"
+import ExpandChevron from "./ExpandChevron"
 
 interface ProjectProps {
   project: Project & { boards: Board[] }
@@ -38,6 +40,8 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
 
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
+
+  const { isExpanded, toggle } = useExpand()
 
   const [isAdding, add, closeAdd] = useAddOrEdit()
   const {
@@ -278,8 +282,10 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
             )}
           </>
         )}
-        {!!boards.length &&
-          boards.map((board) => <Board key={board.id} {...board} />)}
+        <AnimatePresence>
+          {!!boards.length &&
+            boards.map((board) => <Board key={board.id} {...board} />)}
+        </AnimatePresence>
         {!boards.length && (
           <p className="text-base font-bold text-neutral-500">no boards yet</p>
         )}

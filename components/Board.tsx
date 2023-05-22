@@ -14,6 +14,8 @@ import { z } from "zod"
 import LayoutContext from "@/context/LayoutContext"
 import ColorDot from "./ColorDot"
 import { boardSchema } from "@/types/schemas"
+import { GoGrabber } from "react-icons/go"
+import { motion } from "framer-motion"
 
 interface BoardProps {
   name: string
@@ -124,7 +126,10 @@ function Board({ name, color, id, projectId }: BoardProps) {
   }
 
   return (
-    <li
+    <motion.li
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: "auto", opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
       onClick={() => chooseOpenedBoard(id)}
       className={`group flex cursor-pointer items-center gap-2 px-2 text-xl transition-colors hover:bg-zinc-900/40 ${
         chosenBoardId === id && "bg-zinc-900 hover:bg-zinc-900/100"
@@ -144,9 +149,12 @@ function Board({ name, color, id, projectId }: BoardProps) {
       {!isEditingName ? (
         <>
           <p>{!deleteBoard.isLoading ? name : <LoadingDots />}</p>
+
           <div
-            className={`z-10 scale-0 transition-transform ${
-              isEditingColor ? "group-hover:scale-0" : "group-hover:scale-100"
+            className={`invisible z-10 scale-0 transition-transform ${
+              isEditingColor
+                ? "group-hover:scale-0"
+                : "group-hover:visible group-hover:scale-100"
             } `}
           >
             <MenuButton>
@@ -156,6 +164,12 @@ function Board({ name, color, id, projectId }: BoardProps) {
                 delete board
               </MenuItem>
             </MenuButton>
+          </div>
+          <div
+            className="invisible ml-auto cursor-grab group-hover:visible"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <GoGrabber />
           </div>
         </>
       ) : (
@@ -176,7 +190,7 @@ function Board({ name, color, id, projectId }: BoardProps) {
           )}
         </div>
       )}
-    </li>
+    </motion.li>
   )
 }
 

@@ -25,6 +25,7 @@ interface SideMenuProps {
         boards: Board[]
         users: ProjectUser[]
         invited_users: User[]
+        order: number
       })[]
     | undefined
   isLoading: boolean
@@ -48,7 +49,6 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
     async onMutate(input) {
       await utils.project.getByUser.cancel()
       const prevData = utils.project.getByUser.getData()
-      console.log(input)
       utils.project.getByUser.setData(undefined, (old) =>
         old?.map((p) =>
           p.id === input.draggableId
@@ -115,25 +115,30 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
                         draggableId={project.id}
                         index={project.order}
                       >
-                        {(provided) => (
+                        {(provided, snapshot) => (
                           <div
                             className="draggable"
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                           >
-                            <Project
-                              key={project.id}
-                              project={project}
-                              boards={project.boards}
-                              index={project.order}
-                              dragHandleProps={provided.dragHandleProps}
-                              participants={[
-                                ...project.invited_users,
-                                ...project.users.filter(
-                                  (user) => user.id !== session?.user.id
-                                ),
-                              ]}
-                            />
+                            <motion.div
+                              animate={{
+                                rotate: snapshot.isDragging ? -5 : 0,
+                              }}
+                            >
+                              <Project
+                                key={project.id}
+                                project={project}
+                                boards={project.boards}
+                                dragHandleProps={provided.dragHandleProps}
+                                participants={[
+                                  ...project.invited_users,
+                                  ...project.users.filter(
+                                    (user) => user.id !== session?.user.id
+                                  ),
+                                ]}
+                              />
+                            </motion.div>
                           </div>
                         )}
                       </Draggable>
