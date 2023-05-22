@@ -41,7 +41,15 @@ export const boardRouter = createTRPCRouter({
     .input(boardAndProjectSchema)
     .mutation(async ({ ctx, input }) => {
       const board = await ctx.prisma.board.create({
-        data: input,
+        data: {
+          name: input.name,
+          projectId: input.projectId,
+          order: 0,
+        },
+      })
+      await ctx.prisma.board.updateMany({
+        where: { NOT: { id: board.id } },
+        data: { order: { increment: 1 } },
       })
       return board
     }),
@@ -75,7 +83,42 @@ export const boardRouter = createTRPCRouter({
         draggableId: z.string(),
       })
     )
-    .mutation(async ({ ctx, input }) => {}),
+    .mutation(async ({ ctx, input }) => {
+      const boardDragged = await ctx.prisma.board.findUnique({
+        where: { id: input.draggableId },
+      })
+      await ctx.prisma.board.update({
+        where: { id: boardDragged?.id },
+        data: { order: input.boardTwoIndex },
+      })
+      if (input.boardOneIndex > input.boardTwoIndex) {
+        await ctx.prisma.board.updateMany({
+          where: {
+            AND: [
+              { order: { gte: input.boardTwoIndex } },
+              { order: { lte: input.boardOneIndex } },
+              { NOT: { id: boardDragged?.id } },
+            ],
+          },
+          data: { order: { increment: 1 } },
+        })
+      }
+
+      if (input.boardOneIndex < input.boardTwoIndex) {
+        await ctx.prisma.board.updateMany({
+          where: {
+            AND: [
+              { order: { lte: input.boardTwoIndex } },
+              { order: { gte: input.boardOneIndex } },
+              { NOT: { id: boardDragged?.id } },
+            ],
+          },
+          data: { order: { decrement: 1 } },
+        })
+      }
+
+      return { success: true }
+    }),
 
   delete: protectedProcedure
     .input(z.string())

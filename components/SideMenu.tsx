@@ -86,8 +86,6 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
     })
   }
 
-  // add animation, optimistic update
-
   return (
     <>
       <motion.aside

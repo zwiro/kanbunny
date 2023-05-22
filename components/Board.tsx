@@ -16,15 +16,17 @@ import ColorDot from "./ColorDot"
 import { boardSchema } from "@/types/schemas"
 import { GoGrabber } from "react-icons/go"
 import { motion } from "framer-motion"
+import { DraggableProvidedDragHandleProps, DropResult } from "@hello-pangea/dnd"
 
 interface BoardProps {
   name: string
   color: Color
   id: string
   projectId: string
+  dragHandleProps: DraggableProvidedDragHandleProps | null
 }
 
-function Board({ name, color, id, projectId }: BoardProps) {
+function Board({ name, color, id, projectId, dragHandleProps }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
 
@@ -126,10 +128,7 @@ function Board({ name, color, id, projectId }: BoardProps) {
   }
 
   return (
-    <motion.li
-      initial={{ height: 0, opacity: 0 }}
-      animate={{ height: "auto", opacity: 1 }}
-      exit={{ height: 0, opacity: 0 }}
+    <li
       onClick={() => chooseOpenedBoard(id)}
       className={`group flex cursor-pointer items-center gap-2 px-2 text-xl transition-colors hover:bg-zinc-900/40 ${
         chosenBoardId === id && "bg-zinc-900 hover:bg-zinc-900/100"
@@ -166,6 +165,7 @@ function Board({ name, color, id, projectId }: BoardProps) {
             </MenuButton>
           </div>
           <div
+            {...dragHandleProps}
             className="invisible ml-auto cursor-grab group-hover:visible"
             onClick={(e) => e.stopPropagation()}
           >
@@ -190,7 +190,7 @@ function Board({ name, color, id, projectId }: BoardProps) {
           )}
         </div>
       )}
-    </motion.li>
+    </li>
   )
 }
 

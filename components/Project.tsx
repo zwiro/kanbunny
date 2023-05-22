@@ -17,7 +17,13 @@ import Board from "./Board"
 import LayoutContext from "@/context/LayoutContext"
 import { boardAndProjectSchema } from "@/types/schemas"
 import { GoGrabber } from "react-icons/go"
-import { Draggable, DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
+import {
+  DragDropContext,
+  Draggable,
+  DraggableProvidedDragHandleProps,
+  DropResult,
+  Droppable,
+} from "@hello-pangea/dnd"
 import getProjectOrder from "@/utils/getProjectOrder"
 import useExpand from "@/hooks/useExpand"
 import ExpandChevron from "./ExpandChevron"
@@ -157,6 +163,48 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
     exit: { height: 0, opacity: 0 },
   }
 
+  const reorder = trpc.board.reorder.useMutation({
+    // async onMutate(input) {
+    //   await utils.project.getByUser.cancel()
+    //   const prevData = utils.project.getByUser.getData()
+    //   utils.project.getByUser.setData(undefined, (old) =>
+    //     old?.map((p) =>
+    //       p.id === input.draggableId
+    //         ? { ...p, order: input.projectTwoIndex }
+    //         : input.projectOneIndex > input.projectTwoIndex &&
+    //           p.order >= input.projectTwoIndex &&
+    //           p.order <= input.projectOneIndex
+    //         ? { ...p, order: p.order + 1 }
+    //         : input.projectOneIndex < input.projectTwoIndex &&
+    //           p.order <= input.projectTwoIndex &&
+    //           p.order >= input.projectOneIndex
+    //         ? { ...p, order: p.order - 1 }
+    //         : p
+    //     )
+    //   )
+    //   return { prevData }
+    // },
+    // onError(err, input, ctx) {
+    //   utils.project.getByUser.setData(undefined, ctx?.prevData)
+    // },
+    onSettled() {
+      utils.project.getByUser.invalidate()
+    },
+  })
+
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination, draggableId } = result
+    if (!result.destination || source?.index === destination?.index) {
+      return
+    }
+    console.log(source, destination, draggableId)
+    reorder.mutate({
+      boardOneIndex: source.index,
+      boardTwoIndex: destination!.index,
+      draggableId,
+    })
+  }
+
   return (
     <section className="my-4 border-b border-neutral-700">
       {!isEditingName ? (
@@ -264,7 +312,7 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
         {isAdding && (
           <>
             <div className="flex items-center gap-2">
-              <div className="h-4 w-4 rounded-full bg-red-500" />
+              <div className="h-4 w-4 bg-red-500" />
               <FormProvider {...boardMethods}>
                 <AddEditForm
                   name="name"
@@ -283,8 +331,45 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
           </>
         )}
         <AnimatePresence>
-          {!!boards.length &&
-            boards.map((board) => <Board key={board.id} {...board} />)}
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="projects">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {!!boards.length &&
+                    boards
+                      ?.sort((a, b) => a.order - b.order)
+                      .map((board) => (
+                        <Draggable
+                          key={board.id}
+                          draggableId={board.id}
+                          index={board.order}
+                        >
+                          {(provided, snapshot) => (
+                            <div
+                              className="draggable"
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                            >
+                              <motion.div
+                                animate={{
+                                  rotate: snapshot.isDragging ? -5 : 0,
+                                }}
+                              >
+                                <Board
+                                  key={board.id}
+                                  {...board}
+                                  dragHandleProps={provided.dragHandleProps}
+                                />
+                              </motion.div>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </AnimatePresence>
         {!boards.length && (
           <p className="text-base font-bold text-neutral-500">no boards yet</p>
