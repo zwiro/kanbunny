@@ -67,6 +67,16 @@ export const boardRouter = createTRPCRouter({
       })
       return board
     }),
+  reorder: protectedProcedure
+    .input(
+      z.object({
+        boardOneIndex: z.number(),
+        boardTwoIndex: z.number(),
+        draggableId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {}),
+
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {

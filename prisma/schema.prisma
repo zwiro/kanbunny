@@ -41,6 +41,7 @@ model Board {
   lists      List[]
   created_at DateTime @default(now())
   color      Color    @default(red)
+  order      Int
 
   @@index([projectId])
 }
@@ -53,6 +54,7 @@ model List {
   tasks      Task[]
   created_at DateTime @default(now())
   color      Color    @default(blue)
+  order      Int
 
   @@index([boardId])
 }
@@ -65,6 +67,8 @@ model Task {
   created_at  DateTime  @default(now())
   assigned_to User[]
   due_to      DateTime?
+  color       Color     @default(green)
+  order       Int
 
   @@index([listId])
 }

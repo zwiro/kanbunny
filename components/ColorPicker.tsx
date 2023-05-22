@@ -31,14 +31,6 @@ function ColorPicker({ close, id, editColor }: ColorPickerProps) {
     exit: { opacity: 0 },
   }
 
-  // const colorClasses = {
-  //   red: "bg-red-500",
-  //   blue: "bg-blue-500",
-  //   green: "bg-green-500",
-  //   yellow: "bg-yellow-500",
-  //   pink: "bg-pink-500",
-  // }
-
   return (
     <motion.div
       {...pickerAnimation}
@@ -49,7 +41,7 @@ function ColorPicker({ close, id, editColor }: ColorPickerProps) {
       {Object.values(colorSchema.shape.color.enum).map((color) => (
         <button
           key={color}
-          className={`relative h-4 w-4 rounded-full bg-${color}-500 hover:brightness-125`}
+          className={`relative h-4 w-4 bg-${color}-500 hover:brightness-125`}
           data-color={color}
         />
       ))}
