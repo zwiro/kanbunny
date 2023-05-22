@@ -164,29 +164,36 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
   }
 
   const reorder = trpc.board.reorder.useMutation({
-    // async onMutate(input) {
-    //   await utils.project.getByUser.cancel()
-    //   const prevData = utils.project.getByUser.getData()
-    //   utils.project.getByUser.setData(undefined, (old) =>
-    //     old?.map((p) =>
-    //       p.id === input.draggableId
-    //         ? { ...p, order: input.projectTwoIndex }
-    //         : input.projectOneIndex > input.projectTwoIndex &&
-    //           p.order >= input.projectTwoIndex &&
-    //           p.order <= input.projectOneIndex
-    //         ? { ...p, order: p.order + 1 }
-    //         : input.projectOneIndex < input.projectTwoIndex &&
-    //           p.order <= input.projectTwoIndex &&
-    //           p.order >= input.projectOneIndex
-    //         ? { ...p, order: p.order - 1 }
-    //         : p
-    //     )
-    //   )
-    //   return { prevData }
-    // },
-    // onError(err, input, ctx) {
-    //   utils.project.getByUser.setData(undefined, ctx?.prevData)
-    // },
+    async onMutate(input) {
+      await utils.project.getByUser.cancel()
+      const prevData = utils.project.getByUser.getData()
+      utils.project.getByUser.setData(undefined, (old) =>
+        old?.map((p) =>
+          p.id === project.id
+            ? {
+                ...p,
+                boards: p.boards.map((b) =>
+                  b.id === input.draggableId
+                    ? { ...b, order: input.boardTwoIndex }
+                    : input.boardOneIndex > input.boardTwoIndex &&
+                      b.order >= input.boardTwoIndex &&
+                      b.order <= input.boardOneIndex
+                    ? { ...b, order: b.order + 1 }
+                    : input.boardOneIndex < input.boardTwoIndex &&
+                      b.order <= input.boardTwoIndex &&
+                      b.order >= input.boardOneIndex
+                    ? { ...b, order: b.order - 1 }
+                    : b
+                ),
+              }
+            : p
+        )
+      )
+      return { prevData }
+    },
+    onError(err, input, ctx) {
+      utils.project.getByUser.setData(undefined, ctx?.prevData)
+    },
     onSettled() {
       utils.project.getByUser.invalidate()
     },
