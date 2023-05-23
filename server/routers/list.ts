@@ -9,7 +9,11 @@ export const listRouter = createTRPCRouter({
     .input(listSchema)
     .mutation(async ({ ctx, input }) => {
       const list = await ctx.prisma.list.create({
-        data: input,
+        data: {
+          name: input.name,
+          boardId: input.boardId,
+          order: 0,
+        },
       })
       return list
     }),
