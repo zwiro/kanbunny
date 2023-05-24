@@ -123,7 +123,7 @@ export default function Home() {
     //   utils.project.getByUser.setData(undefined, ctx?.prevData)
     // },
     onSettled() {
-      utils.project.getByUser.invalidate()
+      utils.board.getById.invalidate()
     },
   })
 
@@ -184,7 +184,7 @@ export default function Home() {
                         >
                           {(provided, snapshot) => (
                             <div
-                              className="draggable"
+                              // className="draggable"
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                             >

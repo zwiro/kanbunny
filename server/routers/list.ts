@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { protectedProcedure, createTRPCRouter } from "../trpc"
+import { protectedProcedure, createTRPCRouter, publicProcedure } from "../trpc"
 import { colorSchema, reorderSchema } from "@/types/schemas"
 import { listSchema } from "@/types/schemas"
 import { editListSchema } from "@/types/schemas"
@@ -89,4 +89,8 @@ export const listRouter = createTRPCRouter({
       })
       return list
     }),
+  // deleteAll: publicProcedure.query(async ({ ctx }) => {
+  //   const lists = await ctx.prisma.list.deleteMany()
+  //   return lists
+  // }),
 })
