@@ -26,7 +26,14 @@ interface BoardProps {
   dragHandleProps: DraggableProvidedDragHandleProps | null
 }
 
-function Board({ name, color, id, projectId, dragHandleProps }: BoardProps) {
+function Board({
+  name,
+  color,
+  id,
+  projectId,
+  dragHandleProps,
+  isDragging,
+}: BoardProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
 
@@ -131,7 +138,7 @@ function Board({ name, color, id, projectId, dragHandleProps }: BoardProps) {
     <li
       onClick={() => chooseOpenedBoard(id)}
       className={`group flex cursor-pointer items-center gap-2 px-2 text-xl transition-colors hover:bg-zinc-900/40 ${
-        chosenBoardId === id && "bg-zinc-900 hover:bg-zinc-900/100"
+        chosenBoardId === id && "bg-zinc-900 hover:bg-zinc-900"
       } `}
     >
       <ColorDot editColor={editColor} color={color}>
@@ -166,7 +173,9 @@ function Board({ name, color, id, projectId, dragHandleProps }: BoardProps) {
           </div>
           <div
             {...dragHandleProps}
-            className="invisible ml-auto cursor-grab group-hover:visible"
+            className={`ml-auto cursor-grab group-hover:visible ${
+              isDragging ? "visible" : "invisible"
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
             <GoGrabber />

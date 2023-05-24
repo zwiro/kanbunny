@@ -365,6 +365,7 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
                                 <Board
                                   key={board.id}
                                   {...board}
+                                  isDragging={snapshot.isDragging}
                                   dragHandleProps={provided.dragHandleProps}
                                 />
                               </motion.div>
