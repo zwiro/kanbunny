@@ -162,76 +162,74 @@ export default function Home() {
               owner: {board.data?.project.owner.name}
             </p>
           </div>
-
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="projects" direction="horizontal">
-              {(provided) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="flex min-h-[16rem] gap-4 overflow-x-scroll lg:gap-8 xl:gap-16"
-                >
-                  {!!board.data?.lists.length &&
-                    board.data?.lists
-                      .sort((a, b) => a.order - b.order)
-                      .map((list) => (
-                        <Draggable
-                          key={list.id}
-                          draggableId={list.id}
-                          index={list.order}
-                        >
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                            >
-                              <motion.div
-                                animate={{
-                                  rotate: snapshot.isDragging ? -5 : 0,
-                                }}
+          <div className="flex gap-4 overflow-x-scroll lg:gap-8 xl:gap-16">
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="projects" direction="horizontal">
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16"
+                  >
+                    {!!board.data?.lists.length &&
+                      board.data?.lists
+                        .sort((a, b) => a.order - b.order)
+                        .map((list) => (
+                          <Draggable
+                            key={list.id}
+                            draggableId={list.id}
+                            index={list.order}
+                          >
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
                               >
-                                <List
-                                  key={list.id}
-                                  dragHandleProps={provided.dragHandleProps}
-                                  {...list}
-                                />
-                              </motion.div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                  {isAdding ? (
-                    <ListContainer>
-                      <div className="flex flex-col">
-                        <FormProvider {...listMethods}>
-                          <AddEditForm
-                            name="name"
-                            placeholder="list name"
-                            close={closeAdd}
-                            handleSubmit={listMethods.handleSubmit(onSubmit)}
-                            isLoading={createList.isLoading}
-                          />
-                        </FormProvider>
-                        {listMethods.formState.errors && (
-                          <p role="alert" className="text-base text-red-500">
-                            {
-                              listMethods.formState.errors?.name
-                                ?.message as string
-                            }
-                          </p>
-                        )}
-                      </div>
-                    </ListContainer>
-                  ) : (
-                    <AddButton onClick={add}>
-                      new list <PlusIcon />
-                    </AddButton>
+                                <motion.div
+                                  animate={{
+                                    rotate: snapshot.isDragging ? -5 : 0,
+                                  }}
+                                >
+                                  <List
+                                    key={list.id}
+                                    dragHandleProps={provided.dragHandleProps}
+                                    {...list}
+                                  />
+                                </motion.div>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+            {isAdding ? (
+              <ListContainer>
+                <div className="flex flex-col">
+                  <FormProvider {...listMethods}>
+                    <AddEditForm
+                      name="name"
+                      placeholder="list name"
+                      close={closeAdd}
+                      handleSubmit={listMethods.handleSubmit(onSubmit)}
+                      isLoading={createList.isLoading}
+                    />
+                  </FormProvider>
+                  {listMethods.formState.errors && (
+                    <p role="alert" className="text-base text-red-500">
+                      {listMethods.formState.errors?.name?.message as string}
+                    </p>
                   )}
-                  {provided.placeholder}
                 </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+              </ListContainer>
+            ) : (
+              <AddButton onClick={add}>
+                new list <PlusIcon />
+              </AddButton>
+            )}
+          </div>
         </>
       ) : (
         <p className="text-center font-bold text-neutral-500">
