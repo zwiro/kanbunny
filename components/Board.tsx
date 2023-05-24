@@ -24,6 +24,7 @@ interface BoardProps {
   id: string
   projectId: string
   dragHandleProps: DraggableProvidedDragHandleProps | null
+  isDragging: boolean
 }
 
 function Board({

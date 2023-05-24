@@ -44,3 +44,9 @@ export const colorSchema = z.object({
   color: z.enum(["red", "blue", "green", "yellow", "pink"]),
   id: z.string(),
 })
+
+export const reorderSchema = z.object({
+  itemOneIndex: z.number(),
+  itemTwoIndex: z.number(),
+  draggableId: z.string(),
+})

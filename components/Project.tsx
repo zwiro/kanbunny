@@ -174,14 +174,14 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
                 ...p,
                 boards: p.boards.map((b) =>
                   b.id === input.draggableId
-                    ? { ...b, order: input.boardTwoIndex }
-                    : input.boardOneIndex > input.boardTwoIndex &&
-                      b.order >= input.boardTwoIndex &&
-                      b.order <= input.boardOneIndex
+                    ? { ...b, order: input.itemTwoIndex }
+                    : input.itemOneIndex > input.itemTwoIndex &&
+                      b.order >= input.itemTwoIndex &&
+                      b.order <= input.itemOneIndex
                     ? { ...b, order: b.order + 1 }
-                    : input.boardOneIndex < input.boardTwoIndex &&
-                      b.order <= input.boardTwoIndex &&
-                      b.order >= input.boardOneIndex
+                    : input.itemOneIndex < input.itemTwoIndex &&
+                      b.order <= input.itemTwoIndex &&
+                      b.order >= input.itemOneIndex
                     ? { ...b, order: b.order - 1 }
                     : b
                 ),
@@ -204,10 +204,9 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
     if (!result.destination || source?.index === destination?.index) {
       return
     }
-    console.log(source, destination, draggableId)
     reorder.mutate({
-      boardOneIndex: source.index,
-      boardTwoIndex: destination!.index,
+      itemOneIndex: source.index,
+      itemTwoIndex: destination!.index,
       draggableId,
     })
   }

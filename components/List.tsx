@@ -18,6 +18,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useAssignUser from "@/hooks/useAssignUser"
 import { editListSchema, editTaskSchema } from "@/types/schemas"
+import { GoGrabber } from "react-icons/go"
 
 type TaskWithAssignedTo = Prisma.TaskGetPayload<{
   include: { assigned_to: true }
@@ -151,6 +152,12 @@ function List({ name, color, tasks, id, boardId }: ListProps) {
                   delete list
                 </MenuItem>
               </MenuButton>
+            </div>
+            <div
+              className={`cursor-grab group-hover:visible`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <GoGrabber size={24} />
             </div>
           </>
         ) : (

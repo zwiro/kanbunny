@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { protectedProcedure, createTRPCRouter } from "../trpc"
-import { projectSchema } from "@/types/schemas"
+import { projectSchema, reorderSchema } from "@/types/schemas"
 
 export const projectRouter = createTRPCRouter({
   getByUser: protectedProcedure.query(async ({ ctx }) => {
@@ -146,29 +146,23 @@ export const projectRouter = createTRPCRouter({
       return project
     }),
   reorder: protectedProcedure
-    .input(
-      z.object({
-        projectOneIndex: z.number(),
-        projectTwoIndex: z.number(),
-        draggableId: z.string(),
-      })
-    )
+    .input(reorderSchema)
     .mutation(async ({ ctx, input }) => {
       const projectDragged = await ctx.prisma.projectUser.findFirst({
-        where: { order: input.projectOneIndex },
+        where: { order: input.itemOneIndex },
       })
 
       await ctx.prisma.projectUser.update({
         where: { id: projectDragged?.id },
-        data: { order: input.projectTwoIndex },
+        data: { order: input.itemTwoIndex },
       })
 
-      if (input.projectOneIndex > input.projectTwoIndex) {
+      if (input.itemOneIndex > input.itemTwoIndex) {
         await ctx.prisma.projectUser.updateMany({
           where: {
             AND: [
-              { order: { gte: input.projectTwoIndex } },
-              { order: { lte: input.projectOneIndex } },
+              { order: { gte: input.itemTwoIndex } },
+              { order: { lte: input.itemOneIndex } },
               { NOT: { id: projectDragged?.id } },
             ],
           },
@@ -176,12 +170,12 @@ export const projectRouter = createTRPCRouter({
         })
       }
 
-      if (input.projectOneIndex < input.projectTwoIndex) {
+      if (input.itemOneIndex < input.itemTwoIndex) {
         await ctx.prisma.projectUser.updateMany({
           where: {
             AND: [
-              { order: { lte: input.projectTwoIndex } },
-              { order: { gte: input.projectOneIndex } },
+              { order: { lte: input.itemTwoIndex } },
+              { order: { gte: input.itemOneIndex } },
               { NOT: { id: projectDragged?.id } },
             ],
           },

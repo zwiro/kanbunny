@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { protectedProcedure, createTRPCRouter } from "../trpc"
-import { boardAndProjectSchema } from "@/types/schemas"
+import { boardAndProjectSchema, reorderSchema } from "@/types/schemas"
 import { colorSchema } from "@/types/schemas"
 import { boardSchema } from "@/types/schemas"
 
@@ -32,7 +32,9 @@ export const boardRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const users = await ctx.prisma.user.findMany({
         where: {
-          projects_in: { some: { userId: input } },
+          projects_in: {
+            some: { project: { boards: { some: { id: input } } } },
+          },
         },
       })
       return users
@@ -76,27 +78,21 @@ export const boardRouter = createTRPCRouter({
       return board
     }),
   reorder: protectedProcedure
-    .input(
-      z.object({
-        boardOneIndex: z.number(),
-        boardTwoIndex: z.number(),
-        draggableId: z.string(),
-      })
-    )
+    .input(reorderSchema)
     .mutation(async ({ ctx, input }) => {
       const boardDragged = await ctx.prisma.board.findUnique({
         where: { id: input.draggableId },
       })
       await ctx.prisma.board.update({
         where: { id: boardDragged?.id },
-        data: { order: input.boardTwoIndex },
+        data: { order: input.itemTwoIndex },
       })
-      if (input.boardOneIndex > input.boardTwoIndex) {
+      if (input.itemOneIndex > input.itemTwoIndex) {
         await ctx.prisma.board.updateMany({
           where: {
             AND: [
-              { order: { gte: input.boardTwoIndex } },
-              { order: { lte: input.boardOneIndex } },
+              { order: { gte: input.itemTwoIndex } },
+              { order: { lte: input.itemOneIndex } },
               { NOT: { id: boardDragged?.id } },
             ],
           },
@@ -104,12 +100,12 @@ export const boardRouter = createTRPCRouter({
         })
       }
 
-      if (input.boardOneIndex < input.boardTwoIndex) {
+      if (input.itemOneIndex < input.itemTwoIndex) {
         await ctx.prisma.board.updateMany({
           where: {
             AND: [
-              { order: { lte: input.boardTwoIndex } },
-              { order: { gte: input.boardOneIndex } },
+              { order: { lte: input.itemTwoIndex } },
+              { order: { gte: input.itemOneIndex } },
               { NOT: { id: boardDragged?.id } },
             ],
           },

@@ -52,14 +52,14 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
       utils.project.getByUser.setData(undefined, (old) =>
         old?.map((p) =>
           p.id === input.draggableId
-            ? { ...p, order: input.projectTwoIndex }
-            : input.projectOneIndex > input.projectTwoIndex &&
-              p.order >= input.projectTwoIndex &&
-              p.order <= input.projectOneIndex
+            ? { ...p, order: input.itemTwoIndex }
+            : input.itemOneIndex > input.itemTwoIndex &&
+              p.order >= input.itemTwoIndex &&
+              p.order <= input.itemOneIndex
             ? { ...p, order: p.order + 1 }
-            : input.projectOneIndex < input.projectTwoIndex &&
-              p.order <= input.projectTwoIndex &&
-              p.order >= input.projectOneIndex
+            : input.itemOneIndex < input.itemTwoIndex &&
+              p.order <= input.itemTwoIndex &&
+              p.order >= input.itemOneIndex
             ? { ...p, order: p.order - 1 }
             : p
         )
@@ -80,8 +80,8 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
       return
     }
     reorder.mutate({
-      projectOneIndex: source.index,
-      projectTwoIndex: destination!.index,
+      itemOneIndex: source.index,
+      itemTwoIndex: destination!.index,
       draggableId,
     })
   }
