@@ -92,36 +92,34 @@ export default function Home() {
   }
 
   const reorder = trpc.list.reorder.useMutation({
-    // async onMutate(input) {
-    //   await utils.project.getByUser.cancel()
-    //   const prevData = utils.project.getByUser.getData()
-    //   utils.project.getByUser.setData(undefined, (old) =>
-    //     old?.map((p) =>
-    //       p.id === project.id
-    //         ? {
-    //             ...p,
-    //             lists: p.lists.map((b) =>
-    //               b.id === input.draggableId
-    //                 ? { ...b, order: input.itemTwoIndex }
-    //                 : input.itemOneIndex > input.itemTwoIndex &&
-    //                   b.order >= input.itemTwoIndex &&
-    //                   b.order <= input.itemOneIndex
-    //                 ? { ...b, order: b.order + 1 }
-    //                 : input.itemOneIndex < input.itemTwoIndex &&
-    //                   b.order <= input.itemTwoIndex &&
-    //                   b.order >= input.itemOneIndex
-    //                 ? { ...b, order: b.order - 1 }
-    //                 : b
-    //             ),
-    //           }
-    //         : p
-    //     )
-    //   )
-    //   return { prevData }
-    // },
-    // onError(err, input, ctx) {
-    //   utils.project.getByUser.setData(undefined, ctx?.prevData)
-    // },
+    async onMutate(input) {
+      await utils.board.getById.cancel()
+      const prevData = utils.board.getById.getData()
+      utils.board.getById.setData(
+        chosenBoardId!,
+        (old) =>
+          ({
+            ...old,
+            lists: old?.lists.map((l) =>
+              l.id === input.draggableId
+                ? { ...l, order: input.itemTwoIndex }
+                : input.itemOneIndex > input.itemTwoIndex &&
+                  l.order >= input.itemTwoIndex &&
+                  l.order <= input.itemOneIndex
+                ? { ...l, order: l.order + 1 }
+                : input.itemOneIndex < input.itemTwoIndex &&
+                  l.order <= input.itemTwoIndex &&
+                  l.order >= input.itemOneIndex
+                ? { ...l, order: l.order - 1 }
+                : l
+            ),
+          } as any)
+      )
+      return { prevData }
+    },
+    onError(err, input, ctx) {
+      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+    },
     onSettled() {
       utils.board.getById.invalidate()
     },
@@ -184,7 +182,6 @@ export default function Home() {
                         >
                           {(provided, snapshot) => (
                             <div
-                              // className="draggable"
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                             >
