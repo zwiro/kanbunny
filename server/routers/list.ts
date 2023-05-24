@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { protectedProcedure, createTRPCRouter } from "../trpc"
-import { colorSchema } from "@/types/schemas"
+import { colorSchema, reorderSchema } from "@/types/schemas"
 import { listSchema } from "@/types/schemas"
 import { editListSchema } from "@/types/schemas"
 
@@ -14,6 +14,10 @@ export const listRouter = createTRPCRouter({
           boardId: input.boardId,
           order: 0,
         },
+      })
+      await ctx.prisma.list.updateMany({
+        where: { NOT: { id: list.id } },
+        data: { order: { increment: 1 } },
       })
       return list
     }),
@@ -39,7 +43,44 @@ export const listRouter = createTRPCRouter({
       })
       return list
     }),
+  reorder: protectedProcedure
+    .input(reorderSchema)
+    .mutation(async ({ ctx, input }) => {
+      const listDragged = await ctx.prisma.list.findUnique({
+        where: { id: input.draggableId },
+      })
+      await ctx.prisma.list.update({
+        where: { id: listDragged?.id },
+        data: { order: input.itemTwoIndex },
+      })
+      if (input.itemOneIndex > input.itemTwoIndex) {
+        await ctx.prisma.list.updateMany({
+          where: {
+            AND: [
+              { order: { gte: input.itemTwoIndex } },
+              { order: { lte: input.itemOneIndex } },
+              { NOT: { id: listDragged?.id } },
+            ],
+          },
+          data: { order: { increment: 1 } },
+        })
+      }
 
+      if (input.itemOneIndex < input.itemTwoIndex) {
+        await ctx.prisma.list.updateMany({
+          where: {
+            AND: [
+              { order: { lte: input.itemTwoIndex } },
+              { order: { gte: input.itemOneIndex } },
+              { NOT: { id: listDragged?.id } },
+            ],
+          },
+          data: { order: { decrement: 1 } },
+        })
+      }
+
+      return { success: true }
+    }),
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {

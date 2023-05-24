@@ -19,6 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import useAssignUser from "@/hooks/useAssignUser"
 import { editListSchema, editTaskSchema } from "@/types/schemas"
 import { GoGrabber } from "react-icons/go"
+import { DraggableProvidedDragHandleProps, DropResult } from "@hello-pangea/dnd"
 
 type TaskWithAssignedTo = Prisma.TaskGetPayload<{
   include: { assigned_to: true }
@@ -26,9 +27,10 @@ type TaskWithAssignedTo = Prisma.TaskGetPayload<{
 
 interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]
+  dragHandleProps: DraggableProvidedDragHandleProps | null
 }
 
-function List({ name, color, tasks, id, boardId }: ListProps) {
+function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
@@ -154,6 +156,7 @@ function List({ name, color, tasks, id, boardId }: ListProps) {
               </MenuButton>
             </div>
             <div
+              {...dragHandleProps}
               className={`cursor-grab group-hover:visible`}
               onClick={(e) => e.stopPropagation()}
             >

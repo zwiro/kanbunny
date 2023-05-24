@@ -20,13 +20,20 @@ import { get } from "http"
 
 interface SideMenuProps {
   data:
-    | (Project & {
+    | {
+        order: number
+        id: string
+        name: string
+        ownerId: string
+        created_at: Date
+        updated_at: Date
         owner: User
         boards: Board[]
-        users: ProjectUser[]
+        users: {
+          order: number
+        }[]
         invited_users: User[]
-        order: number
-      })[]
+      }[]
     | undefined
   isLoading: boolean
 }
@@ -129,12 +136,6 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
                                 project={project}
                                 boards={project.boards}
                                 dragHandleProps={provided.dragHandleProps}
-                                participants={[
-                                  ...project.invited_users,
-                                  ...project.users.filter(
-                                    (user) => user.id !== session?.user.id
-                                  ),
-                                ]}
                               />
                             </motion.div>
                           </div>

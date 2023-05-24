@@ -31,7 +31,6 @@ import ExpandChevron from "./ExpandChevron"
 interface ProjectProps {
   project: Project & { boards: Board[] }
   boards: Board[]
-  participants: (User | ProjectUser)[]
   dragHandleProps: DraggableProvidedDragHandleProps | null
 }
 

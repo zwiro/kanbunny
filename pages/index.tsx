@@ -17,6 +17,12 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import ColorDot from "@/components/ColorDot"
 import { listSchema } from "@/types/schemas"
+import {
+  DragDropContext,
+  Draggable,
+  DropResult,
+  Droppable,
+} from "@hello-pangea/dnd"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
@@ -33,8 +39,6 @@ export default function Home() {
   const board = trpc.board.getById.useQuery(chosenBoardId!, {
     enabled: !!chosenBoardId,
   })
-
-  console.log(userProjects.data)
 
   const createList = trpc.list.create.useMutation({
     async onMutate(createdList) {
@@ -87,6 +91,54 @@ export default function Home() {
     exit: { backdropFilter: "blur(0px)" },
   }
 
+  const reorder = trpc.list.reorder.useMutation({
+    // async onMutate(input) {
+    //   await utils.project.getByUser.cancel()
+    //   const prevData = utils.project.getByUser.getData()
+    //   utils.project.getByUser.setData(undefined, (old) =>
+    //     old?.map((p) =>
+    //       p.id === project.id
+    //         ? {
+    //             ...p,
+    //             lists: p.lists.map((b) =>
+    //               b.id === input.draggableId
+    //                 ? { ...b, order: input.itemTwoIndex }
+    //                 : input.itemOneIndex > input.itemTwoIndex &&
+    //                   b.order >= input.itemTwoIndex &&
+    //                   b.order <= input.itemOneIndex
+    //                 ? { ...b, order: b.order + 1 }
+    //                 : input.itemOneIndex < input.itemTwoIndex &&
+    //                   b.order <= input.itemTwoIndex &&
+    //                   b.order >= input.itemOneIndex
+    //                 ? { ...b, order: b.order - 1 }
+    //                 : b
+    //             ),
+    //           }
+    //         : p
+    //     )
+    //   )
+    //   return { prevData }
+    // },
+    // onError(err, input, ctx) {
+    //   utils.project.getByUser.setData(undefined, ctx?.prevData)
+    // },
+    onSettled() {
+      utils.project.getByUser.invalidate()
+    },
+  })
+
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination, draggableId } = result
+    if (!result.destination || source?.index === destination?.index) {
+      return
+    }
+    reorder.mutate({
+      itemOneIndex: source.index,
+      itemTwoIndex: destination!.index,
+      draggableId,
+    })
+  }
+
   return (
     <div
       onClick={() => {
@@ -113,34 +165,76 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="flex min-h-[16rem] gap-4 overflow-x-scroll lg:gap-8 xl:gap-16">
-            {!!board.data?.lists.length &&
-              board.data?.lists.map((list) => <List key={list.id} {...list} />)}
-            {isAdding ? (
-              <ListContainer>
-                <div className="flex flex-col">
-                  <FormProvider {...listMethods}>
-                    <AddEditForm
-                      name="name"
-                      placeholder="list name"
-                      close={closeAdd}
-                      handleSubmit={listMethods.handleSubmit(onSubmit)}
-                      isLoading={createList.isLoading}
-                    />
-                  </FormProvider>
-                  {listMethods.formState.errors && (
-                    <p role="alert" className="text-base text-red-500">
-                      {listMethods.formState.errors?.name?.message as string}
-                    </p>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="projects" direction="horizontal">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="flex min-h-[16rem] gap-4 overflow-x-scroll lg:gap-8 xl:gap-16"
+                >
+                  {!!board.data?.lists.length &&
+                    board.data?.lists
+                      .sort((a, b) => a.order - b.order)
+                      .map((list) => (
+                        <Draggable
+                          key={list.id}
+                          draggableId={list.id}
+                          index={list.order}
+                        >
+                          {(provided, snapshot) => (
+                            <div
+                              className="draggable"
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                            >
+                              <motion.div
+                                animate={{
+                                  rotate: snapshot.isDragging ? -5 : 0,
+                                }}
+                              >
+                                <List
+                                  key={list.id}
+                                  dragHandleProps={provided.dragHandleProps}
+                                  {...list}
+                                />
+                              </motion.div>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                  {isAdding ? (
+                    <ListContainer>
+                      <div className="flex flex-col">
+                        <FormProvider {...listMethods}>
+                          <AddEditForm
+                            name="name"
+                            placeholder="list name"
+                            close={closeAdd}
+                            handleSubmit={listMethods.handleSubmit(onSubmit)}
+                            isLoading={createList.isLoading}
+                          />
+                        </FormProvider>
+                        {listMethods.formState.errors && (
+                          <p role="alert" className="text-base text-red-500">
+                            {
+                              listMethods.formState.errors?.name
+                                ?.message as string
+                            }
+                          </p>
+                        )}
+                      </div>
+                    </ListContainer>
+                  ) : (
+                    <AddButton onClick={add}>
+                      new list <PlusIcon />
+                    </AddButton>
                   )}
+                  {provided.placeholder}
                 </div>
-              </ListContainer>
-            ) : (
-              <AddButton onClick={add}>
-                new list <PlusIcon />
-              </AddButton>
-            )}
-          </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </>
       ) : (
         <p className="text-center font-bold text-neutral-500">

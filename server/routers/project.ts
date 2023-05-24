@@ -205,8 +205,12 @@ export const projectRouter = createTRPCRouter({
           },
         })
       })
-      return await ctx.prisma.project.delete({
+      await ctx.prisma.projectUser.deleteMany({
+        where: { projectId: input },
+      })
+      await ctx.prisma.project.deleteMany({
         where: { id: input },
       })
+      return { success: true }
     }),
 })
