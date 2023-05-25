@@ -6,7 +6,7 @@ import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import AddEditForm from "./AddEditForm"
 import AddTaskModal from "./AddTaskModal"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, color, motion } from "framer-motion"
 import ColorPicker from "./ColorPicker"
 import UserCheckbox from "./UserCheckbox"
 import type { List as ListType, Prisma, Task } from "@prisma/client"
@@ -28,6 +28,14 @@ type TaskWithAssignedTo = Prisma.TaskGetPayload<{
 interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]
   dragHandleProps: DraggableProvidedDragHandleProps | null
+}
+
+const colorVariants = {
+  blue: "border-blue-500",
+  red: "border-red-500",
+  yellow: "border-yellow-500",
+  green: "border-green-500",
+  pink: "border-pink-500",
 }
 
 function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
@@ -123,7 +131,9 @@ function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
   }
 
   return (
-    <section className="mt-4 flex h-min min-w-[18rem] flex-col gap-4 border border-neutral-800 bg-zinc-800 p-4">
+    <section
+      className={`mt-4 flex h-min min-w-[18rem] flex-col gap-4 border-t-4 bg-zinc-800 p-4 ${colorVariants[color]} `}
+    >
       <div className="flex items-center gap-2">
         <ColorDot editColor={editColor} color={color}>
           <AnimatePresence>
@@ -174,9 +184,11 @@ function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
           </FormProvider>
         )}
       </div>
-      {tasks.map((task) => (
-        <Task key={task.id} {...task} />
-      ))}
+      {tasks
+        .sort((a, b) => a.order - b.order)
+        .map((task) => (
+          <Task key={task.id} {...task} />
+        ))}
       <AnimatePresence>
         {isAdding && <AddTaskModal close={closeAdd} listId={id} />}
       </AnimatePresence>
@@ -186,7 +198,7 @@ function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
 
 type TaskSchema = z.infer<typeof editTaskSchema>
 
-function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
+function Task({ name, id, listId, assigned_to, color }: TaskWithAssignedTo) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
   const { chosenBoardId } = useContext(LayoutContext)
@@ -303,13 +315,61 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
     })
   }
 
+  const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
+
+  const updateColor = trpc.task.editColor.useMutation({
+    async onMutate(updatedTask) {
+      await utils.board.getById.cancel()
+      const prevData = utils.board.getById.getData()
+      utils.board.getById.setData(
+        chosenBoardId!,
+        (old) =>
+          ({
+            ...old,
+            lists: old?.lists.map((l) =>
+              l.id === listId
+                ? {
+                    ...l,
+                    tasks: l.tasks.map((t) =>
+                      t.id === updatedTask.id
+                        ? { ...t, color: updatedTask.color }
+                        : t
+                    ),
+                  }
+                : l
+            ),
+          } as any)
+      )
+      return { prevData }
+    },
+    onError(err, updatedTask, ctx) {
+      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+    },
+    onSettled: () => {
+      utils.board.getById.invalidate(chosenBoardId)
+      closeEditColor()
+    },
+  })
+
   return (
     <>
-      <div className="group flex items-center justify-between border-l-8 border-neutral-900 bg-zinc-700 p-2">
+      <div
+        className={`group flex items-center justify-between border-l-8 ${colorVariants[color]} bg-zinc-700 p-2`}
+      >
         {!isEditingName ? (
           <>
-            <div className="flex flex-col">
+            <div className="relative flex flex-col">
+              <AnimatePresence>
+                {isEditingColor && (
+                  <ColorPicker
+                    id={id}
+                    close={closeEditColor}
+                    editColor={updateColor}
+                  />
+                )}
+              </AnimatePresence>
               <p className="font-bold">{name}</p>
+
               <ul className="flex flex-wrap gap-1">
                 {assigned_to.map((user) => (
                   <li key={user.id} className="text-sm text-neutral-500">
@@ -318,10 +378,11 @@ function Task({ name, id, listId, assigned_to }: TaskWithAssignedTo) {
                 ))}
               </ul>
             </div>
-            <div className="scale-0 transition-transform group-hover:scale-100">
+            <div className="z-20 scale-0 transition-transform group-hover:scale-100">
               <MenuButton>
                 <MenuItem handleClick={editName}>edit task name</MenuItem>
                 <MenuItem handleClick={editUsers}>assign user</MenuItem>
+                <MenuItem handleClick={editColor}>change color</MenuItem>
                 <MenuItem handleClick={() => deleteTask.mutate(id)}>
                   delete task
                 </MenuItem>

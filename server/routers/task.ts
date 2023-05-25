@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { protectedProcedure, createTRPCRouter } from "../trpc"
-import { taskSchema } from "@/types/schemas"
+import { colorSchema, taskSchema } from "@/types/schemas"
 import { editTaskSchema } from "@/types/schemas"
 
 export const taskRouter = createTRPCRouter({
@@ -15,7 +15,16 @@ export const taskRouter = createTRPCRouter({
       const task = await ctx.prisma.task.create({
         data: {
           ...input,
+          order: 0,
           assigned_to: { connect: users.map((user) => ({ id: user.id })) },
+        },
+      })
+      await ctx.prisma.task.updateMany({
+        where: {
+          id: { not: task.id },
+        },
+        data: {
+          order: { increment: 1 },
         },
       })
       return task
@@ -27,6 +36,17 @@ export const taskRouter = createTRPCRouter({
         where: { id: input.id },
         data: {
           name: input.name,
+        },
+      })
+      return task
+    }),
+  editColor: protectedProcedure
+    .input(colorSchema)
+    .mutation(async ({ ctx, input }) => {
+      const task = await ctx.prisma.task.update({
+        where: { id: input.id },
+        data: {
+          color: input.color,
         },
       })
       return task

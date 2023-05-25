@@ -3,13 +3,13 @@ import { useRef } from "react"
 import { motion } from "framer-motion"
 import { z } from "zod"
 import { UseTRPCMutationResult } from "@trpc/react-query/shared"
-import type { Board, List } from "@prisma/client"
+import type { Board, List, Task } from "@prisma/client"
 import { colorSchema } from "@/types/schemas"
 
 interface ColorPickerProps {
   close: () => void
   id: string
-  editColor: UseTRPCMutationResult<Board | List, any, any, any>
+  editColor: UseTRPCMutationResult<Board | List | Task, any, any, any>
 }
 
 function ColorPicker({ close, id, editColor }: ColorPickerProps) {
