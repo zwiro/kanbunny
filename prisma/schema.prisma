@@ -67,7 +67,7 @@ model Task {
   created_at  DateTime  @default(now())
   assigned_to User[]
   due_to      DateTime?
-  color       Color     @default(green)
+  color       Color     @default(blue)
   order       Int       @default(0)
 
   @@index([listId])
