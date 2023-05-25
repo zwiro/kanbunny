@@ -19,7 +19,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import useAssignUser from "@/hooks/useAssignUser"
 import { editListSchema, editTaskSchema } from "@/types/schemas"
 import { GoGrabber } from "react-icons/go"
-import { DraggableProvidedDragHandleProps, DropResult } from "@hello-pangea/dnd"
+import {
+  DragDropContext,
+  Draggable,
+  DraggableProvidedDragHandleProps,
+  DropResult,
+  Droppable,
+} from "@hello-pangea/dnd"
 
 type TaskWithAssignedTo = Prisma.TaskGetPayload<{
   include: { assigned_to: true }
@@ -38,7 +44,15 @@ const colorVariants = {
   pink: "border-pink-500",
 }
 
-function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
+function List({
+  name,
+  color,
+  tasks,
+  id,
+  boardId,
+  order,
+  dragHandleProps,
+}: ListProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
@@ -130,6 +144,59 @@ function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
     updateName.mutate({ name: data.name, id, boardId })
   }
 
+  const reorder = trpc.task.reorder.useMutation({
+    async onMutate(input) {
+      await utils.project.getByUser.cancel()
+      const prevData = utils.board.getById.getData()
+      utils.board.getById.setData(
+        chosenBoardId!,
+        (old) =>
+          ({
+            ...old,
+            lists: old?.lists.map((l) =>
+              l.id === id
+                ? {
+                    ...l,
+                    tasks: l.tasks.map((t) =>
+                      t.id === input.draggableId
+                        ? { ...t, order: input.itemTwoIndex }
+                        : input.itemOneIndex > input.itemTwoIndex &&
+                          t.order >= input.itemTwoIndex &&
+                          t.order <= input.itemOneIndex
+                        ? { ...t, order: t.order + 1 }
+                        : input.itemOneIndex < input.itemTwoIndex &&
+                          t.order <= input.itemTwoIndex &&
+                          t.order >= input.itemOneIndex
+                        ? { ...t, order: t.order - 1 }
+                        : t
+                    ),
+                  }
+                : l
+            ),
+          } as any)
+      )
+      return { prevData }
+    },
+    onError(err, input, ctx) {
+      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+    },
+    onSettled() {
+      utils.project.getByUser.invalidate()
+    },
+  })
+
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination, draggableId } = result
+    if (!result.destination || source?.index === destination?.index) {
+      return
+    }
+    reorder.mutate({
+      itemOneIndex: source.index,
+      itemTwoIndex: destination!.index,
+      draggableId,
+    })
+  }
+
   return (
     <section
       className={`mt-4 flex h-min min-w-[18rem] flex-col gap-4 border-t-4 bg-zinc-800 p-4 ${colorVariants[color]} `}
@@ -167,7 +234,7 @@ function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
             </div>
             <div
               {...dragHandleProps}
-              className={`cursor-grab group-hover:visible`}
+              className={`cursor-grab`}
               onClick={(e) => e.stopPropagation()}
             >
               <GoGrabber size={24} />
@@ -184,11 +251,45 @@ function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
           </FormProvider>
         )}
       </div>
-      {tasks
-        .sort((a, b) => a.order - b.order)
-        .map((task) => (
-          <Task key={task.id} {...task} />
-        ))}
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="projects">
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="flex flex-col gap-4"
+            >
+              {tasks
+                .sort((a, b) => a.order - b.order)
+                .map((task) => (
+                  <Draggable
+                    key={task.id}
+                    draggableId={task.id}
+                    index={task.order}
+                  >
+                    {(provided, snapshot) => (
+                      <div ref={provided.innerRef} {...provided.draggableProps}>
+                        <motion.div
+                          animate={{
+                            rotate: snapshot.isDragging ? -5 : 0,
+                          }}
+                        >
+                          <Task
+                            key={task.id}
+                            dragHandleProps={provided.dragHandleProps}
+                            isDragging={snapshot.isDragging}
+                            {...task}
+                          />
+                        </motion.div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
       <AnimatePresence>
         {isAdding && <AddTaskModal close={closeAdd} listId={id} />}
       </AnimatePresence>
@@ -198,7 +299,20 @@ function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
 
 type TaskSchema = z.infer<typeof editTaskSchema>
 
-function Task({ name, id, listId, assigned_to, color }: TaskWithAssignedTo) {
+interface TaskProps extends TaskWithAssignedTo {
+  dragHandleProps: DraggableProvidedDragHandleProps | null
+  isDragging: boolean
+}
+
+function Task({
+  name,
+  id,
+  listId,
+  assigned_to,
+  color,
+  dragHandleProps,
+  isDragging,
+}: TaskProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
   const { chosenBoardId } = useContext(LayoutContext)
@@ -369,7 +483,6 @@ function Task({ name, id, listId, assigned_to, color }: TaskWithAssignedTo) {
                 )}
               </AnimatePresence>
               <p className="font-bold">{name}</p>
-
               <ul className="flex flex-wrap gap-1">
                 {assigned_to.map((user) => (
                   <li key={user.id} className="text-sm text-neutral-500">
@@ -378,7 +491,7 @@ function Task({ name, id, listId, assigned_to, color }: TaskWithAssignedTo) {
                 ))}
               </ul>
             </div>
-            <div className="z-20 scale-0 transition-transform group-hover:scale-100">
+            <div className="z-20 ml-auto scale-0 transition-transform group-hover:scale-100">
               <MenuButton>
                 <MenuItem handleClick={editName}>edit task name</MenuItem>
                 <MenuItem handleClick={editUsers}>assign user</MenuItem>
@@ -387,6 +500,15 @@ function Task({ name, id, listId, assigned_to, color }: TaskWithAssignedTo) {
                   delete task
                 </MenuItem>
               </MenuButton>
+            </div>
+            <div
+              {...dragHandleProps}
+              className={`cursor-grab group-hover:visible ${
+                isDragging ? "visible" : "invisible"
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <GoGrabber size={24} />
             </div>
           </>
         ) : (
