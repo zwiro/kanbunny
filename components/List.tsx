@@ -199,7 +199,7 @@ function List({
 
   return (
     <section
-      className={`mt-4 flex h-min min-w-[18rem] flex-col gap-4 border-t-4 bg-zinc-800 p-4 ${colorVariants[color]} `}
+      className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-t-4 bg-zinc-800 p-4 ${colorVariants[color]} `}
     >
       <div className="flex items-center gap-2">
         <ColorDot editColor={editColor} color={color}>
@@ -252,7 +252,7 @@ function List({
         )}
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="projects">
+        <Droppable droppableId="tasks">
           {(provided) => (
             <div
               {...provided.droppableProps}

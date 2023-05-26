@@ -162,7 +162,7 @@ export default function Home() {
               owner: {board.data?.project.owner.name}
             </p>
           </div>
-          <div className="flex gap-4 overflow-x-scroll lg:gap-8 xl:gap-16">
+          <div className="flex gap-4 overflow-y-hidden overflow-x-scroll pb-48 lg:gap-8 xl:gap-16">
             <DragDropContext onDragEnd={onDragEnd}>
               <Droppable droppableId="projects" direction="horizontal">
                 {(provided) => (
