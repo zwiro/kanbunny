@@ -187,14 +187,20 @@ function List({
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
-    if (!result.destination || source?.index === destination?.index) {
-      return
+    // if (!result.destination || source?.index === destination?.index) {
+    //   return
+    // }
+    if (destination) {
+      reorder.mutate({
+        itemOneIndex: source.index,
+        itemTwoIndex: destination!.index,
+        draggableId,
+      })
     }
-    reorder.mutate({
-      itemOneIndex: source.index,
-      itemTwoIndex: destination!.index,
-      draggableId,
-    })
+    if (source.droppableId !== destination?.droppableId) {
+    }
+
+    console.log(source, destination, draggableId)
   }
 
   return (
@@ -251,45 +257,43 @@ function List({
           </FormProvider>
         )}
       </div>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="tasks">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="flex flex-col gap-4"
-            >
-              {tasks
-                .sort((a, b) => a.order - b.order)
-                .map((task) => (
-                  <Draggable
-                    key={task.id}
-                    draggableId={task.id}
-                    index={task.order}
-                  >
-                    {(provided, snapshot) => (
-                      <div ref={provided.innerRef} {...provided.draggableProps}>
-                        <motion.div
-                          animate={{
-                            rotate: snapshot.isDragging ? -5 : 0,
-                          }}
-                        >
-                          <Task
-                            key={task.id}
-                            dragHandleProps={provided.dragHandleProps}
-                            isDragging={snapshot.isDragging}
-                            {...task}
-                          />
-                        </motion.div>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <Droppable droppableId={id}>
+        {(provided) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className="flex flex-col gap-4"
+          >
+            {tasks
+              .sort((a, b) => a.order - b.order)
+              .map((task) => (
+                <Draggable
+                  key={task.id}
+                  draggableId={task.id}
+                  index={task.order}
+                >
+                  {(provided, snapshot) => (
+                    <div ref={provided.innerRef} {...provided.draggableProps}>
+                      <motion.div
+                        animate={{
+                          rotate: snapshot.isDragging ? -5 : 0,
+                        }}
+                      >
+                        <Task
+                          key={task.id}
+                          dragHandleProps={provided.dragHandleProps}
+                          isDragging={snapshot.isDragging}
+                          {...task}
+                        />
+                      </motion.div>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
       <AnimatePresence>
         {isAdding && <AddTaskModal close={closeAdd} listId={id} />}
       </AnimatePresence>
