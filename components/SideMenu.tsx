@@ -18,6 +18,22 @@ import { trpc } from "@/utils/trpc"
 import getProjectOrder from "@/utils/getProjectOrder"
 import { get } from "http"
 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+
 interface SideMenuProps {
   data:
     | {
@@ -81,24 +97,30 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
     },
   })
 
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination, draggableId } = result
-    if (!result.destination || source?.index === destination?.index) {
-      return
-    }
+  const onDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!active || !over) return
+    if (active.id === over.id) return
     reorder.mutate({
-      itemOneIndex: source.index,
-      itemTwoIndex: destination!.index,
-      draggableId,
+      itemOneIndex: active.data.current?.sortable.index,
+      itemTwoIndex: over.data.current?.sortable.index,
+      draggableId: active.id as string,
     })
   }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   return (
     <>
       <motion.aside
         onClick={(e) => e.stopPropagation()}
         {...sideMenuAnimation}
-        className="fixed bottom-0 left-0 top-16 w-11/12 overflow-y-scroll bg-zinc-800 px-24 py-8 text-2xl lg:px-36 lg:text-3xl [&>button]:my-0"
+        className="fixed bottom-0 left-0 top-16 w-11/12 bg-zinc-800 px-24 py-8 text-2xl lg:px-36 lg:text-3xl [&>button]:my-0"
       >
         {!isLoading ? (
           <AddButton onClick={add}>
@@ -107,47 +129,24 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
         ) : (
           <LoadingDots />
         )}
-        <DragDropContext onDragEnd={onDragEnd}>
-          {!!data?.length && (
-            <Droppable droppableId="projects">
-              {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {data
-                    ?.sort((a, b) => a.order - b.order)
-                    .map((project) => (
-                      <Draggable
-                        key={project.id}
-                        draggableId={project.id}
-                        index={project.order}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            className="draggable"
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                          >
-                            <motion.div
-                              animate={{
-                                rotate: snapshot.isDragging ? -5 : 0,
-                              }}
-                            >
-                              <Project
-                                key={project.id}
-                                project={project}
-                                boards={project.boards}
-                                dragHandleProps={provided.dragHandleProps}
-                              />
-                            </motion.div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          )}
-        </DragDropContext>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={onDragEnd}
+        >
+          <SortableContext items={data!} strategy={verticalListSortingStrategy}>
+            {!!data?.length &&
+              data
+                ?.sort((a, b) => a.order - b.order)
+                .map((project) => (
+                  <Project
+                    key={project.id}
+                    project={project}
+                    boards={project.boards}
+                  />
+                ))}
+          </SortableContext>
+        </DndContext>
         {!data?.length && !isLoading && (
           <p className="text-netural-500 text-center">no projects yet</p>
         )}

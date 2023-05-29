@@ -165,44 +165,44 @@ export default function Home() {
           </div>
           <div className="flex gap-4 overflow-y-hidden overflow-x-scroll pb-48 lg:gap-8 xl:gap-16">
             <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="lists" direction="horizontal">
+              <Droppable droppableId="lists" direction="horizontal" key="list">
                 {(provided) => (
                   <div
                     {...provided.droppableProps}
                     ref={provided.innerRef}
                     className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16"
                   >
-                    <DragDropContext onDragEnd={onDragEnd}>
-                      {!!board.data?.lists.length &&
-                        board.data?.lists
-                          .sort((a, b) => a.order - b.order)
-                          .map((list) => (
-                            <Draggable
-                              key={list.id}
-                              draggableId={list.id}
-                              index={list.order}
-                            >
-                              {(provided, snapshot) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
+                    {/* <DragDropContext onDragEnd={onDragEnd}> */}
+                    {!!board.data?.lists.length &&
+                      board.data?.lists
+                        .sort((a, b) => a.order - b.order)
+                        .map((list) => (
+                          <Draggable
+                            key={list.id}
+                            draggableId={list.id}
+                            index={list.order}
+                          >
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                              >
+                                <motion.div
+                                  animate={{
+                                    rotate: snapshot.isDragging ? -5 : 0,
+                                  }}
                                 >
-                                  <motion.div
-                                    animate={{
-                                      rotate: snapshot.isDragging ? -5 : 0,
-                                    }}
-                                  >
-                                    <List
-                                      key={list.id}
-                                      dragHandleProps={provided.dragHandleProps}
-                                      {...list}
-                                    />
-                                  </motion.div>
-                                </div>
-                              )}
-                            </Draggable>
-                          ))}
-                    </DragDropContext>
+                                  <List
+                                    key={list.id}
+                                    dragHandleProps={provided.dragHandleProps}
+                                    {...list}
+                                  />
+                                </motion.div>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                    {/* </DragDropContext> */}
 
                     {provided.placeholder}
                   </div>
