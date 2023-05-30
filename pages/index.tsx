@@ -165,14 +165,17 @@ export default function Home() {
           </div>
           <div className="flex gap-4 overflow-y-hidden overflow-x-scroll pb-48 lg:gap-8 xl:gap-16">
             <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="lists" direction="horizontal" key="list">
+              <Droppable
+                droppableId="board"
+                direction="horizontal"
+                type="boards"
+              >
                 {(provided) => (
                   <div
                     {...provided.droppableProps}
                     ref={provided.innerRef}
                     className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16"
                   >
-                    {/* <DragDropContext onDragEnd={onDragEnd}> */}
                     {!!board.data?.lists.length &&
                       board.data?.lists
                         .sort((a, b) => a.order - b.order)
@@ -202,7 +205,6 @@ export default function Home() {
                             )}
                           </Draggable>
                         ))}
-                    {/* </DragDropContext> */}
 
                     {provided.placeholder}
                   </div>

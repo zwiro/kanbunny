@@ -257,7 +257,7 @@ function List({
           </FormProvider>
         )}
       </div>
-      <Droppable droppableId={id} key="task" direction="vertical">
+      <Droppable droppableId={id} type="tasks">
         {(provided) => (
           <div
             {...provided.droppableProps}
