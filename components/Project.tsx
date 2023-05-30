@@ -27,17 +27,16 @@ import {
 import getProjectOrder from "@/utils/getProjectOrder"
 import useExpand from "@/hooks/useExpand"
 import ExpandChevron from "./ExpandChevron"
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
 
 interface ProjectProps {
   project: Project & { boards: Board[] }
   boards: Board[]
+  dragHandleProps: DraggableProvidedDragHandleProps | null
 }
 
 type BoardAndProjectSchema = z.infer<typeof boardAndProjectSchema>
 
-function Project({ project, boards }: ProjectProps) {
+function Project({ project, boards, dragHandleProps }: ProjectProps) {
   trpc.project.getUsers.useQuery(project.id, {
     onSuccess(data) {
       setAllUsers(data?.map((user) => user.name!))
@@ -211,33 +210,8 @@ function Project({ project, boards }: ProjectProps) {
     })
   }
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-    isSorting,
-    isOver,
-  } = useSortable({
-    id: project.id,
-  })
-
-  const style = {
-    transform: isSorting
-      ? `translate(${transform?.x}px, ${transform?.y}px)`
-      : undefined,
-    transition: isDragging
-      ? "0 ease-in-out transform"
-      : isSorting
-      ? "200ms ease-in-out transform"
-      : undefined,
-    opacity: isDragging ? "0.8" : "1",
-  }
-
   return (
-    <section style={style} className="my-4 border-b border-neutral-700">
+    <section className="my-4 border-b border-neutral-700">
       {!isEditingName ? (
         <div className="flex items-center gap-4">
           <p
@@ -257,12 +231,7 @@ function Project({ project, boards }: ProjectProps) {
             </MenuItem>
           </MenuButton>
 
-          <div
-            ref={setNodeRef}
-            {...listeners}
-            {...attributes}
-            className="ml-auto cursor-grab"
-          >
+          <div {...dragHandleProps} className="ml-auto cursor-grab">
             <GoGrabber />
           </div>
         </div>

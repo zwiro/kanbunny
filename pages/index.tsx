@@ -127,15 +127,14 @@ export default function Home() {
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
-    // if (!result.destination || source?.index === destination?.index) {
-    //   return
-    // }
-    console.log(source, destination)
-    // reorder.mutate({
-    //   itemOneIndex: source.index,
-    //   itemTwoIndex: destination!.index,
-    //   draggableId,
-    // })
+    if (!destination || source.index === destination.index) {
+      return
+    }
+    reorder.mutate({
+      itemOneIndex: source.index,
+      itemTwoIndex: destination.index,
+      draggableId,
+    })
   }
 
   return (

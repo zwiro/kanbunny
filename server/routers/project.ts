@@ -6,7 +6,6 @@ export const projectRouter = createTRPCRouter({
   getByUser: protectedProcedure.query(async ({ ctx }) => {
     const projects = await ctx.prisma.projectUser.findMany({
       where: { userId: ctx.session.user.id },
-      orderBy: { order: "asc" },
       select: {
         project: {
           include: {
