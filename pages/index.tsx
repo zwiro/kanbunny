@@ -125,16 +125,62 @@ export default function Home() {
     },
   })
 
+  const reorderTasks = trpc.task.reorder.useMutation({
+    async onMutate(input) {
+      await utils.board.getById.cancel()
+      const prevData = utils.board.getById.getData()
+      utils.board.getById.setData(
+        chosenBoardId!,
+        (old) =>
+          ({
+            ...old,
+            lists: old?.lists.map((l) => ({
+              ...l,
+              tasks: l.tasks.map((t) =>
+                t.id === input.draggableId
+                  ? { ...t, order: input.itemTwoIndex }
+                  : input.itemOneIndex > input.itemTwoIndex &&
+                    t.order >= input.itemTwoIndex &&
+                    t.order <= input.itemOneIndex
+                  ? { ...t, order: t.order + 1 }
+                  : input.itemOneIndex < input.itemTwoIndex &&
+                    t.order <= input.itemTwoIndex &&
+                    t.order >= input.itemOneIndex
+                  ? { ...t, order: t.order - 1 }
+                  : t
+              ),
+            })),
+          } as any)
+      )
+      return { prevData }
+    },
+    onError(err, input, ctx) {
+      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+    },
+    onSettled() {
+      utils.board.getById.invalidate()
+    },
+  })
+
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
-    if (!destination || source.index === destination.index) {
+    if (!destination) {
       return
     }
-    reorder.mutate({
-      itemOneIndex: source.index,
-      itemTwoIndex: destination.index,
-      draggableId,
-    })
+    if (source.droppableId !== "board" || destination.droppableId !== "board") {
+      reorderTasks.mutate({
+        itemOneIndex: source.index,
+        itemTwoIndex: destination.index,
+        listId: destination.droppableId,
+        draggableId,
+      })
+    } else {
+      reorder.mutate({
+        itemOneIndex: source.index,
+        itemTwoIndex: destination.index,
+        draggableId,
+      })
+    }
   }
 
   return (

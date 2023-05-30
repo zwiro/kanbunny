@@ -21,7 +21,7 @@ export const taskRouter = createTRPCRouter({
       })
       await ctx.prisma.task.updateMany({
         where: {
-          id: { not: task.id },
+          AND: [{ listId: input.listId }, { id: { not: task.id } }],
         },
         data: {
           order: { increment: 1 },
@@ -68,39 +68,84 @@ export const taskRouter = createTRPCRouter({
       return task
     }),
   reorder: protectedProcedure
-    .input(reorderSchema)
+    .input(reorderSchema.extend({ listId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const taskDragged = await ctx.prisma.task.findUnique({
         where: { id: input.draggableId },
       })
-      await ctx.prisma.task.update({
-        where: { id: taskDragged?.id },
-        data: { order: input.itemTwoIndex },
-      })
-      if (input.itemOneIndex > input.itemTwoIndex) {
-        await ctx.prisma.task.updateMany({
-          where: {
-            AND: [
-              { order: { gte: input.itemTwoIndex } },
-              { order: { lte: input.itemOneIndex } },
-              { NOT: { id: taskDragged?.id } },
-            ],
+      const prevListId = taskDragged?.listId
+      console.log(
+        prevListId,
+        input.listId,
+        input.itemOneIndex,
+        input.itemTwoIndex
+      )
+      if (prevListId !== input.listId) {
+        await ctx.prisma.task.update({
+          where: { id: taskDragged?.id },
+          data: {
+            listId: { set: input.listId },
+            order: input.itemTwoIndex,
           },
-          data: { order: { increment: 1 } },
         })
-      }
-
-      if (input.itemOneIndex < input.itemTwoIndex) {
+        const taskDraggedUpdated = await ctx.prisma.task.findUnique({
+          where: { id: input.draggableId },
+        })
         await ctx.prisma.task.updateMany({
           where: {
             AND: [
-              { order: { lte: input.itemTwoIndex } },
-              { order: { gte: input.itemOneIndex } },
-              { NOT: { id: taskDragged?.id } },
+              { listId: prevListId },
+              { order: { gt: input.itemOneIndex } },
+              { NOT: { id: taskDraggedUpdated?.id } },
             ],
           },
           data: { order: { decrement: 1 } },
         })
+        await ctx.prisma.task.updateMany({
+          where: {
+            AND: [
+              { listId: taskDraggedUpdated?.listId },
+              { order: { gte: input.itemTwoIndex } },
+              { NOT: { id: taskDraggedUpdated?.id } },
+            ],
+          },
+          data: { order: { increment: 1 } },
+        })
+      } else {
+        await ctx.prisma.task.update({
+          where: { id: input.draggableId },
+          data: { order: input.itemTwoIndex },
+        })
+        const taskDraggedUpdated = await ctx.prisma.task.findUnique({
+          where: { id: input.draggableId },
+        })
+        if (input.itemOneIndex > input.itemTwoIndex) {
+          await ctx.prisma.task.updateMany({
+            where: {
+              AND: [
+                { listId: input.listId },
+                { order: { gte: input.itemTwoIndex } },
+                { order: { lte: input.itemOneIndex } },
+                { NOT: { id: taskDraggedUpdated?.id } },
+              ],
+            },
+            data: { order: { increment: 1 } },
+          })
+        }
+
+        if (input.itemOneIndex < input.itemTwoIndex) {
+          await ctx.prisma.task.updateMany({
+            where: {
+              AND: [
+                { listId: input.listId },
+                { order: { lte: input.itemTwoIndex } },
+                { order: { gte: input.itemOneIndex } },
+                { NOT: { id: taskDraggedUpdated?.id } },
+              ],
+            },
+            data: { order: { decrement: 1 } },
+          })
+        }
       }
 
       return { success: true }

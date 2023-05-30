@@ -144,65 +144,6 @@ function List({
     updateName.mutate({ name: data.name, id, boardId })
   }
 
-  const reorder = trpc.task.reorder.useMutation({
-    async onMutate(input) {
-      await utils.project.getByUser.cancel()
-      const prevData = utils.board.getById.getData()
-      utils.board.getById.setData(
-        chosenBoardId!,
-        (old) =>
-          ({
-            ...old,
-            lists: old?.lists.map((l) =>
-              l.id === id
-                ? {
-                    ...l,
-                    tasks: l.tasks.map((t) =>
-                      t.id === input.draggableId
-                        ? { ...t, order: input.itemTwoIndex }
-                        : input.itemOneIndex > input.itemTwoIndex &&
-                          t.order >= input.itemTwoIndex &&
-                          t.order <= input.itemOneIndex
-                        ? { ...t, order: t.order + 1 }
-                        : input.itemOneIndex < input.itemTwoIndex &&
-                          t.order <= input.itemTwoIndex &&
-                          t.order >= input.itemOneIndex
-                        ? { ...t, order: t.order - 1 }
-                        : t
-                    ),
-                  }
-                : l
-            ),
-          } as any)
-      )
-      return { prevData }
-    },
-    onError(err, input, ctx) {
-      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
-    },
-    onSettled() {
-      utils.project.getByUser.invalidate()
-    },
-  })
-
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination, draggableId } = result
-    // if (!result.destination || source?.index === destination?.index) {
-    //   return
-    // }
-    if (destination) {
-      reorder.mutate({
-        itemOneIndex: source.index,
-        itemTwoIndex: destination!.index,
-        draggableId,
-      })
-    }
-    if (source.droppableId !== destination?.droppableId) {
-    }
-
-    console.log(source, destination, draggableId)
-  }
-
   return (
     <section
       className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-t-4 bg-zinc-800 p-4 ${colorVariants[color]} `}
