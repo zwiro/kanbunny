@@ -45,28 +45,21 @@ export default function Home() {
 
   const createList = trpc.list.create.useMutation({
     async onMutate(createdList) {
-      await utils.board.getById.cancel()
-      const prevData = utils.board.getById.getData()
-      utils.board.getById.setData(
+      await utils.list.getByBoard.cancel()
+      const prevData = utils.list.getByBoard.getData()
+      utils.list.getByBoard.setData(
         chosenBoardId!,
-        (old) =>
-          ({
-            ...old,
-            lists: [
-              ...old?.lists!,
-              { ...createdList, tasks: [], color: "blue" },
-            ],
-          } as any)
+        (old) => [...old!, { ...createdList, tasks: [], color: "blue" }] as any
       )
       return { prevData }
     },
     onError(err, createdList, ctx) {
-      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
     },
     onSettled() {
       listMethods.reset()
       closeAdd()
-      utils.board.getById.invalidate()
+      utils.list.getByBoard.invalidate()
     },
   })
 

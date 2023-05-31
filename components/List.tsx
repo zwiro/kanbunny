@@ -63,73 +63,58 @@ function List({
 
   const updateName = trpc.list.editName.useMutation({
     async onMutate(updatedList) {
-      await utils.board.getById.cancel()
-      const prevData = utils.board.getById.getData()
-      utils.board.getById.setData(
-        boardId,
-        (old) =>
-          ({
-            ...old,
-            lists: old?.lists!.map((l) =>
-              l.id === updatedList.id ? { ...l, name: updatedList.name } : l
-            ),
-          } as any)
+      await utils.list.getByBoard.cancel()
+      const prevData = utils.list.getByBoard.getData()
+      utils.list.getByBoard.setData(boardId, (old) =>
+        old?.map((l) =>
+          l.id === updatedList.id ? { ...l, name: updatedList.name } : l
+        )
       )
       return { prevData }
     },
     onError(err, updatedList, ctx) {
-      utils.board.getById.setData(boardId, ctx?.prevData)
+      utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled: () => {
-      utils.board.getById.invalidate(boardId)
+      utils.list.getByBoard.invalidate(boardId)
       closeEditName()
     },
   })
 
   const updateColor = trpc.list.editColor.useMutation({
     async onMutate(updatedList) {
-      await utils.board.getById.cancel()
-      const prevData = utils.board.getById.getData()
-      utils.board.getById.setData(
-        boardId,
-        (old) =>
-          ({
-            ...old,
-            lists: old?.lists!.map((l) =>
-              l.id === updatedList.id ? { ...l, color: updatedList.color } : l
-            ),
-          } as any)
+      await utils.list.getByBoard.cancel()
+      const prevData = utils.list.getByBoard.getData()
+      utils.list.getByBoard.setData(boardId, (old) =>
+        old?.map((l) =>
+          l.id === updatedList.id ? { ...l, color: updatedList.color } : l
+        )
       )
       return { prevData }
     },
     onError(err, updatedList, ctx) {
-      utils.board.getById.setData(boardId, ctx?.prevData)
+      utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled: () => {
-      utils.board.getById.invalidate(boardId)
+      utils.list.getByBoard.invalidate(boardId)
       closeEditColor()
     },
   })
 
   const deleteList = trpc.list.delete.useMutation({
     async onMutate(deletedListId) {
-      await utils.board.getById.cancel()
-      const prevData = utils.board.getById.getData()
-      utils.board.getById.setData(
-        chosenBoardId!,
-        (old) =>
-          ({
-            ...old,
-            lists: old?.lists!.filter((list) => list.id !== deletedListId),
-          } as any)
+      await utils.list.getByBoard.cancel()
+      const prevData = utils.list.getByBoard.getData()
+      utils.list.getByBoard.setData(chosenBoardId!, (old) =>
+        old?.filter((list) => list.id !== deletedListId)
       )
       return { prevData }
     },
     onError(err, updatedList, ctx) {
-      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
     },
     onSettled() {
-      utils.board.getById.invalidate(boardId)
+      utils.list.getByBoard.invalidate(boardId)
     },
   })
 
