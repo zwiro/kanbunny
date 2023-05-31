@@ -23,6 +23,7 @@ import {
   DropResult,
   Droppable,
 } from "@hello-pangea/dnd"
+import { Task } from "@prisma/client"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
@@ -33,6 +34,8 @@ export default function Home() {
   const { chosenBoardId } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
+
+  const lists = trpc.list.getByBoard.useQuery(chosenBoardId!)
 
   const userProjects = trpc.project.getByUser.useQuery()
 
@@ -93,91 +96,115 @@ export default function Home() {
 
   const reorder = trpc.list.reorder.useMutation({
     async onMutate(input) {
-      await utils.board.getById.cancel()
-      const prevData = utils.board.getById.getData()
-      utils.board.getById.setData(
-        chosenBoardId!,
-        (old) =>
-          ({
-            ...old,
-            lists: old?.lists.map((l) =>
-              l.id === input.draggableId
-                ? { ...l, order: input.itemTwoIndex }
-                : input.itemOneIndex > input.itemTwoIndex &&
-                  l.order >= input.itemTwoIndex &&
-                  l.order <= input.itemOneIndex
-                ? { ...l, order: l.order + 1 }
-                : input.itemOneIndex < input.itemTwoIndex &&
-                  l.order <= input.itemTwoIndex &&
-                  l.order >= input.itemOneIndex
-                ? { ...l, order: l.order - 1 }
-                : l
-            ),
-          } as any)
+      await utils.list.getByBoard.cancel()
+      const prevData = utils.list.getByBoard.getData()
+      utils.list.getByBoard.setData(chosenBoardId!, (old) =>
+        old?.map((l) =>
+          l.id === input.draggableId
+            ? { ...l, order: input.itemTwoIndex }
+            : input.itemOneIndex > input.itemTwoIndex &&
+              l.order >= input.itemTwoIndex &&
+              l.order <= input.itemOneIndex
+            ? { ...l, order: l.order + 1 }
+            : input.itemOneIndex < input.itemTwoIndex &&
+              l.order <= input.itemTwoIndex &&
+              l.order >= input.itemOneIndex
+            ? { ...l, order: l.order - 1 }
+            : l
+        )
       )
       return { prevData }
     },
     onError(err, input, ctx) {
-      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
     },
     onSettled() {
-      utils.board.getById.invalidate()
+      utils.list.getByBoard.invalidate()
     },
   })
 
   const reorderTasks = trpc.task.reorder.useMutation({
     async onMutate(input) {
-      await utils.board.getById.cancel()
-      const prevData = utils.board.getById.getData()
-      utils.board.getById.setData(
-        chosenBoardId!,
-        (old) =>
-          ({
-            ...old,
-            lists: old?.lists.map((l) => ({
-              ...l,
-              tasks: l.tasks.map((t) =>
-                t.id === input.draggableId
-                  ? { ...t, order: input.itemTwoIndex }
-                  : input.itemOneIndex > input.itemTwoIndex &&
-                    t.order >= input.itemTwoIndex &&
-                    t.order <= input.itemOneIndex
-                  ? { ...t, order: t.order + 1 }
-                  : input.itemOneIndex < input.itemTwoIndex &&
-                    t.order <= input.itemTwoIndex &&
-                    t.order >= input.itemOneIndex
-                  ? { ...t, order: t.order - 1 }
-                  : t
-              ),
-            })),
-          } as any)
-      )
+      await utils.list.getByBoard.cancel()
+      const prevData = utils.list.getByBoard.getData()
+      utils.list.getByBoard.setData(chosenBoardId!, (old) => {
+        const taskDragged = old
+          ?.filter((l) => l.tasks.find((t) => t.id === input.draggableId))[0]
+          .tasks.find((t) => t.id === input.draggableId)
+        return old?.map((l) => {
+          if (input.listId !== input.prevListId) {
+            return l.tasks.find((t) => t.id === input.draggableId)
+              ? {
+                  ...l,
+                  tasks: l.tasks
+                    .filter((t) => t.id !== input.draggableId)
+                    .map((t) =>
+                      t.order > input.itemOneIndex
+                        ? { ...t, order: t.order - 1 }
+                        : t
+                    )
+                    .sort((a, b) => a!.order - b!.order),
+                }
+              : l.id === input.listId
+              ? {
+                  ...l,
+                  tasks: [
+                    ...l.tasks.map((t) =>
+                      t.order >= input.itemTwoIndex
+                        ? { ...t, order: t.order + 1 }
+                        : t
+                    ),
+                    { ...taskDragged, order: input.itemTwoIndex - 1 },
+                  ].sort((a, b) => a!.order - b!.order),
+                }
+              : l
+          } else if (input.listId === input.prevListId) {
+            return l.id === input.listId
+              ? {
+                  ...l,
+                  tasks: l.tasks.map((t) =>
+                    t.id === input.draggableId
+                      ? { ...t, order: input.itemTwoIndex }
+                      : input.itemOneIndex > input.itemTwoIndex &&
+                        t.order >= input.itemTwoIndex &&
+                        t.order <= input.itemOneIndex
+                      ? { ...t, order: t.order + 1 }
+                      : input.itemOneIndex < input.itemTwoIndex &&
+                        t.order <= input.itemTwoIndex &&
+                        t.order >= input.itemOneIndex
+                      ? { ...t, order: t.order - 1 }
+                      : t
+                  ),
+                }
+              : l
+          } else return l
+        }) as any
+      })
       return { prevData }
     },
     onError(err, input, ctx) {
-      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
     },
     onSettled() {
-      utils.board.getById.invalidate()
+      utils.list.getByBoard.invalidate()
     },
   })
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
-    if (!destination) {
-      return
-    }
-    if (source.droppableId !== "board" || destination.droppableId !== "board") {
+    if (!destination) return
+    if (source.droppableId === "board" || destination.droppableId === "board") {
+      reorder.mutate({
+        itemOneIndex: source.index,
+        itemTwoIndex: destination.index,
+        draggableId,
+      })
+    } else {
       reorderTasks.mutate({
         itemOneIndex: source.index,
         itemTwoIndex: destination.index,
         listId: destination.droppableId,
-        draggableId,
-      })
-    } else {
-      reorder.mutate({
-        itemOneIndex: source.index,
-        itemTwoIndex: destination.index,
+        prevListId: source.droppableId,
         draggableId,
       })
     }
@@ -221,9 +248,9 @@ export default function Home() {
                     ref={provided.innerRef}
                     className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16"
                   >
-                    {!!board.data?.lists.length &&
-                      board.data?.lists
-                        .sort((a, b) => a.order - b.order)
+                    {!!lists.data?.length &&
+                      lists.data
+                        ?.sort((a, b) => a.order - b.order)
                         .map((list) => (
                           <Draggable
                             key={list.id}

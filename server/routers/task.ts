@@ -4,6 +4,23 @@ import { colorSchema, reorderSchema, taskSchema } from "@/types/schemas"
 import { editTaskSchema } from "@/types/schemas"
 
 export const taskRouter = createTRPCRouter({
+  // getByList: protectedProcedure
+  //   .input(z.string())
+  //   .query(async ({ ctx, input }) => {
+  //     const tasks = await ctx.prisma.task.findMany({
+  //       where: {
+  //         listId: input,
+  //       },
+  //       include: {
+  //         assigned_to: true,
+  //       },
+  //       orderBy: {
+  //         order: "asc",
+  //       },
+  //     })
+  //     return tasks
+  //   }),
+
   create: protectedProcedure
     .input(taskSchema)
     .mutation(async ({ ctx, input }) => {
@@ -68,18 +85,13 @@ export const taskRouter = createTRPCRouter({
       return task
     }),
   reorder: protectedProcedure
-    .input(reorderSchema.extend({ listId: z.string() }))
+    .input(reorderSchema.extend({ listId: z.string(), prevListId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const taskDragged = await ctx.prisma.task.findUnique({
         where: { id: input.draggableId },
       })
       const prevListId = taskDragged?.listId
-      console.log(
-        prevListId,
-        input.listId,
-        input.itemOneIndex,
-        input.itemTwoIndex
-      )
+
       if (prevListId !== input.listId) {
         await ctx.prisma.task.update({
           where: { id: taskDragged?.id },

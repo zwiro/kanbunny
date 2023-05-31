@@ -198,7 +198,12 @@ function List({
           </FormProvider>
         )}
       </div>
-      <Droppable droppableId={id} key="task" direction="vertical">
+      <Droppable
+        droppableId={id}
+        key="task"
+        direction="vertical"
+        ignoreContainerClipping={true}
+      >
         {(provided) => (
           <div
             {...provided.droppableProps}

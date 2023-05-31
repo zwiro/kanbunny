@@ -5,6 +5,16 @@ import { listSchema } from "@/types/schemas"
 import { editListSchema } from "@/types/schemas"
 
 export const listRouter = createTRPCRouter({
+  getByBoard: protectedProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const lists = await ctx.prisma.list.findMany({
+        where: { boardId: input },
+        orderBy: { order: "asc" },
+        include: { tasks: { include: { assigned_to: true } } },
+      })
+      return lists
+    }),
   create: protectedProcedure
     .input(listSchema)
     .mutation(async ({ ctx, input }) => {
