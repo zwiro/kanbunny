@@ -266,80 +266,68 @@ function Task({
 
   const updateName = trpc.task.editName.useMutation({
     async onMutate(updatedTask) {
-      await utils.board.getById.cancel()
-      const prevData = utils.board.getById.getData()
-      utils.board.getById.setData(
-        chosenBoardId!,
-        (old) =>
-          ({
-            ...old,
-            lists: old?.lists.map((l) =>
-              l.id === listId
-                ? {
-                    ...l,
-                    tasks: l.tasks.map((t) =>
-                      t.id === updatedTask.id
-                        ? { ...t, name: updatedTask.name }
-                        : t
-                    ),
-                  }
-                : l
-            ),
-          } as any)
+      await utils.list.getByBoard.cancel()
+      const prevData = utils.list.getByBoard.getData()
+      utils.list.getByBoard.setData(chosenBoardId!, (old) =>
+        old?.map((l) =>
+          l.id === listId
+            ? {
+                ...l,
+                tasks: l.tasks.map((t) =>
+                  t.id === updatedTask.id ? { ...t, name: updatedTask.name } : t
+                ),
+              }
+            : l
+        )
       )
       return { prevData }
     },
     onError(err, updatedTask, ctx) {
-      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
     },
     onSettled() {
-      utils.board.getById.invalidate(chosenBoardId!)
+      utils.list.getByBoard.invalidate(chosenBoardId!)
       closeEditName()
     },
   })
 
   const updateUsers = trpc.task.editUsers.useMutation({
     async onMutate(updatedTask) {
-      await utils.board.getById.cancel()
-      const prevData = utils.board.getById.getData()
+      await utils.list.getByBoard.cancel()
+      const prevData = utils.list.getByBoard.getData()
 
       return { prevData }
     },
     onError(err, updatedTask, ctx) {
-      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
     },
     onSettled() {
-      utils.board.getById.invalidate(chosenBoardId!)
+      utils.list.getByBoard.invalidate(chosenBoardId!)
       closeEditUsers()
     },
   })
 
   const deleteTask = trpc.task.delete.useMutation({
     async onMutate(deletedTaskId) {
-      await utils.board.getById.cancel()
-      const prevData = utils.board.getById.getData()
-      utils.board.getById.setData(
-        chosenBoardId!,
-        (old) =>
-          ({
-            ...old,
-            lists: old?.lists.map((l) =>
-              l.id === listId
-                ? {
-                    ...l,
-                    tasks: l.tasks.filter((t) => t.id !== deletedTaskId),
-                  }
-                : l
-            ),
-          } as any)
+      await utils.list.getByBoard.cancel()
+      const prevData = utils.list.getByBoard.getData()
+      utils.list.getByBoard.setData(chosenBoardId!, (old) =>
+        old?.map((l) =>
+          l.id === listId
+            ? {
+                ...l,
+                tasks: l.tasks.filter((t) => t.id !== deletedTaskId),
+              }
+            : l
+        )
       )
       return { prevData }
     },
     onError(err, deletedTaskId, ctx) {
-      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
     },
     onSettled() {
-      utils.board.getById.invalidate(chosenBoardId!)
+      utils.list.getByBoard.invalidate(chosenBoardId!)
     },
   })
 
@@ -368,34 +356,29 @@ function Task({
 
   const updateColor = trpc.task.editColor.useMutation({
     async onMutate(updatedTask) {
-      await utils.board.getById.cancel()
-      const prevData = utils.board.getById.getData()
-      utils.board.getById.setData(
-        chosenBoardId!,
-        (old) =>
-          ({
-            ...old,
-            lists: old?.lists.map((l) =>
-              l.id === listId
-                ? {
-                    ...l,
-                    tasks: l.tasks.map((t) =>
-                      t.id === updatedTask.id
-                        ? { ...t, color: updatedTask.color }
-                        : t
-                    ),
-                  }
-                : l
-            ),
-          } as any)
+      await utils.list.getByBoard.cancel()
+      const prevData = utils.list.getByBoard.getData()
+      utils.list.getByBoard.setData(chosenBoardId!, (old) =>
+        old?.map((l) =>
+          l.id === listId
+            ? {
+                ...l,
+                tasks: l.tasks.map((t) =>
+                  t.id === updatedTask.id
+                    ? { ...t, color: updatedTask.color }
+                    : t
+                ),
+              }
+            : l
+        )
       )
       return { prevData }
     },
     onError(err, updatedTask, ctx) {
-      utils.board.getById.setData(chosenBoardId!, ctx?.prevData)
+      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
     },
     onSettled: () => {
-      utils.board.getById.invalidate(chosenBoardId)
+      utils.list.getByBoard.invalidate(chosenBoardId)
       closeEditColor()
     },
   })
