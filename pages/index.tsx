@@ -16,7 +16,7 @@ import { z } from "zod"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import ColorDot from "@/components/ColorDot"
-import { listSchema } from "@/types/schemas"
+import { listSchema } from "@/utils/schemas"
 import {
   DragDropContext,
   Draggable,
@@ -24,6 +24,8 @@ import {
   Droppable,
 } from "@hello-pangea/dnd"
 import { Task } from "@prisma/client"
+import { createNewList, reorderLists } from "@/mutations/listMutations"
+import { reorderTasks } from "@/mutations/taskMutations"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
@@ -43,32 +45,14 @@ export default function Home() {
     enabled: !!chosenBoardId,
   })
 
-  const createList = trpc.list.create.useMutation({
-    async onMutate(createdList) {
-      await utils.list.getByBoard.cancel()
-      const prevData = utils.list.getByBoard.getData()
-      utils.list.getByBoard.setData(
-        chosenBoardId!,
-        (old) => [...old!, { ...createdList, tasks: [], color: "blue" }] as any
-      )
-      return { prevData }
-    },
-    onError(err, createdList, ctx) {
-      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
-    },
-    onSettled() {
-      listMethods.reset()
-      closeAdd()
-      utils.list.getByBoard.invalidate()
-    },
-  })
-
   type ListSchema = z.infer<typeof listSchema>
 
   const listMethods = useForm<ListSchema>({
     defaultValues: { boardId: chosenBoardId },
     resolver: zodResolver(listSchema),
   })
+
+  const createList = createNewList(chosenBoardId!, utils, closeAdd, listMethods)
 
   useEffect(() => {
     listMethods.reset({ boardId: chosenBoardId })
@@ -87,101 +71,9 @@ export default function Home() {
     exit: { backdropFilter: "blur(0px)" },
   }
 
-  const reorder = trpc.list.reorder.useMutation({
-    async onMutate(input) {
-      await utils.list.getByBoard.cancel()
-      const prevData = utils.list.getByBoard.getData()
-      utils.list.getByBoard.setData(chosenBoardId!, (old) =>
-        old?.map((l) =>
-          l.id === input.draggableId
-            ? { ...l, order: input.itemTwoIndex }
-            : input.itemOneIndex > input.itemTwoIndex &&
-              l.order >= input.itemTwoIndex &&
-              l.order <= input.itemOneIndex
-            ? { ...l, order: l.order + 1 }
-            : input.itemOneIndex < input.itemTwoIndex &&
-              l.order <= input.itemTwoIndex &&
-              l.order >= input.itemOneIndex
-            ? { ...l, order: l.order - 1 }
-            : l
-        )
-      )
-      return { prevData }
-    },
-    onError(err, input, ctx) {
-      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
-    },
-    onSettled() {
-      utils.list.getByBoard.invalidate()
-    },
-  })
+  const reorder = reorderLists(chosenBoardId!, utils)
 
-  const reorderTasks = trpc.task.reorder.useMutation({
-    async onMutate(input) {
-      await utils.list.getByBoard.cancel()
-      const prevData = utils.list.getByBoard.getData()
-      utils.list.getByBoard.setData(chosenBoardId!, (old) => {
-        const taskDragged = old
-          ?.filter((l) => l.tasks.find((t) => t.id === input.draggableId))[0]
-          .tasks.find((t) => t.id === input.draggableId)
-        return old?.map((l) => {
-          if (input.listId !== input.prevListId) {
-            return l.tasks.find((t) => t.id === input.draggableId)
-              ? {
-                  ...l,
-                  tasks: l.tasks
-                    .filter((t) => t.id !== input.draggableId)
-                    .map((t) =>
-                      t.order > input.itemOneIndex
-                        ? { ...t, order: t.order - 1 }
-                        : t
-                    )
-                    .sort((a, b) => a!.order - b!.order),
-                }
-              : l.id === input.listId
-              ? {
-                  ...l,
-                  tasks: [
-                    ...l.tasks.map((t) =>
-                      t.order >= input.itemTwoIndex
-                        ? { ...t, order: t.order + 1 }
-                        : t
-                    ),
-                    { ...taskDragged, order: input.itemTwoIndex - 1 },
-                  ].sort((a, b) => a!.order - b!.order),
-                }
-              : l
-          } else if (input.listId === input.prevListId) {
-            return l.id === input.listId
-              ? {
-                  ...l,
-                  tasks: l.tasks.map((t) =>
-                    t.id === input.draggableId
-                      ? { ...t, order: input.itemTwoIndex }
-                      : input.itemOneIndex > input.itemTwoIndex &&
-                        t.order >= input.itemTwoIndex &&
-                        t.order <= input.itemOneIndex
-                      ? { ...t, order: t.order + 1 }
-                      : input.itemOneIndex < input.itemTwoIndex &&
-                        t.order <= input.itemTwoIndex &&
-                        t.order >= input.itemOneIndex
-                      ? { ...t, order: t.order - 1 }
-                      : t
-                  ),
-                }
-              : l
-          } else return l
-        }) as any
-      })
-      return { prevData }
-    },
-    onError(err, input, ctx) {
-      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
-    },
-    onSettled() {
-      utils.list.getByBoard.invalidate()
-    },
-  })
+  const reorderDisplayedTasks = reorderTasks(chosenBoardId!, utils)
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
@@ -193,7 +85,7 @@ export default function Home() {
         draggableId,
       })
     } else {
-      reorderTasks.mutate({
+      reorderDisplayedTasks.mutate({
         itemOneIndex: source.index,
         itemTwoIndex: destination.index,
         listId: destination.droppableId,

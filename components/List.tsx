@@ -17,7 +17,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useAssignUser from "@/hooks/useAssignUser"
-import { editListSchema, editTaskSchema } from "@/types/schemas"
+import { editListSchema, editTaskSchema } from "@/utils/schemas"
 import { GoGrabber } from "react-icons/go"
 import {
   DragDropContext,
@@ -26,6 +26,17 @@ import {
   DropResult,
   Droppable,
 } from "@hello-pangea/dnd"
+import {
+  deleteOneTask,
+  updateTaskColor,
+  updateTaskUsers,
+  updatedTaskName,
+} from "@/mutations/taskMutations"
+import {
+  deleteOneList,
+  updateListColor,
+  updateListName,
+} from "@/mutations/listMutations"
 
 type TaskWithAssignedTo = Prisma.TaskGetPayload<{
   include: { assigned_to: true }
@@ -44,15 +55,7 @@ const colorVariants = {
   pink: "border-pink-500",
 }
 
-function List({
-  name,
-  color,
-  tasks,
-  id,
-  boardId,
-  order,
-  dragHandleProps,
-}: ListProps) {
+function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
   const [isEditingName, editName, closeEditName] = useAddOrEdit()
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
   const [isAdding, add, closeAdd] = useAddOrEdit()
@@ -61,62 +64,9 @@ function List({
 
   const utils = trpc.useContext()
 
-  const updateName = trpc.list.editName.useMutation({
-    async onMutate(updatedList) {
-      await utils.list.getByBoard.cancel()
-      const prevData = utils.list.getByBoard.getData()
-      utils.list.getByBoard.setData(boardId, (old) =>
-        old?.map((l) =>
-          l.id === updatedList.id ? { ...l, name: updatedList.name } : l
-        )
-      )
-      return { prevData }
-    },
-    onError(err, updatedList, ctx) {
-      utils.list.getByBoard.setData(boardId, ctx?.prevData)
-    },
-    onSettled: () => {
-      utils.list.getByBoard.invalidate(boardId)
-      closeEditName()
-    },
-  })
-
-  const updateColor = trpc.list.editColor.useMutation({
-    async onMutate(updatedList) {
-      await utils.list.getByBoard.cancel()
-      const prevData = utils.list.getByBoard.getData()
-      utils.list.getByBoard.setData(boardId, (old) =>
-        old?.map((l) =>
-          l.id === updatedList.id ? { ...l, color: updatedList.color } : l
-        )
-      )
-      return { prevData }
-    },
-    onError(err, updatedList, ctx) {
-      utils.list.getByBoard.setData(boardId, ctx?.prevData)
-    },
-    onSettled: () => {
-      utils.list.getByBoard.invalidate(boardId)
-      closeEditColor()
-    },
-  })
-
-  const deleteList = trpc.list.delete.useMutation({
-    async onMutate(deletedListId) {
-      await utils.list.getByBoard.cancel()
-      const prevData = utils.list.getByBoard.getData()
-      utils.list.getByBoard.setData(chosenBoardId!, (old) =>
-        old?.filter((list) => list.id !== deletedListId)
-      )
-      return { prevData }
-    },
-    onError(err, updatedList, ctx) {
-      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
-    },
-    onSettled() {
-      utils.list.getByBoard.invalidate(boardId)
-    },
-  })
+  const updateName = updateListName(chosenBoardId!, utils, closeEditName)
+  const updateColor = updateListColor(chosenBoardId!, utils, closeEditColor)
+  const deleteList = deleteOneList(chosenBoardId!, utils)
 
   type ListSchema = z.infer<typeof editListSchema>
 
@@ -254,8 +204,7 @@ function Task({
 
   const assignedToIds = assigned_to.map((u) => u.id)
 
-  const { assignedUsers, assignUser, assignUsers } =
-    useAssignUser(assignedToIds)
+  const { assignedUsers, assignUser } = useAssignUser(assignedToIds)
 
   const utils = trpc.useContext()
 
@@ -264,72 +213,14 @@ function Task({
     resolver: zodResolver(editTaskSchema),
   })
 
-  const updateName = trpc.task.editName.useMutation({
-    async onMutate(updatedTask) {
-      await utils.list.getByBoard.cancel()
-      const prevData = utils.list.getByBoard.getData()
-      utils.list.getByBoard.setData(chosenBoardId!, (old) =>
-        old?.map((l) =>
-          l.id === listId
-            ? {
-                ...l,
-                tasks: l.tasks.map((t) =>
-                  t.id === updatedTask.id ? { ...t, name: updatedTask.name } : t
-                ),
-              }
-            : l
-        )
-      )
-      return { prevData }
-    },
-    onError(err, updatedTask, ctx) {
-      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
-    },
-    onSettled() {
-      utils.list.getByBoard.invalidate(chosenBoardId!)
-      closeEditName()
-    },
-  })
-
-  const updateUsers = trpc.task.editUsers.useMutation({
-    async onMutate(updatedTask) {
-      await utils.list.getByBoard.cancel()
-      const prevData = utils.list.getByBoard.getData()
-
-      return { prevData }
-    },
-    onError(err, updatedTask, ctx) {
-      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
-    },
-    onSettled() {
-      utils.list.getByBoard.invalidate(chosenBoardId!)
-      closeEditUsers()
-    },
-  })
-
-  const deleteTask = trpc.task.delete.useMutation({
-    async onMutate(deletedTaskId) {
-      await utils.list.getByBoard.cancel()
-      const prevData = utils.list.getByBoard.getData()
-      utils.list.getByBoard.setData(chosenBoardId!, (old) =>
-        old?.map((l) =>
-          l.id === listId
-            ? {
-                ...l,
-                tasks: l.tasks.filter((t) => t.id !== deletedTaskId),
-              }
-            : l
-        )
-      )
-      return { prevData }
-    },
-    onError(err, deletedTaskId, ctx) {
-      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
-    },
-    onSettled() {
-      utils.list.getByBoard.invalidate(chosenBoardId!)
-    },
-  })
+  const updateName = updatedTaskName(
+    chosenBoardId!,
+    listId,
+    utils,
+    closeEditName
+  )
+  const updateUsers = updateTaskUsers(chosenBoardId!, utils, closeEditUsers)
+  const deleteTask = deleteOneTask(chosenBoardId!, listId, utils)
 
   const onSubmit: SubmitHandler<TaskSchema> = (data: any) => {
     updateName.mutate({ name: data.name, id, listId })
@@ -354,34 +245,12 @@ function Task({
 
   const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
 
-  const updateColor = trpc.task.editColor.useMutation({
-    async onMutate(updatedTask) {
-      await utils.list.getByBoard.cancel()
-      const prevData = utils.list.getByBoard.getData()
-      utils.list.getByBoard.setData(chosenBoardId!, (old) =>
-        old?.map((l) =>
-          l.id === listId
-            ? {
-                ...l,
-                tasks: l.tasks.map((t) =>
-                  t.id === updatedTask.id
-                    ? { ...t, color: updatedTask.color }
-                    : t
-                ),
-              }
-            : l
-        )
-      )
-      return { prevData }
-    },
-    onError(err, updatedTask, ctx) {
-      utils.list.getByBoard.setData(chosenBoardId!, ctx?.prevData)
-    },
-    onSettled: () => {
-      utils.list.getByBoard.invalidate(chosenBoardId)
-      closeEditColor()
-    },
-  })
+  const updateColor = updateTaskColor(
+    chosenBoardId!,
+    listId,
+    utils,
+    closeEditColor
+  )
 
   return (
     <>

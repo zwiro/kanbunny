@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import Board from "./Board"
 import LayoutContext from "@/context/LayoutContext"
-import { boardAndProjectSchema } from "@/types/schemas"
+import { boardAndProjectSchema } from "@/utils/schemas"
 import { GoGrabber } from "react-icons/go"
 import {
   DragDropContext,
@@ -27,6 +27,12 @@ import {
 import getProjectOrder from "@/utils/getProjectOrder"
 import useExpand from "@/hooks/useExpand"
 import ExpandChevron from "./ExpandChevron"
+import {
+  deleteOneProject,
+  updateProjectName,
+  updateProjectUsers,
+} from "@/mutations/projectMutations"
+import { createNewBoard, reorderBoards } from "@/mutations/boardMutations"
 
 interface ProjectProps {
   project: Project & { boards: Board[] }
@@ -56,81 +62,16 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
 
   const utils = trpc.useContext()
 
-  const updateUsers = trpc.project.editUsers.useMutation({
-    onSuccess() {
-      utils.project.getUsers.invalidate()
-    },
-  })
-
-  const updateName = trpc.project.editName.useMutation({
-    async onMutate(updatedProject) {
-      await utils.project.getByUser.cancel()
-      const prevData = utils.project.getByUser.getData()
-      utils.project.getByUser.setData(undefined, (old) =>
-        old?.map((p) =>
-          p.id === updatedProject.projectId
-            ? { ...p, name: updatedProject.name }
-            : p
-        )
-      )
-      return { prevData }
-    },
-    onError(err, updatedProject, ctx) {
-      utils.project.getByUser.setData(undefined, ctx?.prevData)
-    },
-    onSettled() {
-      utils.project.getByUser.invalidate()
-      closeEditName()
-    },
-  })
-
-  const deleteProject = trpc.project.delete.useMutation({
-    async onMutate(deletedProjectId) {
-      await utils.project.getByUser.cancel()
-      const prevData = utils.project.getByUser.getData()
-      utils.project.getByUser.setData(undefined, (old) =>
-        old?.filter((p) => p.id !== deletedProjectId)
-      )
-      return { prevData }
-    },
-    onError(err, deletedProjectId, ctx) {
-      utils.project.getByUser.setData(undefined, ctx?.prevData)
-    },
-    onSettled() {
-      utils.project.getByUser.invalidate()
-    },
-  })
-
-  const createBoard = trpc.board.create.useMutation({
-    async onMutate(newBoard) {
-      await utils.project.getByUser.cancel()
-      const prevData = utils.project.getByUser.getData()
-      utils.project.getByUser.setData(undefined, (old) =>
-        old?.map((p) =>
-          p.id === newBoard.projectId
-            ? {
-                ...p,
-                boards: [...p.boards, { ...newBoard, color: "red" } as Board],
-              }
-            : p
-        )
-      )
-      return { prevData }
-    },
-    onError(err, newBoard, ctx) {
-      utils.project.getByUser.setData(undefined, ctx?.prevData)
-    },
-    onSettled() {
-      utils.project.getByUser.invalidate()
-      closeAdd()
-      boardMethods.reset()
-    },
-  })
+  const updateUsers = updateProjectUsers(utils)
+  const updateName = updateProjectName(utils, closeEditName)
+  const deleteProject = deleteOneProject(utils)
 
   const boardMethods = useForm<BoardAndProjectSchema>({
     defaultValues: { projectId: project.id },
     resolver: zodResolver(boardAndProjectSchema),
   })
+
+  const createBoard = createNewBoard(utils, closeAdd, boardMethods)
 
   const projectMethods = useForm<BoardAndProjectSchema>({
     defaultValues: { projectId: project.id, name: project.name },
@@ -156,41 +97,7 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
     exit: { height: 0, opacity: 0 },
   }
 
-  const reorder = trpc.board.reorder.useMutation({
-    async onMutate(input) {
-      await utils.project.getByUser.cancel()
-      const prevData = utils.project.getByUser.getData()
-      utils.project.getByUser.setData(undefined, (old) =>
-        old?.map((p) =>
-          p.id === project.id
-            ? {
-                ...p,
-                boards: p.boards.map((b) =>
-                  b.id === input.draggableId
-                    ? { ...b, order: input.itemTwoIndex }
-                    : input.itemOneIndex > input.itemTwoIndex &&
-                      b.order >= input.itemTwoIndex &&
-                      b.order <= input.itemOneIndex
-                    ? { ...b, order: b.order + 1 }
-                    : input.itemOneIndex < input.itemTwoIndex &&
-                      b.order <= input.itemTwoIndex &&
-                      b.order >= input.itemOneIndex
-                    ? { ...b, order: b.order - 1 }
-                    : b
-                ),
-              }
-            : p
-        )
-      )
-      return { prevData }
-    },
-    onError(err, input, ctx) {
-      utils.project.getByUser.setData(undefined, ctx?.prevData)
-    },
-    onSettled() {
-      utils.project.getByUser.invalidate()
-    },
-  })
+  const reorder = reorderBoards(project.id, utils)
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result

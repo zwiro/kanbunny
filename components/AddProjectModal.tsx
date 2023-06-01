@@ -1,14 +1,15 @@
+import { z } from "zod"
+import { useForm, FormProvider, SubmitHandler } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { trpc } from "@/utils/trpc"
+import { projectSchema } from "@/utils/schemas"
+import useAddUser from "@/hooks/useAddUser"
 import AddButton from "./AddButton"
 import FormFieldContainer from "./FormFieldContainer"
 import ModalForm from "./ModalForm"
 import PlusIcon from "./PlusIcon"
 import TextInput from "./TextInput"
-import useAddUser from "@/hooks/useAddUser"
-import { useForm, FormProvider, SubmitHandler } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { trpc } from "@/utils/trpc"
-import { projectSchema } from "@/types/schemas"
+import { createNewProject } from "@/mutations/projectMutations"
 
 interface AddProjectModalProps {
   close: () => void
@@ -19,12 +20,7 @@ function AddProjectModal({ close }: AddProjectModalProps) {
 
   const utils = trpc.useContext()
 
-  const createProject = trpc.project.create.useMutation({
-    onSuccess() {
-      utils.project.getByUser.invalidate()
-      close()
-    },
-  })
+  const createProject = createNewProject(utils)
 
   type ProjectSchema = z.infer<typeof projectSchema>
 

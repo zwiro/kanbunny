@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { z } from "zod"
 import { UseTRPCMutationResult } from "@trpc/react-query/shared"
 import type { Board, List, Task } from "@prisma/client"
-import { colorSchema } from "@/types/schemas"
+import { colorSchema } from "@/utils/schemas"
 
 interface ColorPickerProps {
   close: () => void

@@ -1,8 +1,8 @@
 import { z } from "zod"
 import { protectedProcedure, createTRPCRouter, publicProcedure } from "../trpc"
-import { colorSchema, reorderSchema } from "@/types/schemas"
-import { listSchema } from "@/types/schemas"
-import { editListSchema } from "@/types/schemas"
+import { colorSchema, reorderSchema } from "@/utils/schemas"
+import { listSchema } from "@/utils/schemas"
+import { editListSchema } from "@/utils/schemas"
 
 export const listRouter = createTRPCRouter({
   getByBoard: protectedProcedure

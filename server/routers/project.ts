@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { protectedProcedure, createTRPCRouter } from "../trpc"
-import { projectSchema, reorderSchema } from "@/types/schemas"
+import { projectSchema, reorderSchema } from "@/utils/schemas"
 
 export const projectRouter = createTRPCRouter({
   getByUser: protectedProcedure.query(async ({ ctx }) => {

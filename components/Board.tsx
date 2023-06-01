@@ -1,22 +1,26 @@
+import React, { useContext } from "react"
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { GoGrabber } from "react-icons/go"
+import { z } from "zod"
+import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
 import { AnimatePresence } from "framer-motion"
+import type { Board, Color } from "@prisma/client"
+import { trpc } from "@/utils/trpc"
+import { boardSchema } from "@/utils/schemas"
+import LayoutContext from "@/context/LayoutContext"
+import useAddOrEdit from "@/hooks/useAddOrEdit"
 import MenuButton from "./MenuButton"
 import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
-import useAddOrEdit from "@/hooks/useAddOrEdit"
-import React, { useContext } from "react"
 import ColorPicker from "./ColorPicker"
-import { trpc } from "@/utils/trpc"
-import type { Board, Color } from "@prisma/client"
 import { LoadingDots } from "./LoadingDots"
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import LayoutContext from "@/context/LayoutContext"
 import ColorDot from "./ColorDot"
-import { boardSchema } from "@/types/schemas"
-import { GoGrabber } from "react-icons/go"
-import { motion } from "framer-motion"
-import { DraggableProvidedDragHandleProps, DropResult } from "@hello-pangea/dnd"
+import {
+  deleteOneBoard,
+  updateBoardColor,
+  updateBoardName,
+} from "@/mutations/boardMutations"
 
 interface BoardProps {
   name: string
@@ -42,87 +46,9 @@ function Board({
 
   const utils = trpc.useContext()
 
-  const updateName = trpc.board.editName.useMutation({
-    async onMutate(updatedBoard) {
-      await utils.project.getByUser.cancel()
-      const prevData = utils.project.getByUser.getData()
-      utils.project.getByUser.setData(undefined, (old) =>
-        old?.map((p) =>
-          p.id === projectId
-            ? {
-                ...p,
-                boards: p.boards.map((b) =>
-                  b.id === updatedBoard.id
-                    ? { ...b, name: updatedBoard.name }
-                    : b
-                ),
-              }
-            : p
-        )
-      )
-      return { prevData }
-    },
-    onError(err, updatedBoard, ctx) {
-      utils.project.getByUser.setData(undefined, ctx?.prevData)
-    },
-    onSettled() {
-      utils.project.getByUser.invalidate()
-      closeEditName()
-    },
-  })
-
-  const updateColor = trpc.board.editColor.useMutation({
-    async onMutate(updatedBoard) {
-      await utils.project.getByUser.cancel()
-      const prevData = utils.project.getByUser.getData()
-      utils.project.getByUser.setData(undefined, (old) =>
-        old?.map((p) =>
-          p.id === projectId
-            ? {
-                ...p,
-                boards: p.boards.map((b) =>
-                  b.id === updatedBoard.id
-                    ? { ...b, color: updatedBoard.color }
-                    : b
-                ),
-              }
-            : p
-        )
-      )
-      return { prevData }
-    },
-    onError(err, updatedBoard, ctx) {
-      utils.project.getByUser.setData(undefined, ctx?.prevData)
-    },
-    onSettled: () => {
-      closeEditColor()
-      utils.project.getByUser.invalidate()
-    },
-  })
-
-  const deleteBoard = trpc.board.delete.useMutation({
-    async onMutate(deletedBoardId) {
-      await utils.project.getByUser.cancel()
-      const prevData = utils.project.getByUser.getData()
-      utils.project.getByUser.setData(undefined, (old) =>
-        old?.map((p) =>
-          p.id === projectId
-            ? {
-                ...p,
-                boards: p.boards.filter((b) => b.id !== deletedBoardId),
-              }
-            : p
-        )
-      )
-      return { prevData }
-    },
-    onError(err, updatedBoard, ctx) {
-      utils.project.getByUser.setData(undefined, ctx?.prevData)
-    },
-    onSettled() {
-      utils.project.getByUser.invalidate()
-    },
-  })
+  const updateName = updateBoardName(projectId, utils, closeEditName)
+  const updateColor = updateBoardColor(projectId, utils, closeEditColor)
+  const deleteBoard = deleteOneBoard(projectId, utils)
 
   type BoardSchema = z.infer<typeof boardSchema>
 

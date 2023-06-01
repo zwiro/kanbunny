@@ -17,6 +17,7 @@ import {
 import { trpc } from "@/utils/trpc"
 import getProjectOrder from "@/utils/getProjectOrder"
 import { get } from "http"
+import { reorderProjects } from "@/mutations/projectMutations"
 
 interface SideMenuProps {
   data:
@@ -51,34 +52,7 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
 
   const utils = trpc.useContext()
 
-  const reorder = trpc.project.reorder.useMutation({
-    async onMutate(input) {
-      await utils.project.getByUser.cancel()
-      const prevData = utils.project.getByUser.getData()
-      utils.project.getByUser.setData(undefined, (old) =>
-        old?.map((p) =>
-          p.id === input.draggableId
-            ? { ...p, order: input.itemTwoIndex }
-            : input.itemOneIndex > input.itemTwoIndex &&
-              p.order >= input.itemTwoIndex &&
-              p.order <= input.itemOneIndex
-            ? { ...p, order: p.order + 1 }
-            : input.itemOneIndex < input.itemTwoIndex &&
-              p.order <= input.itemTwoIndex &&
-              p.order >= input.itemOneIndex
-            ? { ...p, order: p.order - 1 }
-            : p
-        )
-      )
-      return { prevData }
-    },
-    onError(err, input, ctx) {
-      utils.project.getByUser.setData(undefined, ctx?.prevData)
-    },
-    onSettled() {
-      utils.project.getByUser.invalidate()
-    },
-  })
+  const reorder = reorderProjects(utils)
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result

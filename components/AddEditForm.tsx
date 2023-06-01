@@ -1,7 +1,7 @@
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
-import TextInput from "./TextInput"
 import { SubmitHandler, useFormContext } from "react-hook-form"
 import { LoadingDots } from "./LoadingDots"
+import TextInput from "./TextInput"
 
 interface AddEditFormProps {
   name: string

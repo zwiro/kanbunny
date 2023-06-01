@@ -1,19 +1,20 @@
-import TextInput from "./TextInput"
+import { useContext, useState } from "react"
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import DateTimePicker from "react-datetime-picker"
 import "react-datetime-picker/dist/DateTimePicker.css"
-import { useContext, useState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { trpc } from "@/utils/trpc"
+import { taskSchema } from "@/utils/schemas"
+import LayoutContext from "@/context/LayoutContext"
+import useAssignUser from "@/hooks/useAssignUser"
+import TextInput from "./TextInput"
 import AddButton from "./AddButton"
 import PlusIcon from "./PlusIcon"
 import UserCheckbox from "./UserCheckbox"
 import ModalForm from "./ModalForm"
 import FormFieldContainer from "./FormFieldContainer"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
-import { trpc } from "@/utils/trpc"
-import LayoutContext from "@/context/LayoutContext"
-import useAssignUser from "@/hooks/useAssignUser"
-import { taskSchema } from "@/types/schemas"
+import { createNewTask } from "@/mutations/taskMutations"
 
 interface AddTaskModalProps {
   close: () => void
@@ -31,12 +32,7 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
 
   const utils = trpc.useContext()
 
-  const createTask = trpc.task.create.useMutation({
-    onSuccess: () => {
-      utils.board.getById.invalidate(chosenBoardId!)
-      close()
-    },
-  })
+  const createTask = createNewTask(chosenBoardId!, utils)
 
   type TaskSchema = z.infer<typeof taskSchema>
 
