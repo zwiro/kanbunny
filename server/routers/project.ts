@@ -10,7 +10,6 @@ export const projectRouter = createTRPCRouter({
         project: {
           include: {
             boards: true,
-            invited_users: true,
             owner: true,
             users: {
               where: { userId: ctx.session.user.id },
@@ -39,11 +38,10 @@ export const projectRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const users = await ctx.prisma.user.findMany({
         where: {
-          OR: [
-            { projects_in: { some: { id: input } } },
-            { invites: { some: { id: input } } },
+          AND: [
+            { projects_in: { some: { projectId: input } } },
+            { NOT: { id: ctx.session.user.id } },
           ],
-          NOT: { id: ctx.session.user.id },
         },
       })
       return users
@@ -66,23 +64,20 @@ export const projectRouter = createTRPCRouter({
   create: protectedProcedure
     .input(projectSchema)
     .mutation(async ({ ctx, input }) => {
-      const invitedUsers = await ctx.prisma.user.findMany({
-        where: { name: { in: input.invited_users } },
+      const users = await ctx.prisma.user.findMany({
+        where: { name: { in: input.users } },
       })
+      const userIds = users
+        .filter((user) => user.id !== ctx.session.user.id)
+        .map((user) => ({ userId: user.id, order: 0 }))
       const project = await ctx.prisma.project.create({
         data: {
           name: input.name,
           ownerId: ctx.session.user.id,
           users: {
-            create: {
-              user: { connect: { id: ctx.session.user.id } },
-              order: 0,
+            createMany: {
+              data: [...userIds, { userId: ctx.session.user.id, order: 0 }],
             },
-          },
-          invited_users: {
-            connect: invitedUsers
-              .filter((user) => user.id !== ctx.session.user.id)
-              .map((user) => ({ id: user.id })),
           },
         },
       })
@@ -97,44 +92,54 @@ export const projectRouter = createTRPCRouter({
       z.object({ projectId: z.string(), participants: z.array(z.string()) })
     )
     .mutation(async ({ ctx, input }) => {
-      const participatingUsers = await ctx.prisma.user.findMany({
+      const toDeleteUsers = await ctx.prisma.user.findMany({
         where: {
           AND: [
-            { projects_in: { some: { id: { in: input.projectId } } } },
+            { projects_in: { some: { projectId: { in: input.projectId } } } },
+            { name: { notIn: input.participants } },
+          ],
+        },
+      })
+      const newUsers = await ctx.prisma.user.findMany({
+        where: {
+          AND: [
+            {
+              NOT: {
+                projects_in: { some: { projectId: { in: input.projectId } } },
+              },
+            },
             { name: { in: input.participants } },
           ],
         },
       })
-      const invitedUsers = await ctx.prisma.user.findMany({
+      await ctx.prisma.projectUser.deleteMany({
         where: {
           AND: [
-            { projects_in: { none: { id: { in: input.projectId } } } },
-            { name: { in: input.participants } },
+            { projectId: input.projectId },
+            {
+              userId: {
+                in: toDeleteUsers.map((u) => u.id),
+                not: ctx.session.user.id!,
+              },
+            },
           ],
         },
       })
-      const project = await ctx.prisma.project.update({
-        where: { id: input.projectId },
-        data: {
-          invited_users: {
-            set: invitedUsers
-              .filter((user) => user.id !== ctx.session.user.id)
-              .map((user) => ({ id: user.id })),
+      for (let user of newUsers) {
+        await ctx.prisma.projectUser.create({
+          data: {
+            projectId: input.projectId,
+            userId: user.id,
+            order: 0,
           },
-          users: {
-            disconnect: participatingUsers
-              .filter((user) => user.id !== ctx.session.user.id)
-              .map((user) => ({ id: user.id })),
-          },
-        },
-      })
-      return project
+        })
+      }
+
+      return { success: true }
     }),
   editName: protectedProcedure
     .input(
-      projectSchema
-        .omit({ invited_users: true })
-        .extend({ projectId: z.string() })
+      projectSchema.omit({ users: true }).extend({ projectId: z.string() })
     )
     .mutation(async ({ ctx, input }) => {
       const project = await ctx.prisma.project.update({
@@ -190,10 +195,7 @@ export const projectRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const users = await ctx.prisma.user.findMany({
         where: {
-          OR: [
-            { projects_in: { some: { id: input } } },
-            { invites: { some: { id: input } } },
-          ],
+          projects_in: { some: { id: input } },
         },
       })
       users.map(async (user) => {
@@ -201,7 +203,6 @@ export const projectRouter = createTRPCRouter({
           where: { id: user.id },
           data: {
             projects_in: { disconnect: { id: input } },
-            invites: { disconnect: { id: input } },
           },
         })
       })

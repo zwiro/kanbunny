@@ -20,15 +20,14 @@ enum Color {
 }
 
 model Project {
-  id            String        @id @default(cuid())
-  name          String
-  owner         User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId       String
-  boards        Board[]
-  users         ProjectUser[]
-  invited_users User[]        @relation("ProjectInvites")
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @updatedAt
+  id         String        @id @default(cuid())
+  name       String
+  owner      User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId    String
+  boards     Board[]
+  users      ProjectUser[]
+  created_at DateTime      @default(now())
+  updated_at DateTime      @updatedAt
 
   @@index([ownerId])
 }
@@ -113,7 +112,6 @@ model User {
   sessions       Session[]
   projects_owned Project[]
   projects_in    ProjectUser[]
-  invites        Project[]     @relation("ProjectInvites")
   tasks          Task[]
 }
 

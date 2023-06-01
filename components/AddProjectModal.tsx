@@ -3,7 +3,7 @@ import FormFieldContainer from "./FormFieldContainer"
 import ModalForm from "./ModalForm"
 import PlusIcon from "./PlusIcon"
 import TextInput from "./TextInput"
-import useInviteUser from "@/hooks/useInviteUser"
+import useAddUser from "@/hooks/useAddUser"
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -15,8 +15,7 @@ interface AddProjectModalProps {
 }
 
 function AddProjectModal({ close }: AddProjectModalProps) {
-  const { user, invitedUsers, inviteUser, removeUser, handleChange } =
-    useInviteUser()
+  const { user, users, addUser, removeUser, handleChange } = useAddUser()
 
   const utils = trpc.useContext()
 
@@ -36,7 +35,7 @@ function AddProjectModal({ close }: AddProjectModalProps) {
   const onSubmit: SubmitHandler<ProjectSchema> = (data: any) => {
     createProject.mutate({
       name: data.name,
-      invited_users: invitedUsers,
+      users,
     })
   }
 
@@ -54,7 +53,7 @@ function AddProjectModal({ close }: AddProjectModalProps) {
           )}
         </FormFieldContainer>
         <FormFieldContainer>
-          <p>invite users</p>
+          <p>add users</p>
           <div className="flex items-center gap-2">
             <input
               type="text"
@@ -63,13 +62,13 @@ function AddProjectModal({ close }: AddProjectModalProps) {
               value={user}
               onChange={handleChange}
             />
-            <button onClick={inviteUser} className="group">
+            <button onClick={addUser} className="group">
               <PlusIcon />
             </button>
           </div>
-          <p>invited ({invitedUsers.length})</p>
+          <p>participating ({users.length})</p>
           <ul className="flex flex-wrap gap-2">
-            {invitedUsers.map((user, i) => (
+            {users.map((user, i) => (
               <li
                 key={`${user}-${i}`}
                 onClick={() => removeUser(user)}

@@ -6,7 +6,7 @@ import AddEditForm from "./AddEditForm"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
 import React, { useContext } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
-import useInviteUser from "@/hooks/useInviteUser"
+import useAddUser from "@/hooks/useAddUser"
 import { trpc } from "@/utils/trpc"
 import type { Project, ProjectUser, User } from "@prisma/client"
 import { LoadingDots } from "./LoadingDots"
@@ -49,14 +49,8 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
   const { isExpanded, toggle } = useExpand()
 
   const [isAdding, add, closeAdd] = useAddOrEdit()
-  const {
-    user,
-    invitedUsers,
-    inviteUser,
-    removeUser,
-    handleChange,
-    setAllUsers,
-  } = useInviteUser()
+  const { user, users, addUser, removeUser, handleChange, setAllUsers } =
+    useAddUser()
 
   const { chosenBoardId } = useContext(LayoutContext)
 
@@ -153,7 +147,7 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
 
   const handleSubmitUsers = (e: React.FormEvent) => {
     e.preventDefault()
-    updateUsers.mutate({ projectId: project.id, participants: invitedUsers })
+    updateUsers.mutate({ projectId: project.id, participants: users })
   }
 
   const projectUsersAnimation = {
@@ -270,13 +264,13 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
                   value={user}
                   onChange={handleChange}
                 />
-                <button onClick={inviteUser} className="group">
+                <button onClick={addUser} className="group">
                   <PlusIcon />
                 </button>
               </div>
-              <p>invited or participating ({invitedUsers.length})</p>
+              <p>participating ({users.length})</p>
               <ul className="flex flex-wrap gap-2">
-                {invitedUsers.map((user, i) => (
+                {users.map((user, i) => (
                   <li
                     key={`${user}-${i}`}
                     onClick={() => removeUser(user)}

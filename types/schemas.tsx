@@ -2,7 +2,7 @@ import { z } from "zod"
 
 export const projectSchema = z.object({
   name: z.string().min(1, { message: "project name is required" }),
-  invited_users: z.array(z.string()).optional(),
+  users: z.array(z.string()).optional(),
 })
 
 export const boardSchema = z.object({

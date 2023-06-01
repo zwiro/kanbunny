@@ -1,21 +1,19 @@
 import { useState } from "react"
 
-function useInviteUser(initialState: string[] = []) {
+function useAddUser(initialState: string[] = []) {
   const [user, setUser] = useState<string>("")
-  const [invitedUsers, setInvitedUsers] = useState<string[]>(initialState)
+  const [users, setUsers] = useState<string[]>(initialState)
 
-  const inviteUser = (e: React.MouseEvent) => {
+  const addUser = (e: React.MouseEvent) => {
     e.preventDefault()
     if (user) {
-      setInvitedUsers([...invitedUsers, user])
+      setUsers([...users, user])
       setUser("")
     }
   }
 
   const removeUser = (user: string) => {
-    setInvitedUsers((prevUsers) =>
-      prevUsers.filter((prevUser) => prevUser !== user)
-    )
+    setUsers((prevUsers) => prevUsers.filter((prevUser) => prevUser !== user))
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,17 +21,17 @@ function useInviteUser(initialState: string[] = []) {
   }
 
   const setAllUsers = (state: string[]) => {
-    setInvitedUsers(state)
+    setUsers(state)
   }
 
   return {
     user,
-    invitedUsers,
-    inviteUser,
+    users,
+    addUser,
     removeUser,
     handleChange,
     setAllUsers,
   }
 }
 
-export default useInviteUser
+export default useAddUser

@@ -32,7 +32,6 @@ interface SideMenuProps {
         users: {
           order: number
         }[]
-        invited_users: User[]
       }[]
     | undefined
   isLoading: boolean
