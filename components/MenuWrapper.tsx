@@ -1,32 +1,37 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, RefObject, useContext } from "react"
 import { AnimatePresence } from "framer-motion"
 import { motion } from "framer-motion"
+import useClickOutside from "@/hooks/useClickOutside"
+import MenuContext, { MenuProvider } from "@/context/MenuContext"
 
-interface MenuButtonProps {
+interface MenuWrapperProps {
   children: JSX.Element | JSX.Element[]
   direction?: "left" | "right"
 }
 
-function MenuButton({ children, direction = "left" }: MenuButtonProps) {
-  const [isMenuOpened, setIsMenuOpened] = useState(false)
+function MenuWrapper({ children, direction = "left" }: MenuWrapperProps) {
+  return (
+    <MenuProvider>
+      <MenuButton direction={direction}>{children}</MenuButton>
+    </MenuProvider>
+  )
+}
+
+interface MenuButtonProps {
+  children: JSX.Element | JSX.Element[]
+  direction: "left" | "right"
+}
+
+function MenuButton({ children, direction }: MenuButtonProps) {
+  const { isMenuOpened, closeMenu, openMenu } = useContext(MenuContext)
 
   const menuRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const handleClickOutside = () => {
-      if (menuRef.current) {
-        setIsMenuOpened(false)
-      }
-    }
-    document.addEventListener("click", handleClickOutside, true)
-    return () => {
-      document.removeEventListener("click", handleClickOutside, true)
-    }
-  }, [menuRef])
+  useClickOutside([menuRef], closeMenu)
 
   return (
     <div className="relative">
-      <button onClick={() => setIsMenuOpened(true)} className="px-1 py-4">
+      <button onClick={openMenu} className="px-1 py-4">
         <MenuDots isMenuOpened={isMenuOpened} />
       </button>
       <AnimatePresence>
@@ -80,4 +85,4 @@ function MenuDots({ isMenuOpened }: MenuDotsProps) {
   )
 }
 
-export default MenuButton
+export default MenuWrapper

@@ -1,6 +1,6 @@
 import PlusIcon from "./PlusIcon"
 import { AnimatePresence, motion } from "framer-motion"
-import MenuButton from "./MenuButton"
+import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
@@ -123,14 +123,14 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
           >
             {project.name}
           </p>
-          <MenuButton>
+          <MenuWrapper>
             <MenuItem handleClick={add}>add board</MenuItem>
             <MenuItem handleClick={editUsers}>edit users</MenuItem>
             <MenuItem handleClick={editName}>edit project name</MenuItem>
             <MenuItem handleClick={() => deleteProject.mutate(project.id)}>
               delete project
             </MenuItem>
-          </MenuButton>
+          </MenuWrapper>
 
           <div {...dragHandleProps} className="ml-auto cursor-grab">
             <GoGrabber />

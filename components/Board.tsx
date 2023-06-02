@@ -10,7 +10,7 @@ import { trpc } from "@/utils/trpc"
 import { boardSchema } from "@/utils/schemas"
 import LayoutContext from "@/context/LayoutContext"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
-import MenuButton from "./MenuButton"
+import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import ColorPicker from "./ColorPicker"
@@ -90,13 +90,13 @@ function Board({
                 : "group-hover:visible group-hover:scale-100"
             } `}
           >
-            <MenuButton>
+            <MenuWrapper>
               <MenuItem handleClick={editName}>edit board name</MenuItem>
               <MenuItem handleClick={editColor}>change color</MenuItem>
               <MenuItem handleClick={() => deleteBoard.mutate(id)}>
                 delete board
               </MenuItem>
-            </MenuButton>
+            </MenuWrapper>
           </div>
           <div
             {...dragHandleProps}

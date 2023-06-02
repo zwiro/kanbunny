@@ -6,7 +6,7 @@ import SideMenu from "@/components/SideMenu"
 import LayoutContext from "@/context/LayoutContext"
 import { motion, AnimatePresence } from "framer-motion"
 import MenuItem from "@/components/MenuItem"
-import MenuButton from "@/components/MenuButton"
+import MenuWrapper from "@/components/MenuWrapper"
 import AddButton from "@/components/AddButton"
 import AddEditForm from "@/components/AddEditForm"
 import ListContainer from "@/components/ListContainer"
@@ -110,10 +110,10 @@ export default function Home() {
                 <ColorDot color={board.data?.color!} />
                 <h1 className="text-2xl font-bold">{board.data?.name}</h1>
               </div>
-              <MenuButton direction="right">
+              <MenuWrapper direction="right">
                 <MenuItem handleClick={add}>add list</MenuItem>
                 <MenuItem handleClick={toggleSideMenu}>more options</MenuItem>
-              </MenuButton>
+              </MenuWrapper>
               <Filters />
             </div>
             <p className="text-slate-300">
@@ -216,6 +216,11 @@ export default function Home() {
 }
 
 function Filters() {
+  const options = ["sort", "filter", "search"] as const
+  const [openedOption, setOpenedOption] = useState<
+    (typeof options)[number] | null
+  >(null)
+
   return (
     <>
       <div className="ml-auto hidden sm:block">
@@ -226,11 +231,28 @@ function Filters() {
         </ul>
       </div>
       <div className="ml-auto sm:hidden">
-        <MenuButton>
-          <MenuItem>sort</MenuItem>
-          <MenuItem>filter</MenuItem>
-          <MenuItem>search</MenuItem>
-        </MenuButton>
+        <MenuWrapper>
+          <>
+            {openedOption === null &&
+              options.map((option, i) => (
+                <MenuItem
+                  key={`option-${i}`}
+                  handleClick={() => setOpenedOption(option)}
+                  closeOnClickInside={false}
+                >
+                  {option}
+                </MenuItem>
+              ))}
+            {openedOption === "sort" && (
+              <>
+                <MenuItem>newest</MenuItem>
+                <MenuItem>oldest</MenuItem>
+                <MenuItem>unassigned</MenuItem>
+                <MenuItem>assigned</MenuItem>
+              </>
+            )}
+          </>
+        </MenuWrapper>
       </div>
     </>
   )

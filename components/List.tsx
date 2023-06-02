@@ -1,5 +1,5 @@
 import { useContext } from "react"
-import MenuButton from "./MenuButton"
+import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
@@ -105,14 +105,14 @@ function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
               <PlusIcon />
             </button>
             <div className="ml-auto pr-2">
-              <MenuButton>
+              <MenuWrapper>
                 <MenuItem handleClick={add}>add task</MenuItem>
                 <MenuItem handleClick={editName}>edit list name</MenuItem>
                 <MenuItem handleClick={editColor}>change color</MenuItem>
                 <MenuItem handleClick={() => deleteList.mutate(id)}>
                   delete list
                 </MenuItem>
-              </MenuButton>
+              </MenuWrapper>
             </div>
             <div
               {...dragHandleProps}
@@ -279,14 +279,14 @@ function Task({
               </ul>
             </div>
             <div className="z-20 ml-auto scale-0 transition-transform group-hover:scale-100">
-              <MenuButton>
+              <MenuWrapper>
                 <MenuItem handleClick={editName}>edit task name</MenuItem>
                 <MenuItem handleClick={editUsers}>assign user</MenuItem>
                 <MenuItem handleClick={editColor}>change color</MenuItem>
                 <MenuItem handleClick={() => deleteTask.mutate(id)}>
                   delete task
                 </MenuItem>
-              </MenuButton>
+              </MenuWrapper>
             </div>
             <div
               {...dragHandleProps}

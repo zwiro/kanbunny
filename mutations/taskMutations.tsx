@@ -1,10 +1,14 @@
 import { TRPCContextType } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
 
-export const createNewTask = (boardId: string, utils: TRPCContextType) =>
+export const createNewTask = (
+  boardId: string,
+  utils: TRPCContextType,
+  close: () => void
+) =>
   trpc.task.create.useMutation({
     onSuccess: () => {
-      utils.board.getById.invalidate(boardId)
+      utils.list.getByBoard.invalidate(boardId)
       close()
     },
   })

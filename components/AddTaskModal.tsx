@@ -32,7 +32,7 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
 
   const utils = trpc.useContext()
 
-  const createTask = createNewTask(chosenBoardId!, utils)
+  const createTask = createNewTask(chosenBoardId!, utils, close)
 
   type TaskSchema = z.infer<typeof taskSchema>
 

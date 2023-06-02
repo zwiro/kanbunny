@@ -1,14 +1,24 @@
+import MenuContext from "@/context/MenuContext"
+import { useContext } from "react"
+
 interface MenuItemProps {
   children: string
   handleClick?: () => void
+  closeOnClickInside?: boolean
 }
 
-function MenuItem({ children, handleClick }: MenuItemProps) {
+function MenuItem({
+  children,
+  handleClick,
+  closeOnClickInside = true,
+}: MenuItemProps) {
+  const { isMenuOpened, closeMenu, openMenu } = useContext(MenuContext)
+
   return (
     <li
-      onClick={(e) => {
+      onClick={() => {
         handleClick && handleClick()
-        e.stopPropagation()
+        closeOnClickInside && closeMenu()
       }}
       className="px-8 hover:cursor-pointer hover:bg-zinc-800"
     >
