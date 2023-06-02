@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState } from "react"
+import { useEffect, useContext, useState, useRef } from "react"
 import { useRouter } from "next/router"
 import PlusIcon from "@/components/PlusIcon"
 import List from "@/components/List"
@@ -26,6 +26,9 @@ import {
 import { Task } from "@prisma/client"
 import { createNewList, reorderLists } from "@/mutations/listMutations"
 import { reorderTasks } from "@/mutations/taskMutations"
+import useClickOutside from "@/hooks/useClickOutside"
+import MenuContext from "@/context/MenuContext"
+import TextInput from "@/components/TextInput"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
@@ -222,38 +225,45 @@ function Filters() {
   >(null)
 
   return (
-    <>
-      <div className="ml-auto hidden sm:block">
-        <ul className="flex gap-4 text-2xl md:gap-12 lg:gap-16">
-          <li>sort</li>
-          <li>filter</li>
-          <li>search</li>
-        </ul>
-      </div>
-      <div className="ml-auto sm:hidden">
-        <MenuWrapper>
-          <>
-            {openedOption === null &&
-              options.map((option, i) => (
-                <MenuItem
-                  key={`option-${i}`}
-                  handleClick={() => setOpenedOption(option)}
-                  closeOnClickInside={false}
-                >
-                  {option}
-                </MenuItem>
-              ))}
-            {openedOption === "sort" && (
-              <>
-                <MenuItem>newest</MenuItem>
-                <MenuItem>oldest</MenuItem>
-                <MenuItem>unassigned</MenuItem>
-                <MenuItem>assigned</MenuItem>
-              </>
-            )}
-          </>
-        </MenuWrapper>
-      </div>
-    </>
+    <div className="ml-auto">
+      <MenuWrapper>
+        <>
+          {openedOption === null &&
+            options.map((option, i) => (
+              <MenuItem
+                key={`option-${i}`}
+                handleClick={() => setOpenedOption(option)}
+                closeOnClickInside={false}
+              >
+                {option}
+              </MenuItem>
+            ))}
+          {openedOption === "sort" && (
+            <>
+              <MenuItem>newest</MenuItem>
+              <MenuItem>oldest</MenuItem>
+              <MenuItem>assigned</MenuItem>
+              <MenuItem>unassigned</MenuItem>
+            </>
+          )}
+          {openedOption === "filter" && (
+            <>
+              <MenuItem>assigned to you</MenuItem>
+              <MenuItem>unassigned</MenuItem>
+            </>
+          )}
+          {openedOption === "search" && (
+            <>
+              <input
+                type="search"
+                name="search"
+                placeholder="change button text"
+                className="bg-zinc-800 px-1 text-sm"
+              />
+            </>
+          )}
+        </>
+      </MenuWrapper>
+    </div>
   )
 }
