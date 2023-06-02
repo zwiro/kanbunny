@@ -13,7 +13,7 @@ import ListContainer from "@/components/ListContainer"
 import useAddOrEdit from "@/hooks/useAddOrEdit"
 import { trpc } from "@/utils/trpc"
 import { z } from "zod"
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
+import { FormProvider, SubmitHandler, set, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import ColorDot from "@/components/ColorDot"
 import { listSchema } from "@/utils/schemas"
@@ -224,8 +224,12 @@ function Filters() {
     (typeof options)[number] | null
   >(null)
 
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useClickOutside([menuRef], () => setOpenedOption(null))
+
   return (
-    <div className="ml-auto">
+    <div className="ml-auto" ref={menuRef}>
       <MenuWrapper>
         <>
           {openedOption === null &&
@@ -240,16 +244,28 @@ function Filters() {
             ))}
           {openedOption === "sort" && (
             <>
-              <MenuItem>newest</MenuItem>
-              <MenuItem>oldest</MenuItem>
-              <MenuItem>assigned</MenuItem>
-              <MenuItem>unassigned</MenuItem>
+              <MenuItem handleClick={() => setOpenedOption(null)}>
+                newest
+              </MenuItem>
+              <MenuItem handleClick={() => setOpenedOption(null)}>
+                oldest
+              </MenuItem>
+              <MenuItem handleClick={() => setOpenedOption(null)}>
+                assigned
+              </MenuItem>
+              <MenuItem handleClick={() => setOpenedOption(null)}>
+                unassigned
+              </MenuItem>
             </>
           )}
           {openedOption === "filter" && (
             <>
-              <MenuItem>assigned to you</MenuItem>
-              <MenuItem>unassigned</MenuItem>
+              <MenuItem handleClick={() => setOpenedOption(null)}>
+                assigned to you
+              </MenuItem>
+              <MenuItem handleClick={() => setOpenedOption(null)}>
+                unassigned
+              </MenuItem>
             </>
           )}
           {openedOption === "search" && (
