@@ -29,6 +29,8 @@ import { reorderTasks } from "@/mutations/taskMutations"
 import useClickOutside from "@/hooks/useClickOutside"
 import MenuContext from "@/context/MenuContext"
 import TextInput from "@/components/TextInput"
+import ExpandChevron from "@/components/ExpandChevron"
+import { AiOutlineFilter, AiOutlineSearch } from "react-icons/ai"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
@@ -219,67 +221,43 @@ export default function Home() {
 }
 
 function Filters() {
-  const options = ["sort", "filter", "search"] as const
-  const [openedOption, setOpenedOption] = useState<
-    (typeof options)[number] | null
-  >(null)
-
-  const menuRef = useRef<HTMLDivElement>(null)
-
-  useClickOutside([menuRef], () => setOpenedOption(null))
-
   return (
-    <div className="ml-auto" ref={menuRef}>
-      <MenuWrapper>
-        <>
-          {openedOption === null &&
-            options.map((option, i) => (
-              <MenuItem
-                key={`option-${i}`}
-                handleClick={() => setOpenedOption(option)}
-                closeOnClickInside={false}
-              >
-                {option}
-              </MenuItem>
-            ))}
-          {openedOption === "sort" && (
-            <>
-              <MenuItem handleClick={() => setOpenedOption(null)}>
-                newest
-              </MenuItem>
-              <MenuItem handleClick={() => setOpenedOption(null)}>
-                oldest
-              </MenuItem>
-              <MenuItem handleClick={() => setOpenedOption(null)}>
-                assigned
-              </MenuItem>
-              <MenuItem handleClick={() => setOpenedOption(null)}>
-                unassigned
-              </MenuItem>
-            </>
-          )}
-          {openedOption === "filter" && (
-            <>
-              <MenuItem handleClick={() => setOpenedOption(null)}>
-                assigned to you
-              </MenuItem>
-              <MenuItem handleClick={() => setOpenedOption(null)}>
-                unassigned
-              </MenuItem>
-            </>
-          )}
-          {openedOption === "search" && (
-            <>
-              <input
-                type="search"
-                name="search"
-                placeholder="change button text"
-                className="bg-zinc-800 px-1 text-sm"
-              />
-            </>
-          )}
-        </>
-      </MenuWrapper>
+    <div className="ml-auto">
+      <div className="flex items-center justify-end gap-1">
+        <AiOutlineFilter size={32} />
+        <div className="flex">
+          <AiOutlineSearch size={32} />
+          <input type="search" />
+        </div>
+      </div>
+      {/* <div>
+        <fieldset className="flex items-center gap-1">
+          <legend>task state</legend>
+          <input type="radio" id="assigned" value="assigned" name="task_type" />
+          <label htmlFor="assigned">assigned</label>
+          <input
+            type="radio"
+            id="unassigned"
+            value="unassigned"
+            name="task_type"
+          />
+          <label htmlFor="unassigned">unassigned</label>
+        </fieldset>
+        <fieldset className="flex items-center gap-1">
+          <legend>due to</legend>
+          <input type="radio" id="tomorrow" value="tomorrow" name="due_to" />
+          <label htmlFor="tomorrow">tomorrow</label>
+          <input type="radio" id="next_week" value="next_week" name="due_to" />
+          <label htmlFor="next_week">next week</label>
+          <input
+            type="radio"
+            id="next_month"
+            value="next_month"
+            name="due_to"
+          />
+          <label htmlFor="next_month">next month</label>
+        </fieldset>
+      </div> */}
     </div>
   )
 }
