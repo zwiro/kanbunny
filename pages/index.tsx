@@ -222,10 +222,16 @@ export default function Home() {
 
 function Filters() {
   const [isSearchOpen, , , toggleSearch] = useBooleanState()
-  const [isFilterOpen, , , toggleFilter] = useBooleanState()
+  const [isFilterOpen, , closeFilter, toggleFilter] = useBooleanState()
 
   const filterRef = useRef<HTMLDivElement>(null)
-  useClickOutside([filterRef])
+  useClickOutside([filterRef], closeFilter)
+
+  const filterAnimation = {
+    initial: { opacity: 0, scale: 0 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0 },
+  }
 
   return (
     <div className="relative ml-auto">
@@ -251,46 +257,87 @@ function Filters() {
           </AnimatePresence>
         </div>
       </div>
-      {isFilterOpen && (
-        <div className="absolute right-0 z-30 whitespace-nowrap bg-zinc-900/95 p-4">
-          <fieldset className="flex items-center gap-1">
-            <legend>task state</legend>
-            <input
-              type="radio"
-              id="assigned"
-              value="assigned"
-              name="task_type"
-            />
-            <label htmlFor="assigned">assigned</label>
-            <input
-              type="radio"
-              id="unassigned"
-              value="unassigned"
-              name="task_type"
-            />
-            <label htmlFor="unassigned">unassigned</label>
-          </fieldset>
-          <fieldset className="flex items-center gap-1">
-            <legend>due to</legend>
-            <input type="radio" id="tomorrow" value="tomorrow" name="due_to" />
-            <label htmlFor="tomorrow">tomorrow</label>
-            <input
-              type="radio"
-              id="next_week"
-              value="next_week"
-              name="due_to"
-            />
-            <label htmlFor="next_week">next week</label>
-            <input
-              type="radio"
-              id="next_month"
-              value="next_month"
-              name="due_to"
-            />
-            <label htmlFor="next_month">next month</label>
-          </fieldset>
-        </div>
-      )}
+      <AnimatePresence>
+        {isFilterOpen && (
+          <motion.div
+            ref={filterRef}
+            {...filterAnimation}
+            className="absolute right-0 z-30 origin-top-right whitespace-nowrap bg-zinc-900/95 p-4"
+          >
+            <fieldset className="flex items-center gap-1">
+              <legend>task state</legend>
+              <input
+                type="radio"
+                id="assigned"
+                value="assigned"
+                name="task_type"
+                className="peer/assigned hidden"
+              />
+              <label
+                htmlFor="assigned"
+                className="cursor-pointer border border-zinc-700 px-1 peer-checked/assigned:bg-zinc-700"
+              >
+                assigned
+              </label>
+              <input
+                type="radio"
+                id="unassigned"
+                value="unassigned"
+                name="task_type"
+                className="peer/unassigned hidden"
+              />
+              <label
+                htmlFor="unassigned"
+                className="cursor-pointer border border-zinc-700 px-1 peer-checked/unassigned:bg-zinc-700"
+              >
+                unassigned
+              </label>
+            </fieldset>
+            <fieldset className="flex items-center gap-1">
+              <legend>due to</legend>
+              <input
+                type="radio"
+                id="tomorrow"
+                value="tomorrow"
+                name="due_to"
+                className="peer/tomorrow hidden"
+              />
+              <label
+                htmlFor="tomorrow"
+                className="cursor-pointer border border-zinc-700 px-1 peer-checked/tomorrow:bg-zinc-700"
+              >
+                tomorrow
+              </label>
+              <input
+                type="radio"
+                id="next_week"
+                value="next_week"
+                name="due_to"
+                className="peer/week hidden"
+              />
+              <label
+                htmlFor="next_week"
+                className="cursor-pointer border border-zinc-700 px-1 peer-checked/week:bg-zinc-700"
+              >
+                next week
+              </label>
+              <input
+                type="radio"
+                id="next_month"
+                value="next_month"
+                name="due_to"
+                className="peer/month hidden"
+              />
+              <label
+                htmlFor="next_month"
+                className="cursor-pointer border border-zinc-700 px-1 peer-checked/month:bg-zinc-700"
+              >
+                next month
+              </label>
+            </fieldset>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
