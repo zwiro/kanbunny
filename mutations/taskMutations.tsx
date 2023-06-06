@@ -136,17 +136,18 @@ export const reorderTasks = (boardId: string, utils: TRPCContextType) =>
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) => {
         const taskDragged = old
-          ?.filter((l) => l.tasks.find((t) => t.id === input.draggableId))[0]
-          .tasks.find((t) => t.id === input.draggableId)
+          ?.filter((l) => l.tasks.find((t) => t.id === input.itemOneId))[0]
+          ?.tasks.find((t) => t.id === input.itemOneId)
+
         return old?.map((l) => {
           if (input.listId !== input.prevListId) {
-            return l.tasks.find((t) => t.id === input.draggableId)
+            return l.tasks.find((t) => t.id === input.itemOneId)
               ? {
                   ...l,
                   tasks: l.tasks
-                    .filter((t) => t.id !== input.draggableId)
+                    .filter((t) => t.id !== input.itemOneId)
                     .map((t) =>
-                      t.order > input.itemOneIndex
+                      t.order > input.itemOneOrder
                         ? { ...t, order: t.order - 1 }
                         : t
                     )
@@ -157,11 +158,11 @@ export const reorderTasks = (boardId: string, utils: TRPCContextType) =>
                   ...l,
                   tasks: [
                     ...l.tasks.map((t) =>
-                      t.order >= input.itemTwoIndex
+                      t.order >= input.itemTwoOrder!
                         ? { ...t, order: t.order + 1 }
                         : t
                     ),
-                    { ...taskDragged, order: input.itemTwoIndex - 1 },
+                    { ...taskDragged, order: input.itemTwoOrder! - 1 },
                   ].sort((a, b) => a!.order - b!.order),
                 }
               : l
@@ -170,15 +171,15 @@ export const reorderTasks = (boardId: string, utils: TRPCContextType) =>
               ? {
                   ...l,
                   tasks: l.tasks.map((t) =>
-                    t.id === input.draggableId
-                      ? { ...t, order: input.itemTwoIndex }
-                      : input.itemOneIndex > input.itemTwoIndex &&
-                        t.order >= input.itemTwoIndex &&
-                        t.order <= input.itemOneIndex
+                    t.id === input.itemOneId
+                      ? { ...t, order: input.itemTwoOrder! }
+                      : input.itemOneOrder > input.itemTwoOrder! &&
+                        t.order >= input.itemTwoOrder! &&
+                        t.order <= input.itemOneOrder
                       ? { ...t, order: t.order + 1 }
-                      : input.itemOneIndex < input.itemTwoIndex &&
-                        t.order <= input.itemTwoIndex &&
-                        t.order >= input.itemOneIndex
+                      : input.itemOneOrder < input.itemTwoOrder! &&
+                        t.order <= input.itemTwoOrder! &&
+                        t.order >= input.itemOneOrder
                       ? { ...t, order: t.order - 1 }
                       : t
                   ),

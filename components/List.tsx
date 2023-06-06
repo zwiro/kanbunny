@@ -45,6 +45,7 @@ type TaskWithAssignedTo = Prisma.TaskGetPayload<{
 interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]
   dragHandleProps: DraggableProvidedDragHandleProps | null
+  searchQuery: string
 }
 
 const colorVariants = {
@@ -55,7 +56,15 @@ const colorVariants = {
   pink: "border-pink-500",
 }
 
-function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
+function List({
+  name,
+  color,
+  tasks,
+  id,
+  boardId,
+  dragHandleProps,
+  searchQuery,
+}: ListProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
   const [isAdding, add, closeAdd] = useBooleanState()
@@ -147,12 +156,13 @@ function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
           >
             {tasks
               .sort((a, b) => a.order - b.order)
-              .map((task) => (
-                <Draggable
-                  key={task.id}
-                  draggableId={task.id}
-                  index={task.order}
-                >
+              .filter(
+                (task) =>
+                  task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  searchQuery === ""
+              )
+              .map((task, i) => (
+                <Draggable key={task.id} draggableId={task.id} index={i}>
                   {(provided, snapshot) => (
                     <div ref={provided.innerRef} {...provided.draggableProps}>
                       <motion.div
@@ -164,6 +174,7 @@ function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
                           key={task.id}
                           dragHandleProps={provided.dragHandleProps}
                           isDragging={snapshot.isDragging}
+                          length={tasks.length}
                           {...task}
                         />
                       </motion.div>
@@ -187,6 +198,7 @@ type TaskSchema = z.infer<typeof editTaskSchema>
 interface TaskProps extends TaskWithAssignedTo {
   dragHandleProps: DraggableProvidedDragHandleProps | null
   isDragging: boolean
+  length: number
 }
 
 function Task({
@@ -197,6 +209,7 @@ function Task({
   color,
   dragHandleProps,
   isDragging,
+  length,
 }: TaskProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()

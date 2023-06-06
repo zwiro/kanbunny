@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState, useRef } from "react"
+import { useEffect, useContext, useState, useRef, ChangeEvent } from "react"
 import { useRouter } from "next/router"
 import PlusIcon from "@/components/PlusIcon"
 import List from "@/components/List"
@@ -42,6 +42,8 @@ export default function Home() {
 
   const utils = trpc.useContext()
 
+  const [searchQuery, setSearchQuery] = useState("")
+
   const lists = trpc.list.getByBoard.useQuery(chosenBoardId!)
 
   const userProjects = trpc.project.getByUser.useQuery()
@@ -49,6 +51,10 @@ export default function Home() {
   const board = trpc.board.getById.useQuery(chosenBoardId!, {
     enabled: !!chosenBoardId,
   })
+
+  const search = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+  }
 
   type ListSchema = z.infer<typeof listSchema>
 
@@ -82,7 +88,22 @@ export default function Home() {
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
-    if (!destination) return
+    const itemOne = lists.data
+      ?.filter((l) => l.id === source.droppableId)[0]
+      ?.tasks.filter(
+        (task) =>
+          task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          searchQuery === ""
+      )[source.index]
+    const itemTwo = lists.data
+      ?.filter((l) => l.id === destination?.droppableId)[0]
+      ?.tasks.filter(
+        (task) =>
+          task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          searchQuery === ""
+      )[destination!.index]
+
+    if (!destination || !itemOne) return
     if (source.droppableId === "board" || destination.droppableId === "board") {
       reorder.mutate({
         itemOneIndex: source.index,
@@ -91,11 +112,12 @@ export default function Home() {
       })
     } else {
       reorderDisplayedTasks.mutate({
-        itemOneIndex: source.index,
-        itemTwoIndex: destination.index,
+        itemOneId: itemOne.id,
+        itemTwoId: itemTwo?.id || undefined,
+        itemOneOrder: itemOne.order,
+        itemTwoOrder: destination.index,
         listId: destination.droppableId,
         prevListId: source.droppableId,
-        draggableId,
       })
     }
   }
@@ -119,7 +141,7 @@ export default function Home() {
                 <MenuItem handleClick={add}>add list</MenuItem>
                 <MenuItem handleClick={toggleSideMenu}>more options</MenuItem>
               </MenuWrapper>
-              <Filters />
+              <Filters searchQuery={searchQuery} search={search} />
             </div>
             <p className="text-slate-300">
               owner: {board.data?.project.owner.name}
@@ -160,6 +182,7 @@ export default function Home() {
                                   <List
                                     key={list.id}
                                     dragHandleProps={provided.dragHandleProps}
+                                    searchQuery={searchQuery}
                                     {...list}
                                   />
                                 </motion.div>
@@ -220,7 +243,12 @@ export default function Home() {
   )
 }
 
-function Filters() {
+interface FiltersProps {
+  searchQuery: string
+  search: (e: ChangeEvent<HTMLInputElement>) => void
+}
+
+function Filters({ searchQuery, search }: FiltersProps) {
   const [isSearchOpen, , , toggleSearch] = useBooleanState()
   const [isFilterOpen, , closeFilter, toggleFilter] = useBooleanState()
 
@@ -249,6 +277,8 @@ function Filters() {
                 initial={{ width: 0 }}
                 animate={{ width: "auto" }}
                 exit={{ width: 0 }}
+                value={searchQuery}
+                onChange={search}
                 type="search"
                 placeholder="add dark mode..."
                 className="bg-zinc-900 p-1"
@@ -266,6 +296,19 @@ function Filters() {
           >
             <fieldset className="flex items-center gap-1">
               <legend>task state</legend>
+              <input
+                type="radio"
+                id="assigned_user"
+                value="assigned_user"
+                name="task_type"
+                className="peer/assigned_user hidden"
+              />
+              <label
+                htmlFor="assigned_user"
+                className="cursor-pointer border border-zinc-700 px-1 peer-checked/assigned_user:bg-zinc-700"
+              >
+                assigned to me
+              </label>
               <input
                 type="radio"
                 id="assigned"

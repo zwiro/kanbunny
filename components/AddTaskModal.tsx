@@ -22,7 +22,7 @@ interface AddTaskModalProps {
 }
 
 function AddTaskModal({ close, listId }: AddTaskModalProps) {
-  const [date, onChange] = useState<Date | null>(new Date())
+  const [date, onChange] = useState<Date | null>()
 
   const { chosenBoardId } = useContext(LayoutContext)
 

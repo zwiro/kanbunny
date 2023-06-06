@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { string, z } from "zod"
 import { protectedProcedure, createTRPCRouter } from "../trpc"
 import { colorSchema, reorderSchema, taskSchema } from "@/utils/schemas"
 import { editTaskSchema } from "@/utils/schemas"
@@ -85,30 +85,40 @@ export const taskRouter = createTRPCRouter({
       return task
     }),
   reorder: protectedProcedure
-    .input(reorderSchema.extend({ listId: z.string(), prevListId: z.string() }))
+    .input(
+      z.object({
+        itemOneId: z.string(),
+        itemTwoId: z.string().or(z.undefined()),
+        itemOneOrder: z.number(),
+        itemTwoOrder: z.number().or(z.undefined()),
+        listId: z.string(),
+        prevListId: z.string(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const taskDragged = await ctx.prisma.task.findUnique({
-        where: { id: input.draggableId },
+        where: { id: input.itemOneId },
       })
+
       const prevListId = taskDragged?.listId
 
       if (prevListId !== input.listId) {
         await ctx.prisma.task.update({
-          where: { id: taskDragged?.id },
+          where: { id: input.itemOneId },
           data: {
             listId: { set: input.listId },
-            order: input.itemTwoIndex,
+            order: input.itemTwoOrder,
           },
         })
         const taskDraggedUpdated = await ctx.prisma.task.findUnique({
-          where: { id: input.draggableId },
+          where: { id: input.itemOneId },
         })
         await ctx.prisma.task.updateMany({
           where: {
             AND: [
               { listId: prevListId },
-              { order: { gt: input.itemOneIndex } },
-              { NOT: { id: taskDraggedUpdated?.id } },
+              { order: { gt: input.itemOneOrder } },
+              { NOT: { id: input.itemOneId } },
             ],
           },
           data: { order: { decrement: 1 } },
@@ -117,42 +127,40 @@ export const taskRouter = createTRPCRouter({
           where: {
             AND: [
               { listId: taskDraggedUpdated?.listId },
-              { order: { gte: input.itemTwoIndex } },
-              { NOT: { id: taskDraggedUpdated?.id } },
+              { order: { gte: input.itemTwoOrder } },
+              { NOT: { id: input.itemOneId } },
             ],
           },
           data: { order: { increment: 1 } },
         })
       } else {
         await ctx.prisma.task.update({
-          where: { id: input.draggableId },
-          data: { order: input.itemTwoIndex },
+          where: { id: input.itemOneId },
+          data: { order: input.itemTwoOrder },
         })
-        const taskDraggedUpdated = await ctx.prisma.task.findUnique({
-          where: { id: input.draggableId },
-        })
-        if (input.itemOneIndex > input.itemTwoIndex) {
+
+        if (input.itemOneOrder > input.itemTwoOrder!) {
           await ctx.prisma.task.updateMany({
             where: {
               AND: [
                 { listId: input.listId },
-                { order: { gte: input.itemTwoIndex } },
-                { order: { lte: input.itemOneIndex } },
-                { NOT: { id: taskDraggedUpdated?.id } },
+                { order: { gte: input.itemTwoOrder } },
+                { order: { lte: input.itemOneOrder } },
+                { NOT: { id: input.itemOneId } },
               ],
             },
             data: { order: { increment: 1 } },
           })
         }
 
-        if (input.itemOneIndex < input.itemTwoIndex) {
+        if (input.itemOneOrder < input.itemTwoOrder!) {
           await ctx.prisma.task.updateMany({
             where: {
               AND: [
                 { listId: input.listId },
-                { order: { lte: input.itemTwoIndex } },
-                { order: { gte: input.itemOneIndex } },
-                { NOT: { id: taskDraggedUpdated?.id } },
+                { order: { lte: input.itemTwoOrder } },
+                { order: { gte: input.itemOneOrder } },
+                { NOT: { id: input.itemOneId } },
               ],
             },
             data: { order: { decrement: 1 } },
