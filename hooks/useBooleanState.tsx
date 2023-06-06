@@ -11,7 +11,11 @@ function useBooleanState() {
     setBooleanState(false)
   }
 
-  return [booleanState, setTrue, setFalse] as const
+  const toggle = () => {
+    setBooleanState((prevState) => !prevState)
+  }
+
+  return [booleanState, setTrue, setFalse, toggle] as const
 }
 
 export default useBooleanState

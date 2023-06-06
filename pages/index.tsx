@@ -221,50 +221,76 @@ export default function Home() {
 }
 
 function Filters() {
-  const [isSearching, openSearch, closeSearch] = useBooleanState()
+  const [isSearchOpen, , , toggleSearch] = useBooleanState()
+  const [isFilterOpen, , , toggleFilter] = useBooleanState()
+
+  const filterRef = useRef<HTMLDivElement>(null)
+  useClickOutside([filterRef])
+
   return (
-    <div className="ml-auto">
+    <div className="relative ml-auto">
       <div className="flex items-center justify-end gap-1">
-        <AiOutlineFilter size={32} />
+        <button onClick={toggleFilter}>
+          <AiOutlineFilter size={32} />
+        </button>
         <div className="flex">
-          <AiOutlineSearch size={32} onClick={openSearch} />
-          {isSearching && (
-            <input
-              type="search"
-              placeholder="add dark mode..."
-              className="bg-zinc-900 p-1"
-            />
-          )}
+          <button onClick={toggleSearch}>
+            <AiOutlineSearch size={32} />
+          </button>
+          <AnimatePresence>
+            {isSearchOpen && (
+              <motion.input
+                initial={{ width: 0 }}
+                animate={{ width: "auto" }}
+                exit={{ width: 0 }}
+                type="search"
+                placeholder="add dark mode..."
+                className="bg-zinc-900 p-1"
+              />
+            )}
+          </AnimatePresence>
         </div>
       </div>
-      {/* <div>
-        <fieldset className="flex items-center gap-1">
-          <legend>task state</legend>
-          <input type="radio" id="assigned" value="assigned" name="task_type" />
-          <label htmlFor="assigned">assigned</label>
-          <input
-            type="radio"
-            id="unassigned"
-            value="unassigned"
-            name="task_type"
-          />
-          <label htmlFor="unassigned">unassigned</label>
-        </fieldset>
-        <fieldset className="flex items-center gap-1">
-          <legend>due to</legend>
-          <input type="radio" id="tomorrow" value="tomorrow" name="due_to" />
-          <label htmlFor="tomorrow">tomorrow</label>
-          <input type="radio" id="next_week" value="next_week" name="due_to" />
-          <label htmlFor="next_week">next week</label>
-          <input
-            type="radio"
-            id="next_month"
-            value="next_month"
-            name="due_to"
-          />
-          <label htmlFor="next_month">next month</label>
-        </fieldset>
-      </div> */}
+      {isFilterOpen && (
+        <div className="absolute right-0 z-30 whitespace-nowrap bg-zinc-900/95 p-4">
+          <fieldset className="flex items-center gap-1">
+            <legend>task state</legend>
+            <input
+              type="radio"
+              id="assigned"
+              value="assigned"
+              name="task_type"
+            />
+            <label htmlFor="assigned">assigned</label>
+            <input
+              type="radio"
+              id="unassigned"
+              value="unassigned"
+              name="task_type"
+            />
+            <label htmlFor="unassigned">unassigned</label>
+          </fieldset>
+          <fieldset className="flex items-center gap-1">
+            <legend>due to</legend>
+            <input type="radio" id="tomorrow" value="tomorrow" name="due_to" />
+            <label htmlFor="tomorrow">tomorrow</label>
+            <input
+              type="radio"
+              id="next_week"
+              value="next_week"
+              name="due_to"
+            />
+            <label htmlFor="next_week">next week</label>
+            <input
+              type="radio"
+              id="next_month"
+              value="next_month"
+              name="due_to"
+            />
+            <label htmlFor="next_month">next month</label>
+          </fieldset>
+        </div>
+      )}
     </div>
   )
 }
