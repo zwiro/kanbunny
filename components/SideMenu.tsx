@@ -1,7 +1,7 @@
 import PlusIcon from "./PlusIcon"
 import AddButton from "./AddButton"
 import { AnimatePresence, motion } from "framer-motion"
-import useAddOrEdit from "@/hooks/useAddOrEdit"
+import useAddOrEdit from "@/hooks/useBooleanState"
 import AddProjectModal from "./AddProjectModal"
 import React, { useState } from "react"
 import { LoadingDots } from "./LoadingDots"

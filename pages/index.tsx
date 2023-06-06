@@ -10,7 +10,7 @@ import MenuWrapper from "@/components/MenuWrapper"
 import AddButton from "@/components/AddButton"
 import AddEditForm from "@/components/AddEditForm"
 import ListContainer from "@/components/ListContainer"
-import useAddOrEdit from "@/hooks/useAddOrEdit"
+import useAddOrEdit from "@/hooks/useBooleanState"
 import { trpc } from "@/utils/trpc"
 import { z } from "zod"
 import { FormProvider, SubmitHandler, set, useForm } from "react-hook-form"
@@ -227,7 +227,11 @@ function Filters() {
         <AiOutlineFilter size={32} />
         <div className="flex">
           <AiOutlineSearch size={32} />
-          <input type="search" />
+          <input
+            type="search"
+            placeholder="add dark mode..."
+            className="bg-zinc-900 p-1"
+          />
         </div>
       </div>
       {/* <div>
