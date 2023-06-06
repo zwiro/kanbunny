@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
-import useAddOrEdit from "@/hooks/useBooleanState"
+import useBooleanState from "@/hooks/useBooleanState"
 import React, { useContext } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useAddUser from "@/hooks/useAddUser"
@@ -49,12 +49,12 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
     },
   })
 
-  const [isEditingName, editName, closeEditName] = useAddOrEdit()
-  const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
+  const [isEditingName, editName, closeEditName] = useBooleanState()
+  const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
 
   const { isExpanded, toggle } = useExpand()
 
-  const [isAdding, add, closeAdd] = useAddOrEdit()
+  const [isAdding, add, closeAdd] = useBooleanState()
   const { user, users, addUser, removeUser, handleChange, setAllUsers } =
     useAddUser()
 

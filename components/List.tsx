@@ -5,7 +5,7 @@ import PlusIcon from "./PlusIcon"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import AddEditForm from "./AddEditForm"
 import AddTaskModal from "./AddTaskModal"
-import useAddOrEdit from "@/hooks/useBooleanState"
+import useBooleanState from "@/hooks/useBooleanState"
 import { AnimatePresence, color, motion } from "framer-motion"
 import ColorPicker from "./ColorPicker"
 import UserCheckbox from "./UserCheckbox"
@@ -56,9 +56,9 @@ const colorVariants = {
 }
 
 function List({ name, color, tasks, id, boardId, dragHandleProps }: ListProps) {
-  const [isEditingName, editName, closeEditName] = useAddOrEdit()
-  const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
-  const [isAdding, add, closeAdd] = useAddOrEdit()
+  const [isEditingName, editName, closeEditName] = useBooleanState()
+  const [isEditingColor, editColor, closeEditColor] = useBooleanState()
+  const [isAdding, add, closeAdd] = useBooleanState()
 
   const { chosenBoardId } = useContext(LayoutContext)
 
@@ -198,8 +198,8 @@ function Task({
   dragHandleProps,
   isDragging,
 }: TaskProps) {
-  const [isEditingName, editName, closeEditName] = useAddOrEdit()
-  const [isEditingUsers, editUsers, closeEditUsers] = useAddOrEdit()
+  const [isEditingName, editName, closeEditName] = useBooleanState()
+  const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
   const { chosenBoardId } = useContext(LayoutContext)
 
   const assignedToIds = assigned_to.map((u) => u.id)
@@ -243,7 +243,7 @@ function Task({
     })
   }
 
-  const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
+  const [isEditingColor, editColor, closeEditColor] = useBooleanState()
 
   const updateColor = updateTaskColor(
     chosenBoardId!,

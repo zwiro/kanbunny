@@ -1,7 +1,7 @@
 import PlusIcon from "./PlusIcon"
 import AddButton from "./AddButton"
 import { AnimatePresence, motion } from "framer-motion"
-import useAddOrEdit from "@/hooks/useBooleanState"
+import useBooleanState from "@/hooks/useBooleanState"
 import AddProjectModal from "./AddProjectModal"
 import React, { useState } from "react"
 import { LoadingDots } from "./LoadingDots"
@@ -41,7 +41,7 @@ interface SideMenuProps {
 function SideMenu({ data, isLoading }: SideMenuProps) {
   const { data: session } = useSession()
 
-  const [isAdding, add, closeAdd] = useAddOrEdit()
+  const [isAdding, add, closeAdd] = useBooleanState()
 
   const sideMenuAnimation = {
     initial: { x: "-100vw" },

@@ -9,7 +9,7 @@ import type { Board, Color } from "@prisma/client"
 import { trpc } from "@/utils/trpc"
 import { boardSchema } from "@/utils/schemas"
 import LayoutContext from "@/context/LayoutContext"
-import useAddOrEdit from "@/hooks/useBooleanState"
+import useBooleanState from "@/hooks/useBooleanState"
 import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
@@ -39,8 +39,8 @@ function Board({
   dragHandleProps,
   isDragging,
 }: BoardProps) {
-  const [isEditingName, editName, closeEditName] = useAddOrEdit()
-  const [isEditingColor, editColor, closeEditColor] = useAddOrEdit()
+  const [isEditingName, editName, closeEditName] = useBooleanState()
+  const [isEditingColor, editColor, closeEditColor] = useBooleanState()
 
   const { chosenBoardId, chooseOpenedBoard } = useContext(LayoutContext)
 

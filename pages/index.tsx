@@ -10,7 +10,7 @@ import MenuWrapper from "@/components/MenuWrapper"
 import AddButton from "@/components/AddButton"
 import AddEditForm from "@/components/AddEditForm"
 import ListContainer from "@/components/ListContainer"
-import useAddOrEdit from "@/hooks/useBooleanState"
+import useBooleanState from "@/hooks/useBooleanState"
 import { trpc } from "@/utils/trpc"
 import { z } from "zod"
 import { FormProvider, SubmitHandler, set, useForm } from "react-hook-form"
@@ -36,7 +36,7 @@ export default function Home() {
   const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
     useContext(LayoutContext)
 
-  const [isAdding, add, closeAdd] = useAddOrEdit()
+  const [isAdding, add, closeAdd] = useBooleanState()
 
   const { chosenBoardId } = useContext(LayoutContext)
 
@@ -221,17 +221,20 @@ export default function Home() {
 }
 
 function Filters() {
+  const [isSearching, openSearch, closeSearch] = useBooleanState()
   return (
     <div className="ml-auto">
       <div className="flex items-center justify-end gap-1">
         <AiOutlineFilter size={32} />
         <div className="flex">
-          <AiOutlineSearch size={32} />
-          <input
-            type="search"
-            placeholder="add dark mode..."
-            className="bg-zinc-900 p-1"
-          />
+          <AiOutlineSearch size={32} onClick={openSearch} />
+          {isSearching && (
+            <input
+              type="search"
+              placeholder="add dark mode..."
+              className="bg-zinc-900 p-1"
+            />
+          )}
         </div>
       </div>
       {/* <div>
