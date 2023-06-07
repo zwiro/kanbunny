@@ -2,7 +2,11 @@ import { useContext } from "react"
 import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
-import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
+import {
+  AiOutlineCheck,
+  AiOutlineClockCircle,
+  AiOutlineClose,
+} from "react-icons/ai"
 import AddEditForm from "./AddEditForm"
 import AddTaskModal from "./AddTaskModal"
 import useBooleanState from "@/hooks/useBooleanState"
@@ -210,6 +214,7 @@ function Task({
   dragHandleProps,
   isDragging,
   length,
+  due_to,
 }: TaskProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
@@ -220,6 +225,17 @@ function Task({
   const { assignedUsers, assignUser } = useAssignUser(assignedToIds)
 
   const utils = trpc.useContext()
+  const relativeTimeFormat = new Intl.RelativeTimeFormat("en", {
+    numeric: "auto",
+  })
+
+  const timeDiff = due_to ? due_to.getTime() - new Date().getTime() : 0
+
+  const daysLeft = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+  const hoursLeft = Math.floor(
+    (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+  )
+  const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))
 
   const taskMethods = useForm<TaskSchema>({
     defaultValues: { name, id, listId },
@@ -282,7 +298,22 @@ function Task({
                   />
                 )}
               </AnimatePresence>
-              <p className="font-bold">{name}</p>
+              <div className="flex items-center gap-2">
+                <p
+                  className={`font-bold ${minutesLeft < 0 && "text-zinc-400"} `}
+                >
+                  {name}
+                </p>
+                {daysLeft <= 0 && minutesLeft > 0 && <AiOutlineClockCircle />}
+              </div>
+              <p className="text-sm text-zinc-300">
+                {due_to &&
+                  (daysLeft > 0
+                    ? relativeTimeFormat.format(daysLeft, "day")
+                    : hoursLeft > 0
+                    ? relativeTimeFormat.format(hoursLeft, "hour")
+                    : relativeTimeFormat.format(minutesLeft, "minute"))}
+              </p>
               <ul className="flex flex-wrap gap-1">
                 {assigned_to.map((user) => (
                   <li key={user.id} className="text-sm text-neutral-500">

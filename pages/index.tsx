@@ -30,7 +30,12 @@ import useClickOutside from "@/hooks/useClickOutside"
 import MenuContext from "@/context/MenuContext"
 import TextInput from "@/components/TextInput"
 import ExpandChevron from "@/components/ExpandChevron"
-import { AiOutlineFilter, AiOutlineSearch } from "react-icons/ai"
+import {
+  AiOutlineClose,
+  AiOutlineFilter,
+  AiOutlineSearch,
+} from "react-icons/ai"
+import DateTimePicker from "react-datetime-picker"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
@@ -251,6 +256,7 @@ interface FiltersProps {
 function Filters({ searchQuery, search }: FiltersProps) {
   const [isSearchOpen, , , toggleSearch] = useBooleanState()
   const [isFilterOpen, , closeFilter, toggleFilter] = useBooleanState()
+  const [date, onChange] = useState<Date | null>()
 
   const filterRef = useRef<HTMLDivElement>(null)
   useClickOutside([filterRef], closeFilter)
@@ -269,7 +275,11 @@ function Filters({ searchQuery, search }: FiltersProps) {
         </button>
         <div className="flex">
           <button onClick={toggleSearch}>
-            <AiOutlineSearch size={32} />
+            {isSearchOpen ? (
+              <AiOutlineClose size={32} />
+            ) : (
+              <AiOutlineSearch size={32} />
+            )}
           </button>
           <AnimatePresence>
             {isSearchOpen && (
@@ -336,18 +346,19 @@ function Filters({ searchQuery, search }: FiltersProps) {
                 unassigned
               </label>
             </fieldset>
-            <fieldset className="flex items-center gap-1">
+            <fieldset className="flex flex-wrap items-center gap-1">
               <legend>due to</legend>
               <input
                 type="radio"
                 id="tomorrow"
                 value="tomorrow"
                 name="due_to"
+                disabled={Boolean(date)}
                 className="peer/tomorrow hidden"
               />
               <label
                 htmlFor="tomorrow"
-                className="cursor-pointer border border-zinc-700 px-1 peer-checked/tomorrow:bg-zinc-700"
+                className="cursor-pointer border border-zinc-700 px-1 peer-checked/tomorrow:bg-zinc-700 peer-disabled/tomorrow:bg-transparent"
               >
                 tomorrow
               </label>
@@ -356,11 +367,12 @@ function Filters({ searchQuery, search }: FiltersProps) {
                 id="next_week"
                 value="next_week"
                 name="due_to"
+                disabled={Boolean(date)}
                 className="peer/week hidden"
               />
               <label
                 htmlFor="next_week"
-                className="cursor-pointer border border-zinc-700 px-1 peer-checked/week:bg-zinc-700"
+                className="cursor-pointer border border-zinc-700 px-1 peer-checked/week:bg-zinc-700 peer-disabled/tomorrow:bg-transparent"
               >
                 next week
               </label>
@@ -369,14 +381,23 @@ function Filters({ searchQuery, search }: FiltersProps) {
                 id="next_month"
                 value="next_month"
                 name="due_to"
+                disabled={Boolean(date)}
                 className="peer/month hidden"
               />
               <label
                 htmlFor="next_month"
-                className="cursor-pointer border border-zinc-700 px-1 peer-checked/month:bg-zinc-700"
+                className="cursor-pointer border border-zinc-700 px-1 peer-checked/month:bg-zinc-700 peer-disabled/tomorrow:bg-transparent"
               >
                 next month
               </label>
+              <DateTimePicker
+                onChange={onChange}
+                value={date}
+                disableClock
+                calendarIcon={null}
+                format="y-MM-dd h:mm a"
+                className="border border-zinc-700"
+              />
             </fieldset>
           </motion.div>
         )}
