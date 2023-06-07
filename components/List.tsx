@@ -41,6 +41,8 @@ import {
   updateListColor,
   updateListName,
 } from "@/mutations/listMutations"
+import { useSession } from "next-auth/react"
+import getFilteredTasks from "@/utils/getFilteredTasks"
 
 type TaskWithAssignedTo = Prisma.TaskGetPayload<{
   include: { assigned_to: true }
@@ -50,6 +52,8 @@ interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]
   dragHandleProps: DraggableProvidedDragHandleProps | null
   searchQuery: string
+  dateFilter: string | Date | null
+  assignedFilter: string | null
 }
 
 const colorVariants = {
@@ -68,6 +72,8 @@ function List({
   boardId,
   dragHandleProps,
   searchQuery,
+  dateFilter,
+  assignedFilter,
 }: ListProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
@@ -91,6 +97,11 @@ function List({
   const onSubmit: SubmitHandler<ListSchema> = (data: any) => {
     updateName.mutate({ name: data.name, id, boardId })
   }
+
+  const { data: session, status } = useSession()
+  const userId = session?.user?.id
+
+  console.log(dateFilter)
 
   return (
     <section
@@ -158,7 +169,7 @@ function List({
             ref={provided.innerRef}
             className="flex flex-col gap-4"
           >
-            {tasks
+            {getFilteredTasks(tasks, assignedFilter, dateFilter, userId)
               .sort((a, b) => a.order - b.order)
               .filter(
                 (task) =>

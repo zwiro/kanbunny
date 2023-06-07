@@ -12,7 +12,7 @@ import AddEditForm from "@/components/AddEditForm"
 import ListContainer from "@/components/ListContainer"
 import useBooleanState from "@/hooks/useBooleanState"
 import { trpc } from "@/utils/trpc"
-import { z } from "zod"
+import { date, z } from "zod"
 import { FormProvider, SubmitHandler, set, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import ColorDot from "@/components/ColorDot"
@@ -31,11 +31,13 @@ import MenuContext from "@/context/MenuContext"
 import TextInput from "@/components/TextInput"
 import ExpandChevron from "@/components/ExpandChevron"
 import {
+  AiFillFilter,
   AiOutlineClose,
   AiOutlineFilter,
   AiOutlineSearch,
 } from "react-icons/ai"
 import DateTimePicker from "react-datetime-picker"
+import { useSession } from "next-auth/react"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
@@ -48,6 +50,23 @@ export default function Home() {
   const utils = trpc.useContext()
 
   const [searchQuery, setSearchQuery] = useState("")
+  const [dateFilter, setDateFilter] = useState<string | Date | null>(null)
+  const [assignedFilter, setAssignedFilter] = useState<string | null>(null)
+
+  const handleDateFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setDateFilter(e.target.value)
+  }
+
+  const handleAssignedFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setAssignedFilter(e.target.value)
+  }
+
+  const clearFilters = () => {
+    setDateFilter(null)
+    setAssignedFilter(null)
+  }
+
+  // move to context later
 
   const lists = trpc.list.getByBoard.useQuery(chosenBoardId!)
 
@@ -108,7 +127,7 @@ export default function Home() {
           searchQuery === ""
       )[destination!.index]
 
-    if (!destination || !itemOne) return
+    if (!destination) return
     if (source.droppableId === "board" || destination.droppableId === "board") {
       reorder.mutate({
         itemOneIndex: source.index,
@@ -116,6 +135,7 @@ export default function Home() {
         draggableId,
       })
     } else {
+      if (!itemOne) return
       reorderDisplayedTasks.mutate({
         itemOneId: itemOne.id,
         itemTwoId: itemTwo?.id || undefined,
@@ -146,7 +166,16 @@ export default function Home() {
                 <MenuItem handleClick={add}>add list</MenuItem>
                 <MenuItem handleClick={toggleSideMenu}>more options</MenuItem>
               </MenuWrapper>
-              <Filters searchQuery={searchQuery} search={search} />
+              <Filters
+                searchQuery={searchQuery}
+                search={search}
+                assignedFilter={assignedFilter}
+                dateFilter={dateFilter}
+                handleDateFilterChange={handleDateFilterChange}
+                handleAssignedFilterChange={handleAssignedFilterChange}
+                clearFilters={clearFilters}
+                setDateFilter={setDateFilter}
+              />
             </div>
             <p className="text-slate-300">
               owner: {board.data?.project.owner.name}
@@ -189,6 +218,8 @@ export default function Home() {
                                     dragHandleProps={provided.dragHandleProps}
                                     searchQuery={searchQuery}
                                     {...list}
+                                    dateFilter={dateFilter}
+                                    assignedFilter={assignedFilter}
                                   />
                                 </motion.div>
                               </div>
@@ -251,12 +282,27 @@ export default function Home() {
 interface FiltersProps {
   searchQuery: string
   search: (e: ChangeEvent<HTMLInputElement>) => void
+  assignedFilter: string | null
+  dateFilter: Date | string | null
+  handleAssignedFilterChange: (e: ChangeEvent<HTMLInputElement>) => void
+  handleDateFilterChange: (e: ChangeEvent<HTMLInputElement>) => void
+  clearFilters: () => void
+  setDateFilter: React.Dispatch<React.SetStateAction<Date | string | null>>
 }
 
-function Filters({ searchQuery, search }: FiltersProps) {
+function Filters({
+  searchQuery,
+  search,
+  assignedFilter,
+  dateFilter,
+  handleAssignedFilterChange,
+  handleDateFilterChange,
+  clearFilters,
+  setDateFilter,
+}: FiltersProps) {
   const [isSearchOpen, , , toggleSearch] = useBooleanState()
   const [isFilterOpen, , closeFilter, toggleFilter] = useBooleanState()
-  const [date, onChange] = useState<Date | null>()
+  // const [date, onChange] = useState<Date | null>()
 
   const filterRef = useRef<HTMLDivElement>(null)
   useClickOutside([filterRef], closeFilter)
@@ -271,7 +317,11 @@ function Filters({ searchQuery, search }: FiltersProps) {
     <div className="relative ml-auto">
       <div className="flex items-center justify-end gap-1">
         <button onClick={toggleFilter}>
-          <AiOutlineFilter size={32} />
+          {dateFilter || assignedFilter ? (
+            <AiFillFilter size={32} />
+          ) : (
+            <AiOutlineFilter size={32} />
+          )}
         </button>
         <div className="flex">
           <button onClick={toggleSearch}>
@@ -311,6 +361,8 @@ function Filters({ searchQuery, search }: FiltersProps) {
                 id="assigned_user"
                 value="assigned_user"
                 name="task_type"
+                onChange={handleAssignedFilterChange}
+                checked={assignedFilter === "assigned_user"}
                 className="peer/assigned_user hidden"
               />
               <label
@@ -324,6 +376,8 @@ function Filters({ searchQuery, search }: FiltersProps) {
                 id="assigned"
                 value="assigned"
                 name="task_type"
+                onChange={handleAssignedFilterChange}
+                checked={assignedFilter === "assigned"}
                 className="peer/assigned hidden"
               />
               <label
@@ -337,6 +391,8 @@ function Filters({ searchQuery, search }: FiltersProps) {
                 id="unassigned"
                 value="unassigned"
                 name="task_type"
+                onChange={handleAssignedFilterChange}
+                checked={assignedFilter === "unassigned"}
                 className="peer/unassigned hidden"
               />
               <label
@@ -353,7 +409,9 @@ function Filters({ searchQuery, search }: FiltersProps) {
                 id="tomorrow"
                 value="tomorrow"
                 name="due_to"
-                disabled={Boolean(date)}
+                disabled={Boolean(dateFilter instanceof Date)}
+                checked={dateFilter === "tomorrow"}
+                onChange={handleDateFilterChange}
                 className="peer/tomorrow hidden"
               />
               <label
@@ -367,7 +425,9 @@ function Filters({ searchQuery, search }: FiltersProps) {
                 id="next_week"
                 value="next_week"
                 name="due_to"
-                disabled={Boolean(date)}
+                disabled={Boolean(dateFilter instanceof Date)}
+                checked={dateFilter === "next_week"}
+                onChange={handleDateFilterChange}
                 className="peer/week hidden"
               />
               <label
@@ -381,7 +441,9 @@ function Filters({ searchQuery, search }: FiltersProps) {
                 id="next_month"
                 value="next_month"
                 name="due_to"
-                disabled={Boolean(date)}
+                disabled={Boolean(dateFilter instanceof Date)}
+                checked={dateFilter === "next_month"}
+                onChange={handleDateFilterChange}
                 className="peer/month hidden"
               />
               <label
@@ -391,14 +453,20 @@ function Filters({ searchQuery, search }: FiltersProps) {
                 next month
               </label>
               <DateTimePicker
-                onChange={onChange}
-                value={date}
+                onChange={setDateFilter}
+                value={Boolean(dateFilter instanceof Date) ? dateFilter : null}
                 disableClock
                 calendarIcon={null}
                 format="y-MM-dd h:mm a"
                 className="border border-zinc-700"
               />
             </fieldset>
+            <button
+              onClick={clearFilters}
+              className="mt-2 bg-zinc-700 px-2 py-1"
+            >
+              clear filters
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
