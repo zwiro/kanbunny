@@ -10,7 +10,7 @@ import {
 import AddEditForm from "./AddEditForm"
 import AddTaskModal from "./AddTaskModal"
 import useBooleanState from "@/hooks/useBooleanState"
-import { AnimatePresence, color, motion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import ColorPicker from "./ColorPicker"
 import UserCheckbox from "./UserCheckbox"
 import type { List as ListType, Prisma, Task } from "@prisma/client"
@@ -24,10 +24,8 @@ import useAssignUser from "@/hooks/useAssignUser"
 import { editListSchema, editTaskSchema } from "@/utils/schemas"
 import { GoGrabber } from "react-icons/go"
 import {
-  DragDropContext,
   Draggable,
   DraggableProvidedDragHandleProps,
-  DropResult,
   Droppable,
 } from "@hello-pangea/dnd"
 import {

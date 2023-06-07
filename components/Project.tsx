@@ -8,7 +8,7 @@ import React, { useContext } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useAddUser from "@/hooks/useAddUser"
 import { trpc } from "@/utils/trpc"
-import type { Project, ProjectUser, User } from "@prisma/client"
+import type { Project } from "@prisma/client"
 import { LoadingDots } from "./LoadingDots"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -24,9 +24,7 @@ import {
   DropResult,
   Droppable,
 } from "@hello-pangea/dnd"
-import getProjectOrder from "@/utils/getProjectOrder"
 import useExpand from "@/hooks/useExpand"
-import ExpandChevron from "./ExpandChevron"
 import {
   deleteOneProject,
   updateProjectName,

@@ -1,5 +1,4 @@
 import { useEffect, useContext, useState, useRef, ChangeEvent } from "react"
-import { useRouter } from "next/router"
 import PlusIcon from "@/components/PlusIcon"
 import List from "@/components/List"
 import SideMenu from "@/components/SideMenu"
@@ -12,8 +11,8 @@ import AddEditForm from "@/components/AddEditForm"
 import ListContainer from "@/components/ListContainer"
 import useBooleanState from "@/hooks/useBooleanState"
 import { trpc } from "@/utils/trpc"
-import { date, z } from "zod"
-import { FormProvider, SubmitHandler, set, useForm } from "react-hook-form"
+import { z } from "zod"
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import ColorDot from "@/components/ColorDot"
 import { listSchema } from "@/utils/schemas"
@@ -23,13 +22,10 @@ import {
   DropResult,
   Droppable,
 } from "@hello-pangea/dnd"
-import { Task } from "@prisma/client"
 import { createNewList, reorderLists } from "@/mutations/listMutations"
 import { reorderTasks } from "@/mutations/taskMutations"
 import useClickOutside from "@/hooks/useClickOutside"
-import MenuContext from "@/context/MenuContext"
-import TextInput from "@/components/TextInput"
-import ExpandChevron from "@/components/ExpandChevron"
+
 import {
   AiFillFilter,
   AiOutlineClose,
@@ -37,7 +33,6 @@ import {
   AiOutlineSearch,
 } from "react-icons/ai"
 import DateTimePicker from "react-datetime-picker"
-import { useSession } from "next-auth/react"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =

@@ -3,11 +3,11 @@ import AddButton from "./AddButton"
 import { AnimatePresence, motion } from "framer-motion"
 import useBooleanState from "@/hooks/useBooleanState"
 import AddProjectModal from "./AddProjectModal"
-import React, { useState } from "react"
+import React from "react"
 import { LoadingDots } from "./LoadingDots"
 import { useSession } from "next-auth/react"
 import Project from "./Project"
-import type { Board, ProjectUser, User } from "@prisma/client"
+import type { Board, User } from "@prisma/client"
 import {
   DragDropContext,
   Droppable,
@@ -15,8 +15,6 @@ import {
   DropResult,
 } from "@hello-pangea/dnd"
 import { trpc } from "@/utils/trpc"
-import getProjectOrder from "@/utils/getProjectOrder"
-import { get } from "http"
 import { reorderProjects } from "@/mutations/projectMutations"
 
 interface SideMenuProps {
