@@ -1,4 +1,4 @@
-import { useContext } from "react"
+import { FormEventHandler, useContext } from "react"
 import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
@@ -13,7 +13,7 @@ import useBooleanState from "@/hooks/useBooleanState"
 import { AnimatePresence, motion } from "framer-motion"
 import ColorPicker from "./ColorPicker"
 import UserCheckbox from "./UserCheckbox"
-import type { List as ListType, Prisma, Task } from "@prisma/client"
+import type { List as ListType, Prisma, Task, User } from "@prisma/client"
 import ColorDot from "./ColorDot"
 import { trpc } from "@/utils/trpc"
 import LayoutContext from "@/context/LayoutContext"
@@ -41,6 +41,7 @@ import {
 } from "@/mutations/listMutations"
 import { useSession } from "next-auth/react"
 import getFilteredTasks from "@/utils/getFilteredTasks"
+import { UseTRPCQueryResult } from "@trpc/react-query/shared"
 
 type TaskWithAssignedTo = Prisma.TaskGetPayload<{
   include: { assigned_to: true }
@@ -98,8 +99,6 @@ function List({
 
   const { data: session, status } = useSession()
   const userId = session?.user?.id
-
-  console.log(dateFilter)
 
   return (
     <section
@@ -266,12 +265,6 @@ function Task({
 
   const users = trpc.board.getUsers.useQuery(chosenBoardId!)
 
-  const taskAnimation = {
-    initial: { height: 0, opacity: 0, padding: 0 },
-    animate: { height: "auto", opacity: 1 },
-    exit: { height: 0, opacity: 0, padding: 0 },
-  }
-
   const onSubmitUsers: SubmitHandler<TaskSchema> = (data: any) => {
     updateUsers.mutate({
       assigned_to: assignedUsers,
@@ -317,6 +310,7 @@ function Task({
               </div>
               <p className="text-sm text-zinc-300">
                 {due_to &&
+                  timeDiff > 0 &&
                   (daysLeft > 0
                     ? relativeTimeFormat.format(daysLeft, "day")
                     : hoursLeft > 0
@@ -366,48 +360,92 @@ function Task({
       </div>
       <AnimatePresence>
         {isEditingUsers && (
-          <motion.form
+          <EditTaskUsers
+            assignUser={assignUser}
+            assignedUsers={assignedUsers}
+            closeEditUsers={closeEditUsers}
+            assignedToIds={assignedToIds}
+            listId={listId}
+            name={name}
             onSubmit={taskMethods.handleSubmit(onSubmitUsers)}
-            {...taskAnimation}
-          >
-            <div className="flex flex-wrap gap-2">
-              {users.data?.map((user) => (
-                <UserCheckbox
-                  key={user.id}
-                  name={user.name!}
-                  id={user.id}
-                  assignUser={assignUser}
-                  isAssigned={assignedToIds.includes(user.id)}
-                />
-              ))}
-            </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() =>
-                  updateUsers.mutate({
-                    id,
-                    name,
-                    listId,
-                    assigned_to: assignedUsers,
-                  })
-                }
-                disabled={updateUsers.isLoading}
-                className="ml-auto transition-transform hover:scale-110"
-              >
-                <AiOutlineCheck size={20} />
-              </button>
-              <button
-                type="button"
-                onClick={closeEditUsers}
-                className="transition-transform hover:scale-110"
-              >
-                <AiOutlineClose size={20} />
-              </button>
-            </div>
-          </motion.form>
+            taskId={id}
+            updateUsers={updateUsers}
+            users={users}
+          />
         )}
       </AnimatePresence>
     </>
+  )
+}
+
+interface EditTaskUsersProps {
+  onSubmit: FormEventHandler<HTMLFormElement>
+  users: UseTRPCQueryResult<User[], any>
+  assignUser: (userId: string) => void
+  assignedToIds: string[]
+  updateUsers: any
+  assignedUsers: string[]
+  closeEditUsers: () => void
+  taskId: string
+  listId: string
+  name: string
+}
+
+function EditTaskUsers({
+  onSubmit,
+  users,
+  assignUser,
+  assignedToIds,
+  updateUsers,
+  assignedUsers,
+  closeEditUsers,
+  taskId,
+  listId,
+  name,
+}: EditTaskUsersProps) {
+  const taskAnimation = {
+    initial: { height: 0, opacity: 0, padding: 0 },
+    animate: { height: "auto", opacity: 1 },
+    exit: { height: 0, opacity: 0, padding: 0 },
+  }
+
+  return (
+    <motion.form onSubmit={onSubmit} {...taskAnimation}>
+      <div className="flex flex-wrap gap-2">
+        {users.data?.map((user) => (
+          <UserCheckbox
+            key={user.id}
+            name={user.name!}
+            id={user.id}
+            assignUser={assignUser}
+            isAssigned={assignedToIds.includes(user.id)}
+          />
+        ))}
+      </div>
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() =>
+            updateUsers.mutate({
+              taskId,
+              name,
+              listId,
+              assigned_to: assignedUsers,
+            })
+          }
+          disabled={updateUsers.isLoading}
+          className="ml-auto transition-transform hover:scale-110"
+        >
+          <AiOutlineCheck size={20} />
+        </button>
+        <button
+          type="button"
+          onClick={closeEditUsers}
+          className="transition-transform hover:scale-110"
+        >
+          <AiOutlineClose size={20} />
+        </button>
+      </div>
+    </motion.form>
   )
 }
 
