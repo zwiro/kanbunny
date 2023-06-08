@@ -31,6 +31,7 @@ import {
   updateProjectUsers,
 } from "@/mutations/projectMutations"
 import { createNewBoard, reorderBoards } from "@/mutations/boardMutations"
+import AddUsersInput from "./AddUsersInput"
 
 interface ProjectProps {
   project: Project & { boards: Board[] }
@@ -160,31 +161,14 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
             className="flex flex-col gap-2 pt-4 text-base"
           >
             <form onSubmit={handleSubmitUsers} className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <input
-                  id="user"
-                  type="text"
-                  placeholder="johndoe211"
-                  className="w-44 border bg-zinc-900 p-1 text-xl"
-                  value={user}
-                  onChange={handleChange}
-                />
-                <button onClick={addUser} className="group">
-                  <PlusIcon />
-                </button>
-              </div>
-              <p>participating ({users.length})</p>
-              <ul className="flex flex-wrap gap-2">
-                {users.map((user, i) => (
-                  <li
-                    key={`${user}-${i}`}
-                    onClick={() => removeUser(user)}
-                    className="cursor-pointer border border-zinc-900 bg-zinc-900 p-2 transition-colors hover:bg-transparent"
-                  >
-                    {user}
-                  </li>
-                ))}
-              </ul>
+              <AddUsersInput
+                value={user}
+                onChange={handleChange}
+                addUser={addUser}
+                removeUser={removeUser}
+                length={users.length}
+                users={users}
+              />
               <div className="flex items-center gap-1">
                 {!updateUsers.isLoading ? (
                   <>

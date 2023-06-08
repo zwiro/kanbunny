@@ -10,6 +10,7 @@ import ModalForm from "./ModalForm"
 import PlusIcon from "./PlusIcon"
 import TextInput from "./TextInput"
 import { createNewProject } from "@/mutations/projectMutations"
+import AddUsersInput from "./AddUsersInput"
 
 interface AddProjectModalProps {
   close: () => void
@@ -49,31 +50,14 @@ function AddProjectModal({ close }: AddProjectModalProps) {
           )}
         </FormFieldContainer>
         <FormFieldContainer>
-          <p>add users</p>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="johndoe"
-              className="w-44 bg-zinc-900 p-1 text-xl"
-              value={user}
-              onChange={handleChange}
-            />
-            <button onClick={addUser} className="group">
-              <PlusIcon />
-            </button>
-          </div>
-          <p>participating ({users.length})</p>
-          <ul className="flex flex-wrap gap-2">
-            {users.map((user, i) => (
-              <li
-                key={`${user}-${i}`}
-                onClick={() => removeUser(user)}
-                className="cursor-pointer border border-zinc-900 bg-zinc-900 p-2 transition-colors hover:bg-transparent"
-              >
-                {user}
-              </li>
-            ))}
-          </ul>
+          <AddUsersInput
+            value={user}
+            onChange={handleChange}
+            addUser={addUser}
+            removeUser={removeUser}
+            length={users.length}
+            users={users}
+          />
         </FormFieldContainer>
         <AddButton disabled={createProject.isLoading}>
           add project
