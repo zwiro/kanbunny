@@ -302,12 +302,6 @@ function Filters({
   const filterRef = useRef<HTMLDivElement>(null)
   useClickOutside([filterRef], closeFilter)
 
-  const filterAnimation = {
-    initial: { opacity: 0, scale: 0 },
-    animate: { opacity: 1, scale: 1 },
-    exit: { opacity: 0, scale: 0 },
-  }
-
   return (
     <div className="relative ml-auto">
       <div className="flex items-center justify-end gap-1">
@@ -342,129 +336,169 @@ function Filters({
           </AnimatePresence>
         </div>
       </div>
-      <AnimatePresence>
-        {isFilterOpen && (
-          <motion.div
-            ref={filterRef}
-            {...filterAnimation}
-            className="absolute right-0 z-30 origin-top-right whitespace-nowrap bg-zinc-900/95 p-4"
-          >
-            <fieldset className="flex items-center gap-1">
-              <legend>task state</legend>
-              <input
-                type="radio"
-                id="assigned_user"
-                value="assigned_user"
-                name="task_type"
-                onChange={handleAssignedFilterChange}
-                checked={assignedFilter === "assigned_user"}
-                className="peer/assigned_user hidden"
-              />
-              <label
-                htmlFor="assigned_user"
-                className="cursor-pointer border border-zinc-700 px-1 peer-checked/assigned_user:bg-zinc-700"
-              >
-                assigned to me
-              </label>
-              <input
-                type="radio"
-                id="assigned"
-                value="assigned"
-                name="task_type"
-                onChange={handleAssignedFilterChange}
-                checked={assignedFilter === "assigned"}
-                className="peer/assigned hidden"
-              />
-              <label
-                htmlFor="assigned"
-                className="cursor-pointer border border-zinc-700 px-1 peer-checked/assigned:bg-zinc-700"
-              >
-                assigned
-              </label>
-              <input
-                type="radio"
-                id="unassigned"
-                value="unassigned"
-                name="task_type"
-                onChange={handleAssignedFilterChange}
-                checked={assignedFilter === "unassigned"}
-                className="peer/unassigned hidden"
-              />
-              <label
-                htmlFor="unassigned"
-                className="cursor-pointer border border-zinc-700 px-1 peer-checked/unassigned:bg-zinc-700"
-              >
-                unassigned
-              </label>
-            </fieldset>
-            <fieldset className="flex flex-wrap items-center gap-1">
-              <legend>due to</legend>
-              <input
-                type="radio"
-                id="tomorrow"
-                value="tomorrow"
-                name="due_to"
-                disabled={Boolean(dateFilter instanceof Date)}
-                checked={dateFilter === "tomorrow"}
-                onChange={handleDateFilterChange}
-                className="peer/tomorrow hidden"
-              />
-              <label
-                htmlFor="tomorrow"
-                className="cursor-pointer border border-zinc-700 px-1 peer-checked/tomorrow:bg-zinc-700 peer-disabled/tomorrow:bg-transparent"
-              >
-                tomorrow
-              </label>
-              <input
-                type="radio"
-                id="next_week"
-                value="next_week"
-                name="due_to"
-                disabled={Boolean(dateFilter instanceof Date)}
-                checked={dateFilter === "next_week"}
-                onChange={handleDateFilterChange}
-                className="peer/week hidden"
-              />
-              <label
-                htmlFor="next_week"
-                className="cursor-pointer border border-zinc-700 px-1 peer-checked/week:bg-zinc-700 peer-disabled/tomorrow:bg-transparent"
-              >
-                next week
-              </label>
-              <input
-                type="radio"
-                id="next_month"
-                value="next_month"
-                name="due_to"
-                disabled={Boolean(dateFilter instanceof Date)}
-                checked={dateFilter === "next_month"}
-                onChange={handleDateFilterChange}
-                className="peer/month hidden"
-              />
-              <label
-                htmlFor="next_month"
-                className="cursor-pointer border border-zinc-700 px-1 peer-checked/month:bg-zinc-700 peer-disabled/tomorrow:bg-transparent"
-              >
-                next month
-              </label>
-              <DateTimePicker
-                onChange={setDateFilter}
-                value={Boolean(dateFilter instanceof Date) ? dateFilter : null}
-                disableClock
-                calendarIcon={null}
-                format="y-MM-dd h:mm a"
-                className="border border-zinc-700"
-              />
-            </fieldset>
-            <button
-              onClick={clearFilters}
-              className="mt-2 bg-zinc-700 px-2 py-1"
-            >
-              clear filters
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div ref={filterRef}>
+        <AnimatePresence>
+          {isFilterOpen && (
+            <FiltersMenu
+              assignedFilter={assignedFilter}
+              clearFilters={clearFilters}
+              dateFilter={dateFilter}
+              handleAssignedFilterChange={handleAssignedFilterChange}
+              handleDateFilterChange={handleDateFilterChange}
+              setDateFilter={setDateFilter}
+            />
+          )}
+        </AnimatePresence>
+      </div>
     </div>
+  )
+}
+
+interface FiltersMenuProps {
+  handleAssignedFilterChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  handleDateFilterChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  assignedFilter: string | null
+  dateFilter: string | Date | null
+  setDateFilter: React.Dispatch<React.SetStateAction<Date | string | null>>
+  clearFilters: () => void
+}
+
+function FiltersMenu({
+  handleAssignedFilterChange,
+  handleDateFilterChange,
+  assignedFilter,
+  dateFilter,
+  setDateFilter,
+  clearFilters,
+}: FiltersMenuProps) {
+  const filterAnimation = {
+    initial: { opacity: 0, scale: 0 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0 },
+  }
+
+  return (
+    <motion.div
+      {...filterAnimation}
+      className="absolute right-0 z-30 origin-top-right whitespace-nowrap bg-zinc-900/95 p-4"
+    >
+      <fieldset className="flex items-center gap-1">
+        <legend>task state</legend>
+        <FilterButton
+          value="assigned_user"
+          name="task_type"
+          filter={assignedFilter}
+          handleChange={handleAssignedFilterChange}
+          inputClassName="peer/assigned_user"
+          labelClassName="peer-checked/assigned_user:bg-zinc-700"
+        >
+          assigned to me
+        </FilterButton>
+        <FilterButton
+          value="assigned"
+          name="task_type"
+          filter={assignedFilter}
+          handleChange={handleAssignedFilterChange}
+          inputClassName="peer/assigned"
+          labelClassName="peer-checked/assigned:bg-zinc-700"
+        >
+          assigned
+        </FilterButton>
+        <FilterButton
+          value="unassigned"
+          name="task_type"
+          filter={assignedFilter}
+          handleChange={handleAssignedFilterChange}
+          inputClassName="peer/unassigned"
+          labelClassName="peer-checked/unassigned:bg-zinc-700"
+        >
+          unassigned
+        </FilterButton>
+      </fieldset>
+      <fieldset className="flex flex-wrap items-center gap-1">
+        <legend>due to</legend>
+        <FilterButton
+          value="tomorrow"
+          name="due_to"
+          filter={dateFilter}
+          handleChange={handleDateFilterChange}
+          inputClassName="peer/tomorrow"
+          labelClassName="peer-checked/tomorrow:bg-zinc-700"
+        >
+          tomorrow
+        </FilterButton>
+        <FilterButton
+          value="next_week"
+          name="due_to"
+          filter={dateFilter}
+          handleChange={handleDateFilterChange}
+          inputClassName="peer/next_week"
+          labelClassName="peer-checked/next_week:bg-zinc-700"
+        >
+          next week
+        </FilterButton>
+        <FilterButton
+          value="next_month"
+          name="due_to"
+          filter={dateFilter}
+          handleChange={handleDateFilterChange}
+          inputClassName="peer/next_month"
+          labelClassName="peer-checked/next_month:bg-zinc-700"
+        >
+          next month
+        </FilterButton>
+        <DateTimePicker
+          onChange={setDateFilter}
+          value={Boolean(dateFilter instanceof Date) ? dateFilter : null}
+          disableClock
+          calendarIcon={null}
+          format="y-MM-dd h:mm a"
+          className="border border-zinc-700"
+        />
+      </fieldset>
+      <button onClick={clearFilters} className="mt-2 bg-zinc-700 px-2 py-1">
+        clear filters
+      </button>
+    </motion.div>
+  )
+}
+
+interface FilterButtonProps {
+  value: string
+  name: string
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  filter: string | Date | null
+  inputClassName: string
+  labelClassName: string
+  children: React.ReactNode | string
+}
+
+function FilterButton({
+  value,
+  name,
+  handleChange,
+  filter,
+  inputClassName,
+  labelClassName,
+  children,
+}: FilterButtonProps) {
+  return (
+    <>
+      <input
+        type="radio"
+        id={value}
+        value={value}
+        name={name}
+        onChange={handleChange}
+        checked={filter === value}
+        className={`hidden ${inputClassName}`}
+      />
+      <label
+        htmlFor={value}
+        className={`cursor-pointer border border-zinc-700 px-1 ${labelClassName}`}
+      >
+        {children}
+      </label>
+    </>
   )
 }
