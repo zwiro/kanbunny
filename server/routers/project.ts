@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { protectedProcedure, createTRPCRouter } from "../trpc"
+import { protectedProcedure, createTRPCRouter, publicProcedure } from "../trpc"
 import { projectSchema, reorderSchema } from "@/utils/schemas"
 
 export const projectRouter = createTRPCRouter({
@@ -92,6 +92,12 @@ export const projectRouter = createTRPCRouter({
       z.object({ projectId: z.string(), participants: z.array(z.string()) })
     )
     .mutation(async ({ ctx, input }) => {
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: input.projectId },
+      })
+      if (project?.ownerId !== ctx.session.user.id) {
+        throw new Error("You are not the owner of this project")
+      }
       const toDeleteUsers = await ctx.prisma.user.findMany({
         where: {
           AND: [
@@ -142,8 +148,14 @@ export const projectRouter = createTRPCRouter({
       projectSchema.omit({ users: true }).extend({ projectId: z.string() })
     )
     .mutation(async ({ ctx, input }) => {
-      const project = await ctx.prisma.project.update({
+      const project = await ctx.prisma.project.findUnique({
         where: { id: input.projectId },
+      })
+      if (project?.ownerId !== ctx.session.user.id) {
+        throw new Error("You are not the owner of this project")
+      }
+      await ctx.prisma.project.update({
+        where: { id: project.id },
         data: {
           name: input.name,
         },
@@ -190,28 +202,33 @@ export const projectRouter = createTRPCRouter({
 
       return { success: true }
     }),
-  delete: protectedProcedure
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      const users = await ctx.prisma.user.findMany({
-        where: {
-          projects_in: { some: { id: input } },
+  delete: publicProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
+    const project = await ctx.prisma.project.findUnique({
+      where: { id: input },
+    })
+    if (project?.ownerId !== ctx.session!.user.id) {
+      throw new Error("You are not the owner of this project")
+    }
+
+    const users = await ctx.prisma.user.findMany({
+      where: {
+        projects_in: { some: { id: input } },
+      },
+    })
+    users.map(async (user) => {
+      await ctx.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          projects_in: { disconnect: { id: input } },
         },
       })
-      users.map(async (user) => {
-        await ctx.prisma.user.update({
-          where: { id: user.id },
-          data: {
-            projects_in: { disconnect: { id: input } },
-          },
-        })
-      })
-      await ctx.prisma.projectUser.deleteMany({
-        where: { projectId: input },
-      })
-      await ctx.prisma.project.deleteMany({
-        where: { id: input },
-      })
-      return { success: true }
-    }),
+    })
+    await ctx.prisma.projectUser.deleteMany({
+      where: { projectId: input },
+    })
+    await ctx.prisma.project.deleteMany({
+      where: { id: input },
+    })
+    return { success: true }
+  }),
 })
