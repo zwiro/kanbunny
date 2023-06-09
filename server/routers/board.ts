@@ -58,8 +58,28 @@ export const boardRouter = createTRPCRouter({
   editColor: protectedProcedure
     .input(colorSchema)
     .mutation(async ({ ctx, input }) => {
-      const board = await ctx.prisma.board.update({
+      const board = await ctx.prisma.board.findUnique({
         where: { id: input.id },
+      })
+
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: board?.projectId },
+        include: { users: true },
+      })
+
+      if (!board || !project) {
+        throw new Error("Board does not exist")
+      }
+
+      if (
+        project.ownerId !== ctx.session.user.id &&
+        !project.users.map((u) => u.userId).includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
+
+      await ctx.prisma.board.update({
+        where: { id: board.id },
         data: {
           color: input.color,
         },
@@ -69,8 +89,25 @@ export const boardRouter = createTRPCRouter({
   editName: protectedProcedure
     .input(boardSchema)
     .mutation(async ({ ctx, input }) => {
-      const board = await ctx.prisma.board.update({
+      const board = await ctx.prisma.board.findUnique({
         where: { id: input.id },
+      })
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: board?.projectId },
+        include: { users: true },
+      })
+      if (!board || !project) {
+        throw new Error("Board does not exist")
+      }
+
+      if (
+        project.ownerId !== ctx.session.user.id &&
+        !project.users.map((u) => u.userId).includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
+      await ctx.prisma.board.update({
+        where: { id: board.id },
         data: {
           name: input.name,
         },
@@ -119,8 +156,25 @@ export const boardRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
-      const board = await ctx.prisma.board.delete({
+      const board = await ctx.prisma.board.findUnique({
         where: { id: input },
+      })
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: board?.projectId },
+        include: { users: true },
+      })
+      if (!board || !project) {
+        throw new Error("Board does not exist")
+      }
+
+      if (
+        project.ownerId !== ctx.session.user.id &&
+        !project.users.map((u) => u.userId).includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
+      await ctx.prisma.board.delete({
+        where: { id: board.id },
       })
       return board
     }),
