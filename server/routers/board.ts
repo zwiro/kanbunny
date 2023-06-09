@@ -42,6 +42,20 @@ export const boardRouter = createTRPCRouter({
   create: protectedProcedure
     .input(boardAndProjectSchema)
     .mutation(async ({ ctx, input }) => {
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: input.projectId },
+        include: { users: true },
+      })
+      if (!project) {
+        throw new Error("Project does not exist")
+      }
+
+      if (
+        project.ownerId !== ctx.session.user.id &&
+        !project.users.map((u) => u.userId).includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
       const board = await ctx.prisma.board.create({
         data: {
           name: input.name,

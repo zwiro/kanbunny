@@ -18,6 +18,22 @@ export const listRouter = createTRPCRouter({
   create: protectedProcedure
     .input(listSchema)
     .mutation(async ({ ctx, input }) => {
+      const board = await ctx.prisma.board.findUnique({
+        where: { id: input.boardId },
+      })
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: board?.projectId },
+        include: { users: true },
+      })
+      if (!project || !board) {
+        throw new Error("Board does not exist")
+      }
+      if (
+        project.ownerId !== ctx.session.user.id &&
+        !project.users.map((u) => u.userId).includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
       const list = await ctx.prisma.list.create({
         data: {
           name: input.name,
@@ -34,6 +50,22 @@ export const listRouter = createTRPCRouter({
   editName: protectedProcedure
     .input(editListSchema)
     .mutation(async ({ ctx, input }) => {
+      const board = await ctx.prisma.board.findUnique({
+        where: { id: input.boardId },
+      })
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: board?.projectId },
+        include: { users: true },
+      })
+      if (!project || !board) {
+        throw new Error("Board does not exist")
+      }
+      if (
+        project.ownerId !== ctx.session.user.id &&
+        !project.users.map((u) => u.userId).includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
       const list = await ctx.prisma.list.update({
         where: { id: input.id },
         data: {
@@ -45,8 +77,27 @@ export const listRouter = createTRPCRouter({
   editColor: protectedProcedure
     .input(colorSchema)
     .mutation(async ({ ctx, input }) => {
-      const list = await ctx.prisma.list.update({
+      const list = await ctx.prisma.list.findUnique({
         where: { id: input.id },
+      })
+      const board = await ctx.prisma.board.findUnique({
+        where: { id: list?.boardId },
+      })
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: board?.projectId },
+        include: { users: true },
+      })
+      if (!project || !board || !list) {
+        throw new Error("List does not exist")
+      }
+      if (
+        project.ownerId !== ctx.session.user.id &&
+        !project.users.map((u) => u.userId).includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
+      await ctx.prisma.list.update({
+        where: { id: list.id },
         data: {
           color: input.color,
         },
@@ -94,8 +145,27 @@ export const listRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
-      const list = await ctx.prisma.list.delete({
+      const list = await ctx.prisma.list.findUnique({
         where: { id: input },
+      })
+      const board = await ctx.prisma.board.findUnique({
+        where: { id: list?.boardId },
+      })
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: board?.projectId },
+        include: { users: true },
+      })
+      if (!project || !board || !list) {
+        throw new Error("List does not exist")
+      }
+      if (
+        project.ownerId !== ctx.session.user.id &&
+        !project.users.map((u) => u.userId).includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
+      await ctx.prisma.list.delete({
+        where: { id: list.id },
       })
       return list
     }),
