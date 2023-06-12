@@ -203,10 +203,12 @@ export const projectRouter = createTRPCRouter({
       return { success: true }
     }),
   delete: publicProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
-    const project = await ctx.prisma.project.findUnique({
-      where: { id: input },
+    const projectUser = await ctx.prisma.projectUser.findFirst({
+      where: { projectId: input },
+      include: { project: true },
     })
-    if (project?.ownerId !== ctx.session!.user.id) {
+
+    if (projectUser?.project.ownerId !== ctx.session!.user.id) {
       throw new Error("You are not the owner of this project")
     }
 
@@ -228,6 +230,12 @@ export const projectRouter = createTRPCRouter({
     })
     await ctx.prisma.project.deleteMany({
       where: { id: input },
+    })
+    await ctx.prisma.projectUser.updateMany({
+      where: {
+        AND: [{ NOT: { id: input } }, { order: { gt: projectUser.order } }],
+      },
+      data: { order: { decrement: 1 } },
     })
     return { success: true }
   }),
