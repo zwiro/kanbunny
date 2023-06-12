@@ -42,6 +42,7 @@ import {
 import { useSession } from "next-auth/react"
 import getFilteredTasks from "@/utils/getFilteredTasks"
 import { UseTRPCQueryResult } from "@trpc/react-query/shared"
+import ListSkeleton from "./ListSkeleton"
 
 type TaskWithAssignedTo = Prisma.TaskGetPayload<{
   include: { assigned_to: true }
@@ -53,7 +54,6 @@ interface ListProps extends ListType {
   searchQuery: string
   dateFilter: string | Date | null
   assignedFilter: string | null
-  isLoading: boolean
 }
 
 const colorVariants = {
@@ -74,7 +74,6 @@ function List({
   searchQuery,
   dateFilter,
   assignedFilter,
-  isLoading,
 }: ListProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()

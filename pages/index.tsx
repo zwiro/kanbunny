@@ -33,6 +33,7 @@ import {
   AiOutlineSearch,
 } from "react-icons/ai"
 import DateTimePicker from "react-datetime-picker"
+import ListSkeleton from "@/components/ListSkeleton"
 
 export default function Home() {
   const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
@@ -217,7 +218,6 @@ export default function Home() {
                                     searchQuery={searchQuery}
                                     dateFilter={dateFilter}
                                     assignedFilter={assignedFilter}
-                                    isLoading={lists.isLoading}
                                     {...list}
                                   />
                                 </motion.div>
@@ -231,6 +231,13 @@ export default function Home() {
                 )}
               </Droppable>
             </DragDropContext>
+            {!lists.isLoading && (
+              <>
+                <ListSkeleton />
+                <ListSkeleton />
+                <ListSkeleton />
+              </>
+            )}
             {isAdding ? (
               <ListContainer>
                 <div className="flex flex-col">
