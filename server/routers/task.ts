@@ -278,6 +278,16 @@ export const taskRouter = createTRPCRouter({
       await ctx.prisma.task.delete({
         where: { id: task.id },
       })
-      return task
+      await ctx.prisma.task.updateMany({
+        where: {
+          AND: [
+            { listId: task.listId },
+            { order: { gt: task.order } },
+            { NOT: { id: task.id } },
+          ],
+        },
+        data: { order: { decrement: 1 } },
+      })
+      return { success: true }
     }),
 })
