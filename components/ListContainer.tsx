@@ -1,5 +1,5 @@
 interface ListContainerProps {
-  children: JSX.Element
+  children: React.ReactNode
 }
 
 function ListContainer({ children }: ListContainerProps) {

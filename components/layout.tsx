@@ -5,7 +5,7 @@ import Navbar from "./Navbar"
 const jura = Jura({ subsets: ["latin"], weight: ["400", "700"] })
 
 interface LayoutProps {
-  children: JSX.Element
+  children: React.ReactNode
 }
 
 function Layout({ children }: LayoutProps) {

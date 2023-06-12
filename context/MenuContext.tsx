@@ -12,7 +12,11 @@ const MenuContext = createContext<MenuContextType>({
   closeMenu: () => {},
 })
 
-export function MenuProvider({ children }: { children: JSX.Element }) {
+interface MenuProviderProps {
+  children: React.ReactNode
+}
+
+export function MenuProvider({ children }: MenuProviderProps) {
   const [isMenuOpened, setIsMenuOpened] = useState(false)
 
   const openMenu = () => {

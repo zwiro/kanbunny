@@ -61,8 +61,6 @@ export default function Home() {
     setAssignedFilter(null)
   }
 
-  // move to context later
-
   const lists = trpc.list.getByBoard.useQuery(chosenBoardId!)
 
   const userProjects = trpc.project.getByUser.useQuery()
@@ -153,7 +151,7 @@ export default function Home() {
         <>
           <div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 [&>div]:cursor-default">
                 <ColorDot color={board.data?.color!} />
                 <h1 className="text-2xl font-bold">{board.data?.name}</h1>
               </div>
@@ -212,9 +210,9 @@ export default function Home() {
                                     key={list.id}
                                     dragHandleProps={provided.dragHandleProps}
                                     searchQuery={searchQuery}
-                                    {...list}
                                     dateFilter={dateFilter}
                                     assignedFilter={assignedFilter}
+                                    {...list}
                                   />
                                 </motion.div>
                               </div>
@@ -297,7 +295,6 @@ function Filters({
 }: FiltersProps) {
   const [isSearchOpen, , , toggleSearch] = useBooleanState()
   const [isFilterOpen, , closeFilter, toggleFilter] = useBooleanState()
-  // const [date, onChange] = useState<Date | null>()
 
   const filterRef = useRef<HTMLDivElement>(null)
   useClickOutside([filterRef], closeFilter)

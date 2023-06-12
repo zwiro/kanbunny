@@ -16,7 +16,11 @@ const LayoutContext = createContext<LayoutContextType>({
   chooseOpenedBoard: () => {},
 })
 
-export function LayoutProvider({ children }: { children: JSX.Element }) {
+interface LayoutProviderProps {
+  children: React.ReactNode
+}
+
+export function LayoutProvider({ children }: LayoutProviderProps) {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
 
   const toggleSideMenu = () => {

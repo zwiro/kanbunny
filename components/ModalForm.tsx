@@ -21,7 +21,7 @@ const formVariant = {
 }
 
 interface ModalFormProps {
-  children: JSX.Element | JSX.Element[]
+  children: React.ReactNode
   close?: () => void
   handleSubmit?: (data: any) => void
 }

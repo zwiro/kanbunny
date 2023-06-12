@@ -5,7 +5,7 @@ interface AddButtonProps
     ButtonHTMLAttributes<HTMLButtonElement>,
     HTMLButtonElement
   > {
-  children: JSX.Element | [string, JSX.Element]
+  children: React.ReactNode
   handleClick?: () => void
   isLoading?: boolean
 }

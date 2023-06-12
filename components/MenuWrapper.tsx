@@ -5,7 +5,7 @@ import useClickOutside from "@/hooks/useClickOutside"
 import MenuContext, { MenuProvider } from "@/context/MenuContext"
 
 interface MenuWrapperProps {
-  children: JSX.Element | JSX.Element[]
+  children: React.ReactNode
   direction?: "left" | "right"
 }
 
@@ -18,7 +18,7 @@ function MenuWrapper({ children, direction = "left" }: MenuWrapperProps) {
 }
 
 interface MenuButtonProps {
-  children: JSX.Element | JSX.Element[]
+  children: React.ReactNode
   direction: "left" | "right"
 }
 
@@ -46,7 +46,7 @@ function MenuButton({ children, direction }: MenuButtonProps) {
 }
 
 interface MenuProps {
-  children: JSX.Element | JSX.Element[]
+  children: React.ReactNode
   direction: "left" | "right"
 }
 
