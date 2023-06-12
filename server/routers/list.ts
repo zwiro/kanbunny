@@ -42,7 +42,7 @@ export const listRouter = createTRPCRouter({
         },
       })
       await ctx.prisma.list.updateMany({
-        where: { NOT: { id: list.id } },
+        where: { AND: [{ NOT: { id: list.id } }, { boardId: input.boardId }] },
         data: { order: { increment: 1 } },
       })
       return list
@@ -168,7 +168,7 @@ export const listRouter = createTRPCRouter({
         where: { id: list.id },
       })
       await ctx.prisma.list.updateMany({
-        where: { order: { gt: list.order } },
+        where: { AND: [{ order: { gt: list.order }, boardId: board.id }] },
         data: { order: { decrement: 1 } },
       })
       return { success: true }
