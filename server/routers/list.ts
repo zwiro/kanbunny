@@ -167,10 +167,10 @@ export const listRouter = createTRPCRouter({
       await ctx.prisma.list.delete({
         where: { id: list.id },
       })
-      return list
+      await ctx.prisma.list.updateMany({
+        where: { order: { gt: list.order } },
+        data: { order: { decrement: 1 } },
+      })
+      return { success: true }
     }),
-  // deleteAll: publicProcedure.query(async ({ ctx }) => {
-  //   const lists = await ctx.prisma.list.deleteMany()
-  //   return lists
-  // }),
 })
