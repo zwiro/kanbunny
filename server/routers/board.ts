@@ -64,7 +64,9 @@ export const boardRouter = createTRPCRouter({
         },
       })
       await ctx.prisma.board.updateMany({
-        where: { NOT: { id: board.id } },
+        where: {
+          AND: [{ NOT: { id: board.id } }, { projectId: input.projectId }],
+        },
         data: { order: { increment: 1 } },
       })
       return board
@@ -145,6 +147,7 @@ export const boardRouter = createTRPCRouter({
               { order: { gte: input.itemTwoIndex } },
               { order: { lte: input.itemOneIndex } },
               { NOT: { id: boardDragged?.id } },
+              { projectId: boardDragged?.projectId },
             ],
           },
           data: { order: { increment: 1 } },
@@ -158,6 +161,7 @@ export const boardRouter = createTRPCRouter({
               { order: { lte: input.itemTwoIndex } },
               { order: { gte: input.itemOneIndex } },
               { NOT: { id: boardDragged?.id } },
+              { projectId: boardDragged?.projectId },
             ],
           },
           data: { order: { decrement: 1 } },
@@ -191,7 +195,9 @@ export const boardRouter = createTRPCRouter({
         where: { id: board.id },
       })
       await ctx.prisma.board.updateMany({
-        where: { order: { gt: board.order } },
+        where: {
+          AND: [{ order: { gt: board.order } }, { projectId: project.id }],
+        },
         data: { order: { decrement: 1 } },
       })
       return { success: true }
