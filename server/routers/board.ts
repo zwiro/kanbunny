@@ -190,6 +190,10 @@ export const boardRouter = createTRPCRouter({
       await ctx.prisma.board.delete({
         where: { id: board.id },
       })
-      return board
+      await ctx.prisma.board.updateMany({
+        where: { order: { gt: board.order } },
+        data: { order: { decrement: 1 } },
+      })
+      return { success: true }
     }),
 })
