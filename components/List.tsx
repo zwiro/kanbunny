@@ -53,6 +53,7 @@ interface ListProps extends ListType {
   searchQuery: string
   dateFilter: string | Date | null
   assignedFilter: string | null
+  isLoading: boolean
 }
 
 const colorVariants = {
@@ -73,18 +74,19 @@ function List({
   searchQuery,
   dateFilter,
   assignedFilter,
+  isLoading,
 }: ListProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
   const [isAdding, add, closeAdd] = useBooleanState()
 
-  const { chosenBoardId } = useContext(LayoutContext)
+  const { chosenBoard } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
 
-  const updateName = updateListName(chosenBoardId!, utils, closeEditName)
-  const updateColor = updateListColor(chosenBoardId!, utils, closeEditColor)
-  const deleteList = deleteOneList(chosenBoardId!, utils)
+  const updateName = updateListName(chosenBoard?.id!, utils, closeEditName)
+  const updateColor = updateListColor(chosenBoard?.id!, utils, closeEditColor)
+  const deleteList = deleteOneList(chosenBoard?.id!, utils)
 
   type ListSchema = z.infer<typeof editListSchema>
 
@@ -226,7 +228,7 @@ function Task({
 }: TaskProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
-  const { chosenBoardId } = useContext(LayoutContext)
+  const { chosenBoard } = useContext(LayoutContext)
 
   const assignedToIds = assigned_to.map((u) => u.id)
 
@@ -251,19 +253,19 @@ function Task({
   })
 
   const updateName = updatedTaskName(
-    chosenBoardId!,
+    chosenBoard?.id!,
     listId,
     utils,
     closeEditName
   )
-  const updateUsers = updateTaskUsers(chosenBoardId!, utils, closeEditUsers)
-  const deleteTask = deleteOneTask(chosenBoardId!, listId, utils)
+  const updateUsers = updateTaskUsers(chosenBoard?.id!, utils, closeEditUsers)
+  const deleteTask = deleteOneTask(chosenBoard?.id!, listId, utils)
 
   const onSubmit: SubmitHandler<TaskSchema> = (data: any) => {
     updateName.mutate({ name: data.name, id, listId })
   }
 
-  const users = trpc.board.getUsers.useQuery(chosenBoardId!)
+  const users = trpc.board.getUsers.useQuery(chosenBoard?.id!)
 
   const onSubmitUsers: SubmitHandler<TaskSchema> = (data: any) => {
     updateUsers.mutate({
@@ -277,7 +279,7 @@ function Task({
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
 
   const updateColor = updateTaskColor(
-    chosenBoardId!,
+    chosenBoard?.id!,
     listId,
     utils,
     closeEditColor

@@ -5,7 +5,7 @@ import { GoGrabber } from "react-icons/go"
 import { z } from "zod"
 import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
 import { AnimatePresence } from "framer-motion"
-import type { Board, Color } from "@prisma/client"
+import type { Board, Color, User } from "@prisma/client"
 import { trpc } from "@/utils/trpc"
 import { boardSchema } from "@/utils/schemas"
 import LayoutContext from "@/context/LayoutContext"
@@ -26,6 +26,7 @@ interface BoardProps {
   name: string
   color: Color
   id: string
+  owner: string
   projectId: string
   dragHandleProps: DraggableProvidedDragHandleProps | null
   isDragging: boolean
@@ -35,6 +36,7 @@ function Board({
   name,
   color,
   id,
+  owner,
   projectId,
   dragHandleProps,
   isDragging,
@@ -42,7 +44,7 @@ function Board({
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
 
-  const { chosenBoardId, chooseOpenedBoard } = useContext(LayoutContext)
+  const { chosenBoard, chooseOpenedBoard } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
 
@@ -63,9 +65,9 @@ function Board({
 
   return (
     <li
-      onClick={() => chooseOpenedBoard(id)}
+      onClick={() => chooseOpenedBoard({ id, color, name, owner })}
       className={`group flex cursor-pointer items-center gap-2 px-2 text-xl transition-colors hover:bg-zinc-900/40 ${
-        chosenBoardId === id && "bg-zinc-900 hover:bg-zinc-900"
+        chosenBoard?.id === id && "bg-zinc-900 hover:bg-zinc-900"
       } `}
     >
       <ColorDot editColor={editColor} color={color}>

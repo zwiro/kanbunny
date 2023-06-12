@@ -24,15 +24,15 @@ interface AddTaskModalProps {
 function AddTaskModal({ close, listId }: AddTaskModalProps) {
   const [date, onChange] = useState<Date | null>()
 
-  const { chosenBoardId } = useContext(LayoutContext)
+  const { chosenBoard } = useContext(LayoutContext)
 
   const { assignedUsers, assignUser } = useAssignUser()
 
-  const users = trpc.board.getUsers.useQuery(chosenBoardId!)
+  const users = trpc.board.getUsers.useQuery(chosenBoard?.id!)
 
   const utils = trpc.useContext()
 
-  const createTask = createNewTask(chosenBoardId!, utils, close)
+  const createTask = createNewTask(chosenBoard?.id!, utils, close)
 
   type TaskSchema = z.infer<typeof taskSchema>
 

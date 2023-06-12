@@ -22,6 +22,7 @@ function TextInput({ name, ...props }: TextInputProps) {
       id={name}
       type="text"
       {...register(name)}
+      autoFocus
       {...props}
       className={`w-44 border bg-zinc-900 p-1 text-xl ${
         errors[name] ? "border-red-800" : "border-transparent"

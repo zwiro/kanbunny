@@ -1,18 +1,26 @@
+import { Color } from "@prisma/client"
 import { createContext, useState } from "react"
+
+type BoardContextType = {
+  id: string
+  color: Color
+  name: string
+  owner: string
+}
 
 interface LayoutContextType {
   isSideMenuOpen: boolean
   toggleSideMenu: () => void
   closeSideMenu: () => void
-  chosenBoardId: string | undefined
-  chooseOpenedBoard: (boardId: string) => void
+  chosenBoard: BoardContextType | undefined
+  chooseOpenedBoard: (board: BoardContextType) => void
 }
 
 const LayoutContext = createContext<LayoutContextType>({
   isSideMenuOpen: false,
   toggleSideMenu: () => {},
   closeSideMenu: () => {},
-  chosenBoardId: undefined,
+  chosenBoard: { id: "", color: "red", name: "", owner: "" },
   chooseOpenedBoard: () => {},
 })
 
@@ -30,19 +38,19 @@ export function LayoutProvider({ children }: LayoutProviderProps) {
     setIsSideMenuOpen(false)
   }
 
-  const [chosenBoardId, setChosenBoardId] = useState<string | undefined>(
+  const [chosenBoard, setchosenBoard] = useState<BoardContextType | undefined>(
     undefined
   )
 
-  const chooseOpenedBoard = (boardId: string) => {
-    setChosenBoardId(boardId)
+  const chooseOpenedBoard = (board: BoardContextType) => {
+    setchosenBoard(board)
   }
 
   const value = {
     isSideMenuOpen,
     toggleSideMenu,
     closeSideMenu,
-    chosenBoardId,
+    chosenBoard,
     chooseOpenedBoard,
   }
 

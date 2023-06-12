@@ -36,12 +36,13 @@ import AddUsersInput from "./AddUsersInput"
 interface ProjectProps {
   project: Project & { boards: Board[] }
   boards: Board[]
+  owner: string
   dragHandleProps: DraggableProvidedDragHandleProps | null
 }
 
 type BoardAndProjectSchema = z.infer<typeof boardAndProjectSchema>
 
-function Project({ project, boards, dragHandleProps }: ProjectProps) {
+function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
   trpc.project.getUsers.useQuery(project.id, {
     onSuccess(data) {
       setAllUsers(data?.map((user) => user.name!))
@@ -57,7 +58,7 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
   const { user, users, addUser, removeUser, handleChange, setAllUsers } =
     useAddUser()
 
-  const { chosenBoardId } = useContext(LayoutContext)
+  const { chosenBoard } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
 
@@ -116,7 +117,7 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
         <div className="flex items-center gap-4">
           <p
             className={`relative after:absolute after:-bottom-1 after:left-0 after:z-10 after:h-1 after:w-0 after:bg-white after:transition-all ${
-              project.boards.map((b) => b.id).includes(chosenBoardId!) &&
+              project.boards.map((b) => b.id).includes(chosenBoard?.id!) &&
               "after:w-[100%]"
             }`}
           >
@@ -245,9 +246,10 @@ function Project({ project, boards, dragHandleProps }: ProjectProps) {
                               >
                                 <Board
                                   key={board.id}
-                                  {...board}
                                   isDragging={snapshot.isDragging}
                                   dragHandleProps={provided.dragHandleProps}
+                                  owner={owner}
+                                  {...board}
                                 />
                               </motion.div>
                             </div>

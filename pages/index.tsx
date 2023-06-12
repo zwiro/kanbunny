@@ -40,7 +40,7 @@ export default function Home() {
 
   const [isAdding, add, closeAdd] = useBooleanState()
 
-  const { chosenBoardId } = useContext(LayoutContext)
+  const { chosenBoard } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
 
@@ -61,12 +61,14 @@ export default function Home() {
     setAssignedFilter(null)
   }
 
-  const lists = trpc.list.getByBoard.useQuery(chosenBoardId!)
+  const lists = trpc.list.getByBoard.useQuery(chosenBoard?.id!, {
+    enabled: !!chosenBoard?.id,
+  })
 
   const userProjects = trpc.project.getByUser.useQuery()
 
-  const board = trpc.board.getById.useQuery(chosenBoardId!, {
-    enabled: !!chosenBoardId,
+  const board = trpc.board.getById.useQuery(chosenBoard?.id!, {
+    enabled: !!chosenBoard?.id,
   })
 
   const search = (e: ChangeEvent<HTMLInputElement>) => {
@@ -76,20 +78,25 @@ export default function Home() {
   type ListSchema = z.infer<typeof listSchema>
 
   const listMethods = useForm<ListSchema>({
-    defaultValues: { boardId: chosenBoardId },
+    defaultValues: { boardId: chosenBoard?.id },
     resolver: zodResolver(listSchema),
   })
 
-  const createList = createNewList(chosenBoardId!, utils, closeAdd, listMethods)
+  const createList = createNewList(
+    chosenBoard?.id!,
+    utils,
+    closeAdd,
+    listMethods
+  )
 
   useEffect(() => {
-    listMethods.reset({ boardId: chosenBoardId })
-  }, [chosenBoardId, listMethods, board.data])
+    listMethods.reset({ boardId: chosenBoard?.id })
+  }, [chosenBoard?.id, listMethods, board.data])
 
   const onSubmit: SubmitHandler<ListSchema> = (data: any) => {
     createList.mutate({
       name: data.name,
-      boardId: chosenBoardId!,
+      boardId: chosenBoard?.id!,
     })
   }
 
@@ -99,9 +106,9 @@ export default function Home() {
     exit: { backdropFilter: "blur(0px)" },
   }
 
-  const reorder = reorderLists(chosenBoardId!, utils)
+  const reorder = reorderLists(chosenBoard?.id!, utils)
 
-  const reorderDisplayedTasks = reorderTasks(chosenBoardId!, utils)
+  const reorderDisplayedTasks = reorderTasks(chosenBoard?.id!, utils)
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
@@ -147,13 +154,13 @@ export default function Home() {
       }}
       className="flex flex-col"
     >
-      {chosenBoardId ? (
+      {chosenBoard ? (
         <>
           <div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1 [&>div]:cursor-default">
-                <ColorDot color={board.data?.color!} />
-                <h1 className="text-2xl font-bold">{board.data?.name}</h1>
+                <ColorDot color={chosenBoard.color} />
+                <h1 className="text-2xl font-bold">{chosenBoard.name}</h1>
               </div>
               <MenuWrapper direction="right">
                 <MenuItem handleClick={add}>add list</MenuItem>
@@ -170,9 +177,7 @@ export default function Home() {
                 setDateFilter={setDateFilter}
               />
             </div>
-            <p className="text-slate-300">
-              owner: {board.data?.project.owner.name}
-            </p>
+            <p className="text-slate-300">owner: {chosenBoard.owner}</p>
           </div>
           <div className="flex gap-4 overflow-y-hidden overflow-x-scroll pb-48 lg:gap-8 xl:gap-16">
             <DragDropContext onDragEnd={onDragEnd}>
@@ -212,6 +217,7 @@ export default function Home() {
                                     searchQuery={searchQuery}
                                     dateFilter={dateFilter}
                                     assignedFilter={assignedFilter}
+                                    isLoading={lists.isLoading}
                                     {...list}
                                   />
                                 </motion.div>
