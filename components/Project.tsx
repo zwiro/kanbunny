@@ -118,6 +118,7 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
           <p
             className={`relative after:absolute after:-bottom-1 after:left-0 after:z-10 after:h-1 after:w-0 after:bg-white after:transition-all ${
               project.boards.map((b) => b.id).includes(chosenBoard?.id!) &&
+              chosenBoard &&
               "after:w-[100%]"
             }`}
           >

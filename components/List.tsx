@@ -105,7 +105,9 @@ function List({
 
   return (
     <section
-      className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-t-4 bg-zinc-800 p-4 ${colorVariants[color]} `}
+      className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-t-4 bg-zinc-800 p-4 ${
+        colorVariants[color]
+      } ${isLoading && !id && "opacity-50"}`}
     >
       <div className="flex items-center gap-2">
         <ColorDot editColor={editColor} color={color}>
