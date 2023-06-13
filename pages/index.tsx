@@ -208,6 +208,7 @@ export default function Home() {
                             key={`list-${i}-${list.id}`}
                             draggableId={`list-${i}-${list.id}`}
                             index={list.order}
+                            isDragDisabled={createList.isLoading}
                           >
                             {(provided, snapshot) => (
                               <div

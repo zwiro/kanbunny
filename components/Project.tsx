@@ -230,8 +230,9 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
                       .map((board, i) => (
                         <Draggable
                           key={`board-${i}-${board.id}`}
-                          draggableId={`board-${i}-${board.id}`}
+                          draggableId={board.id || `placeholder-${i}`}
                           index={board.order}
+                          isDragDisabled={createBoard.isLoading}
                         >
                           {(provided, snapshot) => (
                             <div

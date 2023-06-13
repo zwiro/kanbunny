@@ -156,7 +156,7 @@ function List({
         )}
       </div>
       <Droppable
-        droppableId={id || "no id"}
+        droppableId={id || `placeholder-${Math.random()}`}
         key="task"
         direction="vertical"
         ignoreContainerClipping={true}
