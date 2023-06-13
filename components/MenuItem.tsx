@@ -12,7 +12,7 @@ function MenuItem({
   handleClick,
   closeOnClickInside = true,
 }: MenuItemProps) {
-  const { isMenuOpened, closeMenu, openMenu } = useContext(MenuContext)
+  const { closeMenu } = useContext(MenuContext)
 
   return (
     <li

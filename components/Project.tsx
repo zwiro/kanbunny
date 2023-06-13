@@ -1,4 +1,3 @@
-import PlusIcon from "./PlusIcon"
 import { AnimatePresence, motion } from "framer-motion"
 import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
@@ -24,7 +23,6 @@ import {
   DropResult,
   Droppable,
 } from "@hello-pangea/dnd"
-import useExpand from "@/hooks/useExpand"
 import {
   deleteOneProject,
   updateProjectName,
@@ -51,8 +49,6 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
 
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
-
-  const { isExpanded, toggle } = useExpand()
 
   const [isAdding, add, closeAdd] = useBooleanState()
   const { user, users, addUser, removeUser, handleChange, setAllUsers } =

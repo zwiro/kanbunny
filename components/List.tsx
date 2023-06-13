@@ -42,7 +42,6 @@ import {
 import { useSession } from "next-auth/react"
 import getFilteredTasks from "@/utils/getFilteredTasks"
 import { UseTRPCQueryResult } from "@trpc/react-query/shared"
-import ListSkeleton from "./ListSkeleton"
 
 type TaskWithAssignedTo = Prisma.TaskGetPayload<{
   include: { assigned_to: true }
@@ -100,7 +99,7 @@ function List({
     updateName.mutate({ name: data.name, id, boardId })
   }
 
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const userId = session?.user?.id
 
   return (
@@ -227,7 +226,6 @@ function Task({
   color,
   dragHandleProps,
   isDragging,
-  length,
   due_to,
 }: TaskProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()

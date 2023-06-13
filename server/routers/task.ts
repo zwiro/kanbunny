@@ -1,6 +1,6 @@
-import { string, z } from "zod"
+import { z } from "zod"
 import { protectedProcedure, createTRPCRouter } from "../trpc"
-import { colorSchema, reorderSchema, taskSchema } from "@/utils/schemas"
+import { colorSchema, taskSchema } from "@/utils/schemas"
 import { editTaskSchema } from "@/utils/schemas"
 
 export const taskRouter = createTRPCRouter({

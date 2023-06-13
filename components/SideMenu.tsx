@@ -5,7 +5,6 @@ import useBooleanState from "@/hooks/useBooleanState"
 import AddProjectModal from "./AddProjectModal"
 import React from "react"
 import { LoadingDots } from "./LoadingDots"
-import { useSession } from "next-auth/react"
 import Project from "./Project"
 import type { Board, User } from "@prisma/client"
 import {
@@ -37,8 +36,6 @@ interface SideMenuProps {
 }
 
 function SideMenu({ data, isLoading }: SideMenuProps) {
-  const { data: session } = useSession()
-
   const [isAdding, add, closeAdd] = useBooleanState()
 
   const sideMenuAnimation = {
