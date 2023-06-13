@@ -67,10 +67,15 @@ export const updateBoardColor = (
     },
   })
 
-export const deleteOneBoard = (projectId: string, utils: TRPCContextType) =>
+export const deleteOneBoard = (
+  projectId: string,
+  utils: TRPCContextType,
+  unselectBoard: () => void
+) =>
   trpc.board.delete.useMutation({
     async onMutate(input) {
       await utils.project.getByUser.cancel()
+      unselectBoard()
       const prevData = utils.project.getByUser.getData()
       utils.project.getByUser.setData(undefined, (old) =>
         old?.map((p) =>

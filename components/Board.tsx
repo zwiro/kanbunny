@@ -50,9 +50,15 @@ function Board({
 
   const utils = trpc.useContext()
 
+  const unselectBoard = () => {
+    if (chosenBoard?.id === id) {
+      chooseOpenedBoard(undefined)
+    }
+  }
+
   const updateName = updateBoardName(projectId, utils, closeEditName)
   const updateColor = updateBoardColor(projectId, utils, closeEditColor)
-  const deleteBoard = deleteOneBoard(projectId, utils)
+  const deleteBoard = deleteOneBoard(projectId, utils, unselectBoard)
 
   type BoardSchema = z.infer<typeof boardSchema>
 
