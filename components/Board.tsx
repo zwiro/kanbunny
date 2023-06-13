@@ -30,6 +30,7 @@ interface BoardProps {
   projectId: string
   dragHandleProps: DraggableProvidedDragHandleProps | null
   isDragging: boolean
+  isLoading: boolean
 }
 
 function Board({
@@ -40,6 +41,7 @@ function Board({
   projectId,
   dragHandleProps,
   isDragging,
+  isLoading,
 }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
@@ -91,7 +93,7 @@ function Board({
                 : "group-hover:visible group-hover:scale-100"
             } `}
           >
-            <MenuWrapper>
+            <MenuWrapper isLoading={isLoading}>
               <MenuItem handleClick={editName}>edit board name</MenuItem>
               <MenuItem handleClick={editColor}>change color</MenuItem>
               <MenuItem handleClick={() => deleteBoard.mutate(id)}>

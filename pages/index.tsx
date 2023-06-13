@@ -226,6 +226,7 @@ export default function Home() {
                                     searchQuery={searchQuery}
                                     dateFilter={dateFilter}
                                     assignedFilter={assignedFilter}
+                                    isLoading={createList.isLoading}
                                     {...list}
                                   />
                                 </motion.div>

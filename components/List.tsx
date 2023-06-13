@@ -54,6 +54,7 @@ interface ListProps extends ListType {
   searchQuery: string
   dateFilter: string | Date | null
   assignedFilter: string | null
+  isLoading: boolean
 }
 
 const colorVariants = {
@@ -74,6 +75,7 @@ function List({
   searchQuery,
   dateFilter,
   assignedFilter,
+  isLoading,
 }: ListProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
@@ -123,11 +125,12 @@ function List({
             <button
               onClick={add}
               className={`group py-2 ${isEditingColor && "scale-0"} `}
+              disabled={isLoading || isEditingColor}
             >
               <PlusIcon />
             </button>
             <div className="ml-auto pr-2">
-              <MenuWrapper>
+              <MenuWrapper isLoading={isLoading}>
                 <MenuItem handleClick={add}>add task</MenuItem>
                 <MenuItem handleClick={editName}>edit list name</MenuItem>
                 <MenuItem handleClick={editColor}>change color</MenuItem>

@@ -7,12 +7,19 @@ import MenuContext, { MenuProvider } from "@/context/MenuContext"
 interface MenuWrapperProps {
   children: React.ReactNode
   direction?: "left" | "right"
+  isLoading?: boolean
 }
 
-function MenuWrapper({ children, direction = "left" }: MenuWrapperProps) {
+function MenuWrapper({
+  children,
+  direction = "left",
+  isLoading = false,
+}: MenuWrapperProps) {
   return (
     <MenuProvider>
-      <MenuButton direction={direction}>{children}</MenuButton>
+      <MenuButton direction={direction} isLoading={isLoading}>
+        {children}
+      </MenuButton>
     </MenuProvider>
   )
 }
@@ -20,9 +27,14 @@ function MenuWrapper({ children, direction = "left" }: MenuWrapperProps) {
 interface MenuButtonProps {
   children: React.ReactNode
   direction: "left" | "right"
+  isLoading?: boolean
 }
 
-function MenuButton({ children, direction }: MenuButtonProps) {
+function MenuButton({
+  children,
+  direction,
+  isLoading = false,
+}: MenuButtonProps) {
   const { isMenuOpened, closeMenu, openMenu } = useContext(MenuContext)
 
   const menuRef = useRef<HTMLDivElement>(null)
@@ -37,6 +49,7 @@ function MenuButton({ children, direction }: MenuButtonProps) {
           openMenu()
         }}
         className="px-1 py-4"
+        disabled={isLoading}
       >
         <MenuDots isMenuOpened={isMenuOpened} />
       </button>

@@ -249,6 +249,7 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
                                   key={board.id}
                                   isDragging={snapshot.isDragging}
                                   dragHandleProps={provided.dragHandleProps}
+                                  isLoading={createBoard.isLoading}
                                   owner={owner}
                                   {...board}
                                 />
