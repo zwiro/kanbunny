@@ -112,7 +112,10 @@ export const createNewBoard = (
           p.id === input.projectId
             ? {
                 ...p,
-                boards: [...p.boards, { ...input, color: "red" } as Board],
+                boards: [
+                  { ...input, color: "red", order: 0 } as Board,
+                  ...p.boards,
+                ],
               }
             : p
         )

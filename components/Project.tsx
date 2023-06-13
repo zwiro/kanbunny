@@ -227,10 +227,10 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
                   {!!boards.length &&
                     boards
                       ?.sort((a, b) => a.order - b.order)
-                      .map((board) => (
+                      .map((board, i) => (
                         <Draggable
-                          key={board.id}
-                          draggableId={board.id}
+                          key={`board-${i}-${board.id}`}
+                          draggableId={`board-${i}-${board.id}`}
                           index={board.order}
                         >
                           {(provided, snapshot) => (

@@ -31,7 +31,13 @@ function MenuButton({ children, direction }: MenuButtonProps) {
 
   return (
     <div className="relative">
-      <button onClick={openMenu} className="px-1 py-4">
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          openMenu()
+        }}
+        className="px-1 py-4"
+      >
         <MenuDots isMenuOpened={isMenuOpened} />
       </button>
       <AnimatePresence>

@@ -181,6 +181,13 @@ export default function Home() {
             <p className="text-slate-300">owner: {chosenBoard.owner}</p>
           </div>
           <div className="flex gap-4 overflow-y-hidden overflow-x-scroll pb-48 lg:gap-8 xl:gap-16">
+            {lists.isLoading && (
+              <>
+                <ListSkeleton />
+                <ListSkeleton />
+                <ListSkeleton />
+              </>
+            )}
             <DragDropContext onDragEnd={onDragEnd}>
               <Droppable
                 droppableId="board"
@@ -196,10 +203,10 @@ export default function Home() {
                     {!!lists.data?.length &&
                       lists.data
                         ?.sort((a, b) => a.order - b.order)
-                        .map((list) => (
+                        .map((list, i) => (
                           <Draggable
-                            key={list.id}
-                            draggableId={list.id}
+                            key={`list-${i}-${list.id}`}
+                            draggableId={`list-${i}-${list.id}`}
                             index={list.order}
                           >
                             {(provided, snapshot) => (
@@ -231,13 +238,7 @@ export default function Home() {
                 )}
               </Droppable>
             </DragDropContext>
-            {!lists.isLoading && (
-              <>
-                <ListSkeleton />
-                <ListSkeleton />
-                <ListSkeleton />
-              </>
-            )}
+
             {isAdding ? (
               <ListContainer>
                 <div className="flex flex-col">

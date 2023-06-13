@@ -21,7 +21,7 @@ function AddProjectModal({ close }: AddProjectModalProps) {
 
   const utils = trpc.useContext()
 
-  const createProject = createNewProject(utils)
+  const createProject = createNewProject(utils, close)
 
   type ProjectSchema = z.infer<typeof projectSchema>
 

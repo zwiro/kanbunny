@@ -84,7 +84,8 @@ export const createNewList = (
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(
         boardId,
-        (old) => [...old!, { ...input, tasks: [], color: "blue" }] as any
+        (old) =>
+          [{ ...input, tasks: [], color: "blue", order: 0 }, ...old!] as any
       )
       return { prevData }
     },

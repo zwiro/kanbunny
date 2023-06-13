@@ -1,7 +1,7 @@
 import { TRPCContextType } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
 
-export const createNewProject = (utils: TRPCContextType) =>
+export const createNewProject = (utils: TRPCContextType, close: () => void) =>
   trpc.project.create.useMutation({
     onSuccess() {
       utils.project.getByUser.invalidate()

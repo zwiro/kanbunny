@@ -83,7 +83,7 @@ function Board({
       </ColorDot>
       {!isEditingName ? (
         <>
-          <p>{!deleteBoard.isLoading ? name : <LoadingDots />}</p>
+          <div>{!deleteBoard.isLoading ? name : <LoadingDots />}</div>
           <div
             className={`invisible z-10 scale-0 transition-transform ${
               isEditingColor

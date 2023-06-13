@@ -156,7 +156,7 @@ function List({
         )}
       </div>
       <Droppable
-        droppableId={id}
+        droppableId={id || "no id"}
         key="task"
         direction="vertical"
         ignoreContainerClipping={true}

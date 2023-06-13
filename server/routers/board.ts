@@ -196,7 +196,7 @@ export const boardRouter = createTRPCRouter({
       })
       await ctx.prisma.board.updateMany({
         where: {
-          AND: [{ order: { gt: board.order } }, { projectId: project.id }],
+          AND: [{ order: { gt: board.order } }, { projectId: board.projectId }],
         },
         data: { order: { decrement: 1 } },
       })
