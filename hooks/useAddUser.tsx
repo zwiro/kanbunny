@@ -1,32 +1,80 @@
-import { useState } from "react"
+import { useReducer } from "react"
 
-function useAddUser(initialState: string[] = []) {
-  const [user, setUser] = useState<string>("")
-  const [users, setUsers] = useState<string[]>(initialState)
+type Action =
+  | {
+      type: "ADD_USER"
+      payload: { e: React.MouseEvent }
+    }
+  | { type: "REMOVE_USER"; payload: { user: string } }
+  | { type: "SET_ALL_USERS"; payload: { state: string[] } }
+  | {
+      type: "HANDLE_CHANGE"
+      payload: { e: React.ChangeEvent<HTMLInputElement> }
+    }
 
-  const addUser = (e: React.MouseEvent) => {
-    e.preventDefault()
-    if (user) {
-      setUsers([...users, user])
-      setUser("")
+type State = {
+  user: string
+  users: string[]
+}
+
+function useAddUser(initialState: State = { user: "", users: [] }) {
+  function reducer(state = initialState, action: Action) {
+    switch (action.type) {
+      case "ADD_USER":
+        action.payload.e.preventDefault()
+        if (state.user) {
+          return {
+            user: "",
+            users: [...state.users, state.user],
+          }
+        } else {
+          return state
+        }
+      case "REMOVE_USER":
+        const updatedUsers = state.users.filter(
+          (prevUser) => prevUser !== action.payload.user
+        )
+        return {
+          ...state,
+          users: updatedUsers,
+        }
+      case "SET_ALL_USERS":
+        return {
+          ...state,
+          users: action.payload.state,
+        }
+      case "HANDLE_CHANGE":
+        const newUser = action.payload.e.target.value
+        return {
+          ...state,
+          user: newUser,
+        }
+      default:
+        return state
     }
   }
 
+  const [state, dispatch] = useReducer(reducer, initialState)
+
+  const addUser = (e: React.MouseEvent) => {
+    dispatch({ type: "ADD_USER", payload: { e } })
+  }
+
   const removeUser = (user: string) => {
-    setUsers((prevUsers) => prevUsers.filter((prevUser) => prevUser !== user))
+    dispatch({ type: "REMOVE_USER", payload: { user } })
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUser(e.target.value)
+    dispatch({ type: "HANDLE_CHANGE", payload: { e } })
   }
 
   const setAllUsers = (state: string[]) => {
-    setUsers(state)
+    dispatch({ type: "SET_ALL_USERS", payload: { state } })
   }
 
   return {
-    user,
-    users,
+    user: state.user,
+    users: state.users,
     addUser,
     removeUser,
     handleChange,

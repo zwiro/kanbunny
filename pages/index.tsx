@@ -206,7 +206,7 @@ export default function Home() {
                         .map((list, i) => (
                           <Draggable
                             key={`list-${i}-${list.id}`}
-                            draggableId={`list-${i}-${list.id}`}
+                            draggableId={list.id || `placeholder-${i}`}
                             index={list.order}
                             isDragDisabled={createList.isLoading}
                           >
