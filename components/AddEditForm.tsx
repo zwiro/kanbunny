@@ -9,7 +9,7 @@ interface AddEditFormProps {
   close: () => void
   projectId?: string
   handleSubmit?: SubmitHandler<any>
-  isLoading?: boolean
+  // isLoading?: boolean
   defaultValue?: string
 }
 
@@ -18,7 +18,7 @@ function AddEditForm({
   placeholder,
   close,
   handleSubmit,
-  isLoading,
+  // isLoading,
   defaultValue,
 }: AddEditFormProps) {
   const { reset } = useFormContext()
@@ -30,30 +30,21 @@ function AddEditForm({
         placeholder={placeholder}
         defaultValue={defaultValue}
       />
-      {!isLoading ? (
-        <>
-          <button
-            type="submit"
-            className="transition-transform hover:scale-110"
-          >
-            <AiOutlineCheck size={20} />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              reset({}, { keepDefaultValues: true })
-              close()
-            }}
-            className="transition-transform hover:scale-110"
-          >
-            <AiOutlineClose size={20} />
-          </button>
-        </>
-      ) : (
-        <div className="mr-auto">
-          <LoadingDots />
-        </div>
-      )}
+      <>
+        <button type="submit" className="transition-transform hover:scale-110">
+          <AiOutlineCheck size={20} />
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            reset({}, { keepDefaultValues: true })
+            close()
+          }}
+          className="transition-transform hover:scale-110"
+        >
+          <AiOutlineClose size={20} />
+        </button>
+      </>
     </form>
   )
 }

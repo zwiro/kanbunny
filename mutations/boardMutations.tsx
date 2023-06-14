@@ -24,6 +24,7 @@ export const updateBoardName = (
             : p
         )
       )
+      closeEditName()
       return { prevData }
     },
     onError(err, input, ctx) {
@@ -31,7 +32,6 @@ export const updateBoardName = (
     },
     onSettled() {
       utils.project.getByUser.invalidate()
-      closeEditName()
     },
   })
 
@@ -56,13 +56,13 @@ export const updateBoardColor = (
             : p
         )
       )
+      closeEditColor()
       return { prevData }
     },
     onError(err, input, ctx) {
       utils.project.getByUser.setData(undefined, ctx?.prevData)
     },
     onSettled: () => {
-      closeEditColor()
       utils.project.getByUser.invalidate()
     },
   })
@@ -125,6 +125,7 @@ export const createNewBoard = (
             : p
         )
       )
+      closeAdd()
       return { prevData }
     },
     onError(err, input, ctx) {
@@ -132,7 +133,6 @@ export const createNewBoard = (
     },
     onSettled() {
       utils.project.getByUser.invalidate()
-      closeAdd()
       boardMethods.reset()
     },
   })

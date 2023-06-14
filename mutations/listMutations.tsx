@@ -14,6 +14,7 @@ export const updateListName = (
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.map((l) => (l.id === input.id ? { ...l, name: input.name } : l))
       )
+      closeEditName()
       return { prevData }
     },
     onError(err, input, ctx) {
@@ -21,7 +22,6 @@ export const updateListName = (
     },
     onSettled: () => {
       utils.list.getByBoard.invalidate(boardId)
-      closeEditName()
     },
   })
 
@@ -37,6 +37,7 @@ export const updateListColor = (
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.map((l) => (l.id === input.id ? { ...l, color: input.color } : l))
       )
+      closeEditColor()
       return { prevData }
     },
     onError(err, input, ctx) {
@@ -44,7 +45,6 @@ export const updateListColor = (
     },
     onSettled: () => {
       utils.list.getByBoard.invalidate(boardId)
-      closeEditColor()
     },
   })
 
@@ -85,8 +85,12 @@ export const createNewList = (
       utils.list.getByBoard.setData(
         boardId,
         (old) =>
-          [{ ...input, tasks: [], color: "blue", order: 0 }, ...old!] as any
+          [
+            ...old!,
+            { ...input, tasks: [], color: "blue", order: old?.length },
+          ] as any
       )
+      closeAdd()
       return { prevData }
     },
     onError(err, input, ctx) {
@@ -94,7 +98,6 @@ export const createNewList = (
     },
     onSettled() {
       listMethods.reset()
-      closeAdd()
       utils.list.getByBoard.invalidate()
     },
   })

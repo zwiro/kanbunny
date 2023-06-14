@@ -9,7 +9,10 @@ interface ColorDotProps {
 function ColorDot({ editColor, color, children }: ColorDotProps) {
   return (
     <div
-      onClick={editColor}
+      onClick={(e) => {
+        e.stopPropagation()
+        editColor?.()
+      }}
       className={`relative h-4 w-4 cursor-pointer bg-${color}-500`}
     >
       {children}

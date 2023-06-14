@@ -18,6 +18,9 @@ export const listRouter = createTRPCRouter({
   create: protectedProcedure
     .input(listSchema)
     .mutation(async ({ ctx, input }) => {
+      const listsLength = await ctx.prisma.list.count({
+        where: { boardId: input.boardId },
+      })
       const board = await ctx.prisma.board.findUnique({
         where: { id: input.boardId },
       })
@@ -38,12 +41,8 @@ export const listRouter = createTRPCRouter({
         data: {
           name: input.name,
           boardId: input.boardId,
-          order: 0,
+          order: listsLength,
         },
-      })
-      await ctx.prisma.list.updateMany({
-        where: { AND: [{ NOT: { id: list.id } }, { boardId: input.boardId }] },
-        data: { order: { increment: 1 } },
       })
       return list
     }),

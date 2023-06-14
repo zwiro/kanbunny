@@ -35,6 +35,7 @@ export const updatedTaskName = (
             : l
         )
       )
+      closeEditName()
       return { prevData }
     },
     onError(err, input, ctx) {
@@ -42,7 +43,6 @@ export const updatedTaskName = (
     },
     onSettled() {
       utils.list.getByBoard.invalidate(boardId)
-      closeEditName()
     },
   })
 
@@ -118,6 +118,7 @@ export const updateTaskColor = (
             : l
         )
       )
+      closeEditColor()
       return { prevData }
     },
     onError(err, input, ctx) {
@@ -125,7 +126,6 @@ export const updateTaskColor = (
     },
     onSettled: () => {
       utils.list.getByBoard.invalidate(boardId)
-      closeEditColor()
     },
   })
 

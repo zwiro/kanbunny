@@ -116,7 +116,7 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
               project.boards.map((b) => b.id).includes(chosenBoard?.id!) &&
               chosenBoard &&
               "after:w-[100%]"
-            }`}
+            } ${updateName.isLoading && "opacity-50"}`}
           >
             {project.name}
           </p>
@@ -141,7 +141,6 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
               placeholder="project name"
               handleSubmit={projectMethods.handleSubmit(onSubmitName)}
               defaultValue={project.name}
-              isLoading={updateName.isLoading}
               close={closeEditName}
             />
           </FormProvider>
@@ -205,7 +204,6 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
                   placeholder="board name"
                   handleSubmit={boardMethods.handleSubmit(onSubmit)}
                   close={closeAdd}
-                  isLoading={createBoard.isLoading}
                 />
               </FormProvider>
             </div>
@@ -246,7 +244,7 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
                                   key={board.id}
                                   isDragging={snapshot.isDragging}
                                   dragHandleProps={provided.dragHandleProps}
-                                  isLoading={createBoard.isLoading}
+                                  isUpdating={createBoard.isLoading}
                                   owner={owner}
                                   {...board}
                                 />

@@ -226,7 +226,7 @@ export default function Home() {
                                     searchQuery={searchQuery}
                                     dateFilter={dateFilter}
                                     assignedFilter={assignedFilter}
-                                    isLoading={createList.isLoading}
+                                    isUpdating={createList.isLoading}
                                     {...list}
                                   />
                                 </motion.div>
@@ -250,7 +250,6 @@ export default function Home() {
                       placeholder="list name"
                       close={closeAdd}
                       handleSubmit={listMethods.handleSubmit(onSubmit)}
-                      isLoading={createList.isLoading}
                     />
                   </FormProvider>
                   {listMethods.formState.errors && (

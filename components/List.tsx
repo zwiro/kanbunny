@@ -53,7 +53,7 @@ interface ListProps extends ListType {
   searchQuery: string
   dateFilter: string | Date | null
   assignedFilter: string | null
-  isLoading: boolean
+  isUpdating: boolean
 }
 
 const colorVariants = {
@@ -74,7 +74,7 @@ function List({
   searchQuery,
   dateFilter,
   assignedFilter,
-  isLoading,
+  isUpdating,
 }: ListProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
@@ -106,7 +106,12 @@ function List({
     <section
       className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-t-4 bg-zinc-800 p-4 ${
         colorVariants[color]
-      } ${isLoading && !id && "opacity-50"}`}
+      } ${isUpdating && !id && "opacity-50"}       ${
+        ((isUpdating && !id) ||
+          updateName.isLoading ||
+          updateColor.isLoading) &&
+        "opacity-50"
+      }`}
     >
       <div className="flex items-center gap-2">
         <ColorDot editColor={editColor} color={color}>
@@ -116,6 +121,7 @@ function List({
                 close={closeEditColor}
                 editColor={updateColor}
                 id={id}
+                currentColor={color}
               />
             )}
           </AnimatePresence>
@@ -126,12 +132,21 @@ function List({
             <button
               onClick={add}
               className={`group py-2 ${isEditingColor && "scale-0"} `}
-              disabled={isLoading || isEditingColor}
+              disabled={
+                isUpdating ||
+                isEditingColor ||
+                updateColor.isLoading ||
+                updateName.isLoading
+              }
             >
               <PlusIcon />
             </button>
             <div className="ml-auto pr-2">
-              <MenuWrapper isLoading={isLoading}>
+              <MenuWrapper
+                isLoading={
+                  isUpdating || updateName.isLoading || updateColor.isLoading
+                }
+              >
                 <MenuItem handleClick={add}>add task</MenuItem>
                 <MenuItem handleClick={editName}>edit list name</MenuItem>
                 <MenuItem handleClick={editColor}>change color</MenuItem>
@@ -290,7 +305,11 @@ function Task({
   return (
     <>
       <div
-        className={`group flex items-center justify-between border-l-8 ${colorVariants[color]} bg-zinc-700 p-2`}
+        className={`group flex items-center justify-between border-l-8 ${
+          colorVariants[color]
+        } bg-zinc-700 p-2
+        ${(updateColor.isLoading || updateName.isLoading) && "opacity-50"}
+        `}
       >
         {!isEditingName ? (
           <>
@@ -301,12 +320,13 @@ function Task({
                     id={id}
                     close={closeEditColor}
                     editColor={updateColor}
+                    currentColor={color}
                   />
                 )}
               </AnimatePresence>
               <div className="flex items-center gap-2">
                 <p
-                  className={`font-bold ${minutesLeft < 0 && "text-zinc-400"} `}
+                  className={`font-bold ${minutesLeft < 0 && "text-zinc-400"}`}
                 >
                   {name}
                 </p>

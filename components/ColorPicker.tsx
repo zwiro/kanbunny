@@ -6,23 +6,28 @@ import { UseTRPCMutationResult } from "@trpc/react-query/shared"
 import type { Board, List, Task } from "@prisma/client"
 import { colorSchema } from "@/utils/schemas"
 
+type ColorSchema = z.infer<typeof colorSchema>
+
 interface ColorPickerProps {
   close: () => void
   id: string
   editColor: UseTRPCMutationResult<Board | List | Task, any, any, any>
+  currentColor: ColorSchema["color"]
 }
 
-function ColorPicker({ close, id, editColor }: ColorPickerProps) {
+function ColorPicker({ close, id, editColor, currentColor }: ColorPickerProps) {
   const pickerRef = useRef(null)
   useClickOutside([pickerRef], close)
-
-  type ColorSchema = z.infer<typeof colorSchema>
 
   const pickColor = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (e.target instanceof HTMLButtonElement) {
       const color = e.target.dataset.color as ColorSchema["color"]
-      editColor.mutate({ id, color })
+      if (color !== currentColor) {
+        editColor.mutateAsync({ id, color })
+      } else {
+      }
     }
+    close()
   }
 
   const pickerAnimation = {
@@ -49,7 +54,11 @@ function ColorPicker({ close, id, editColor }: ColorPickerProps) {
       {Object.values(colorSchema.shape.color.enum).map((color) => (
         <button
           key={color}
-          className={`relative h-4 w-4 ${colorVariants[color]} hover:brightness-125`}
+          className={`relative h-4 w-4 ${colorVariants[color]} ${
+            color === currentColor
+              ? "ring-2 ring-inset ring-zinc-900 "
+              : "hover:brightness-125"
+          } `}
           data-color={color}
         />
       ))}

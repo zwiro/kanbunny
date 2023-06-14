@@ -29,6 +29,7 @@ export const updateProjectName = (
           p.id === input.projectId ? { ...p, name: input.name } : p
         )
       )
+      closeEditName()
       return { prevData }
     },
     onError(err, input, ctx) {
@@ -36,7 +37,6 @@ export const updateProjectName = (
     },
     onSettled() {
       utils.project.getByUser.invalidate()
-      closeEditName()
     },
   })
 

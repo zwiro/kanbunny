@@ -30,7 +30,7 @@ interface BoardProps {
   projectId: string
   dragHandleProps: DraggableProvidedDragHandleProps | null
   isDragging: boolean
-  isLoading: boolean
+  isUpdating: boolean
 }
 
 function Board({
@@ -41,7 +41,7 @@ function Board({
   projectId,
   dragHandleProps,
   isDragging,
-  isLoading,
+  isUpdating,
 }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
@@ -76,8 +76,12 @@ function Board({
       onClick={() => chooseOpenedBoard({ id, color, name, owner })}
       className={`group flex cursor-pointer items-center gap-2 px-2 text-xl transition-colors hover:bg-zinc-900/40 ${
         chosenBoard?.id === id && id && "bg-zinc-900 hover:bg-zinc-900"
+      } ${
+        ((isUpdating && !id) ||
+          updateName.isLoading ||
+          updateColor.isLoading) &&
+        "opacity-50"
       }
-      ${isLoading && !id && "opacity-50"}
       `}
     >
       <ColorDot editColor={editColor} color={color}>
@@ -87,13 +91,14 @@ function Board({
               id={id}
               close={closeEditColor}
               editColor={updateColor}
+              currentColor={color}
             />
           )}
         </AnimatePresence>
       </ColorDot>
       {!isEditingName ? (
         <>
-          <div>{!deleteBoard.isLoading ? name : <LoadingDots />}</div>
+          <div>{name}</div>
           <div
             className={`invisible z-10 scale-0 transition-transform ${
               isEditingColor
@@ -101,7 +106,11 @@ function Board({
                 : "group-hover:visible group-hover:scale-100"
             } `}
           >
-            <MenuWrapper isLoading={isLoading}>
+            <MenuWrapper
+              isLoading={
+                isUpdating || updateName.isLoading || updateColor.isLoading
+              }
+            >
               <MenuItem handleClick={editName}>edit board name</MenuItem>
               <MenuItem handleClick={editColor}>change color</MenuItem>
               <MenuItem handleClick={() => deleteBoard.mutate(id)}>
@@ -127,7 +136,6 @@ function Board({
               placeholder="board name"
               close={closeEditName}
               handleSubmit={boardMethods.handleSubmit(onSubmit)}
-              isLoading={updateName.isLoading}
             />
           </FormProvider>
           {boardMethods.formState.errors && (
