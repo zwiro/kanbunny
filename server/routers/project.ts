@@ -33,7 +33,7 @@ export const projectRouter = createTRPCRouter({
       })
       return project
     }),
-  getUsers: protectedProcedure //move to user router
+  getUsers: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const users = await ctx.prisma.user.findMany({
@@ -167,7 +167,17 @@ export const projectRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const projectDragged = await ctx.prisma.projectUser.findFirst({
         where: { order: input.itemOneIndex },
+        include: { project: { include: { users: true } } },
       })
+      if (!projectDragged) throw new Error("Project does not exist")
+      if (
+        projectDragged.project.ownerId !== ctx.session.user.id &&
+        !projectDragged?.project.users
+          .map((u) => u.userId)
+          .includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
 
       await ctx.prisma.projectUser.update({
         where: { id: projectDragged?.id },

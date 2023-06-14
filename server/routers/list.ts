@@ -29,7 +29,7 @@ export const listRouter = createTRPCRouter({
         include: { users: true },
       })
       if (!project || !board) {
-        throw new Error("Board does not exist")
+        throw new Error("Project or board does not exist")
       }
       if (
         project.ownerId !== ctx.session.user.id &&
@@ -57,7 +57,7 @@ export const listRouter = createTRPCRouter({
         include: { users: true },
       })
       if (!project || !board) {
-        throw new Error("Board does not exist")
+        throw new Error("Project or board does not exist")
       }
       if (
         project.ownerId !== ctx.session.user.id &&
@@ -87,7 +87,7 @@ export const listRouter = createTRPCRouter({
         include: { users: true },
       })
       if (!project || !board || !list) {
-        throw new Error("List does not exist")
+        throw new Error("Project, board or list does not exist")
       }
       if (
         project.ownerId !== ctx.session.user.id &&
@@ -109,6 +109,22 @@ export const listRouter = createTRPCRouter({
       const listDragged = await ctx.prisma.list.findUnique({
         where: { id: input.draggableId },
       })
+      const board = await ctx.prisma.board.findUnique({
+        where: { id: listDragged?.boardId },
+      })
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: board?.projectId },
+        include: { users: true },
+      })
+      if (!project || !board || !listDragged) {
+        throw new Error("Project, board or list does not exist")
+      }
+      if (
+        project.ownerId !== ctx.session.user.id &&
+        !project.users.map((u) => u.userId).includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
       await ctx.prisma.list.update({
         where: { id: listDragged?.id },
         data: { order: input.itemTwoIndex },
@@ -157,7 +173,7 @@ export const listRouter = createTRPCRouter({
         include: { users: true },
       })
       if (!project || !board || !list) {
-        throw new Error("List does not exist")
+        throw new Error("Project, board or list does not exist")
       }
       if (
         project.ownerId !== ctx.session.user.id &&

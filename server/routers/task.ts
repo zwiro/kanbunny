@@ -4,23 +4,6 @@ import { colorSchema, taskSchema } from "@/utils/schemas"
 import { editTaskSchema } from "@/utils/schemas"
 
 export const taskRouter = createTRPCRouter({
-  // getByList: protectedProcedure
-  //   .input(z.string())
-  //   .query(async ({ ctx, input }) => {
-  //     const tasks = await ctx.prisma.task.findMany({
-  //       where: {
-  //         listId: input,
-  //       },
-  //       include: {
-  //         assigned_to: true,
-  //       },
-  //       orderBy: {
-  //         order: "asc",
-  //       },
-  //     })
-  //     return tasks
-  //   }),
-
   create: protectedProcedure
     .input(taskSchema)
     .mutation(async ({ ctx, input }) => {
@@ -35,7 +18,7 @@ export const taskRouter = createTRPCRouter({
         include: { users: true },
       })
       if (!project || !board || !list) {
-        throw new Error("List does not exist")
+        throw new Error("Project, board or list does not exist")
       }
       if (
         project.ownerId !== ctx.session.user.id &&
@@ -79,7 +62,7 @@ export const taskRouter = createTRPCRouter({
         include: { users: true },
       })
       if (!project || !board || !list) {
-        throw new Error("List does not exist")
+        throw new Error("Project, board or list does not exist")
       }
       if (
         project.ownerId !== ctx.session.user.id &&
@@ -112,7 +95,7 @@ export const taskRouter = createTRPCRouter({
         include: { users: true },
       })
       if (!project || !board || !list || !task) {
-        throw new Error("Task does not exist")
+        throw new Error("Project, board, list or task does not exist")
       }
       if (
         project.ownerId !== ctx.session.user.id &&
@@ -142,7 +125,7 @@ export const taskRouter = createTRPCRouter({
         include: { users: true },
       })
       if (!project || !board || !list) {
-        throw new Error("List does not exist")
+        throw new Error("Project board or list does not exist")
       }
       if (
         project.ownerId !== ctx.session.user.id &&
@@ -178,7 +161,25 @@ export const taskRouter = createTRPCRouter({
       const taskDragged = await ctx.prisma.task.findUnique({
         where: { id: input.itemOneId },
       })
-
+      const list = await ctx.prisma.list.findUnique({
+        where: { id: taskDragged?.listId },
+      })
+      const board = await ctx.prisma.board.findUnique({
+        where: { id: list?.boardId },
+      })
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: board?.projectId },
+        include: { users: true },
+      })
+      if (!project || !board || !list || !taskDragged) {
+        throw new Error("Project, board, list or task does not exist")
+      }
+      if (
+        project.ownerId !== ctx.session.user.id &&
+        !project.users.map((u) => u.userId).includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
       const prevListId = taskDragged?.listId
 
       if (prevListId !== input.listId) {
@@ -267,7 +268,7 @@ export const taskRouter = createTRPCRouter({
         include: { users: true },
       })
       if (!project || !board || !list || !task) {
-        throw new Error("Task does not exist")
+        throw new Error("Project, board, list or task does not exist")
       }
       if (
         project.ownerId !== ctx.session.user.id &&

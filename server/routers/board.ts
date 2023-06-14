@@ -84,7 +84,7 @@ export const boardRouter = createTRPCRouter({
       })
 
       if (!board || !project) {
-        throw new Error("Board does not exist")
+        throw new Error("Project or board does not exist")
       }
 
       if (
@@ -113,7 +113,7 @@ export const boardRouter = createTRPCRouter({
         include: { users: true },
       })
       if (!board || !project) {
-        throw new Error("Board does not exist")
+        throw new Error("Project or board does not exist")
       }
 
       if (
@@ -136,6 +136,19 @@ export const boardRouter = createTRPCRouter({
       const boardDragged = await ctx.prisma.board.findUnique({
         where: { id: input.draggableId },
       })
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: boardDragged?.projectId },
+        include: { users: true },
+      })
+      if (!boardDragged || !project) {
+        throw new Error("Project or board does not exist")
+      }
+      if (
+        project.ownerId !== ctx.session.user.id &&
+        !project.users.map((u) => u.userId).includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
       await ctx.prisma.board.update({
         where: { id: boardDragged?.id },
         data: { order: input.itemTwoIndex },
@@ -182,7 +195,7 @@ export const boardRouter = createTRPCRouter({
         include: { users: true },
       })
       if (!board || !project) {
-        throw new Error("Board does not exist")
+        throw new Error("Project or board does not exist")
       }
 
       if (
