@@ -7,7 +7,7 @@ import React, { useContext } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useAddUser from "@/hooks/useAddUser"
 import { trpc } from "@/utils/trpc"
-import type { Project } from "@prisma/client"
+import type { Project, User } from "@prisma/client"
 import { LoadingDots } from "./LoadingDots"
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -32,16 +32,17 @@ import { createNewBoard, reorderBoards } from "@/mutations/boardMutations"
 import AddUsersInput from "./AddUsersInput"
 
 interface ProjectProps {
-  project: Project & { boards: Board[] }
   boards: Board[]
-  owner: string
+  id: string
+  name: string
+  owner: User
   dragHandleProps: DraggableProvidedDragHandleProps | null
 }
 
 type BoardAndProjectSchema = z.infer<typeof boardAndProjectSchema>
 
-function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
-  trpc.project.getUsers.useQuery(project.id, {
+function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
+  trpc.project.getUsers.useQuery(id, {
     onSuccess(data) {
       setAllUsers(data?.map((user) => user.name!))
     },
@@ -63,28 +64,28 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
   const deleteProject = deleteOneProject(utils)
 
   const boardMethods = useForm<BoardAndProjectSchema>({
-    defaultValues: { projectId: project.id },
+    defaultValues: { projectId: id },
     resolver: zodResolver(boardAndProjectSchema),
   })
 
   const createBoard = createNewBoard(utils, closeAdd, boardMethods)
 
   const projectMethods = useForm<BoardAndProjectSchema>({
-    defaultValues: { projectId: project.id, name: project.name },
+    defaultValues: { projectId: id, name },
     resolver: zodResolver(boardAndProjectSchema),
   })
 
   const onSubmit: SubmitHandler<BoardAndProjectSchema> = (data: any) => {
-    createBoard.mutate({ name: data.name, projectId: project.id })
+    createBoard.mutate({ name: data.name, projectId: id })
   }
 
   const onSubmitName: SubmitHandler<BoardAndProjectSchema> = (data: any) => {
-    updateName.mutate({ name: data.name, projectId: project.id })
+    updateName.mutate({ name: data.name, projectId: id })
   }
 
   const handleSubmitUsers = (e: React.FormEvent) => {
     e.preventDefault()
-    updateUsers.mutate({ projectId: project.id, participants: users })
+    updateUsers.mutate({ projectId: id, participants: users })
   }
 
   const projectUsersAnimation = {
@@ -93,7 +94,7 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
     exit: { height: 0, opacity: 0 },
   }
 
-  const reorder = reorderBoards(project.id, utils)
+  const reorder = reorderBoards(id, utils)
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
@@ -113,18 +114,18 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
         <div className="flex items-center gap-4">
           <p
             className={`relative after:absolute after:-bottom-1 after:left-0 after:z-10 after:h-1 after:w-0 after:bg-white after:transition-all ${
-              project.boards.map((b) => b.id).includes(chosenBoard?.id!) &&
+              boards.map((b) => b.id).includes(chosenBoard?.id!) &&
               chosenBoard &&
               "after:w-[100%]"
             } ${updateName.isLoading && "opacity-50"}`}
           >
-            {project.name}
+            {name}
           </p>
           <MenuWrapper>
             <MenuItem handleClick={add}>add board</MenuItem>
             <MenuItem handleClick={editUsers}>edit users</MenuItem>
             <MenuItem handleClick={editName}>edit project name</MenuItem>
-            <MenuItem handleClick={() => deleteProject.mutate(project.id)}>
+            <MenuItem handleClick={() => deleteProject.mutate(id)}>
               delete project
             </MenuItem>
           </MenuWrapper>
@@ -140,7 +141,7 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
               name="name"
               placeholder="project name"
               handleSubmit={projectMethods.handleSubmit(onSubmitName)}
-              defaultValue={project.name}
+              defaultValue={name}
               close={closeEditName}
             />
           </FormProvider>
@@ -245,7 +246,7 @@ function Project({ project, boards, owner, dragHandleProps }: ProjectProps) {
                                   isDragging={snapshot.isDragging}
                                   dragHandleProps={provided.dragHandleProps}
                                   isUpdating={createBoard.isLoading}
-                                  owner={owner}
+                                  owner={owner.name!}
                                   {...board}
                                 />
                               </motion.div>

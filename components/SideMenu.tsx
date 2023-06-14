@@ -101,10 +101,8 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
                             >
                               <Project
                                 key={project.id}
-                                project={project}
-                                boards={project.boards}
-                                owner={project.owner.name!}
                                 dragHandleProps={provided.dragHandleProps}
+                                {...project}
                               />
                             </motion.div>
                           </div>
