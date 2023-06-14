@@ -1,4 +1,4 @@
-import { Color } from "@prisma/client"
+import type { Color } from "@prisma/client"
 import { createContext, useState } from "react"
 
 type BoardContextType =

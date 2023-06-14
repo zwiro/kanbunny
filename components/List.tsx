@@ -1,4 +1,4 @@
-import { FormEventHandler, useContext } from "react"
+import { type FormEventHandler, useContext } from "react"
 import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
@@ -17,7 +17,7 @@ import type { List as ListType, Prisma, Task, User } from "@prisma/client"
 import ColorDot from "./ColorDot"
 import { trpc } from "@/utils/trpc"
 import LayoutContext from "@/context/LayoutContext"
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useAssignUser from "@/hooks/useAssignUser"
@@ -25,7 +25,7 @@ import { editListSchema, editTaskSchema } from "@/utils/schemas"
 import { GoGrabber } from "react-icons/go"
 import {
   Draggable,
-  DraggableProvidedDragHandleProps,
+  type DraggableProvidedDragHandleProps,
   Droppable,
 } from "@hello-pangea/dnd"
 import {
@@ -41,7 +41,7 @@ import {
 } from "@/mutations/listMutations"
 import { useSession } from "next-auth/react"
 import getFilteredTasks from "@/utils/getFilteredTasks"
-import { UseTRPCQueryResult } from "@trpc/react-query/shared"
+import type { UseTRPCQueryResult } from "@trpc/react-query/shared"
 
 type TaskWithAssignedTo = Prisma.TaskGetPayload<{
   include: { assigned_to: true }

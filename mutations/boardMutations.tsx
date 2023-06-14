@@ -1,7 +1,7 @@
-import { TRPCContextType } from "@/types/trpc"
+import type { TRPCContextType } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
-import { Board } from "@prisma/client"
-import { UseFormReturn } from "react-hook-form"
+import type { Board } from "@prisma/client"
+import type { UseFormReturn } from "react-hook-form"
 
 export const updateBoardName = (
   projectId: string,

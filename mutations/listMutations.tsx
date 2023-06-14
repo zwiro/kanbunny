@@ -1,6 +1,6 @@
-import { TRPCContextType } from "@/types/trpc"
+import type { TRPCContextType } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
-import { UseFormReturn } from "react-hook-form"
+import type { UseFormReturn } from "react-hook-form"
 
 export const updateListName = (
   boardId: string,

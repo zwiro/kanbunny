@@ -1,6 +1,5 @@
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import { SubmitHandler, useFormContext } from "react-hook-form"
-import { LoadingDots } from "./LoadingDots"
 import TextInput from "./TextInput"
 
 interface AddEditFormProps {
@@ -9,7 +8,6 @@ interface AddEditFormProps {
   close: () => void
   projectId?: string
   handleSubmit?: SubmitHandler<any>
-  // isLoading?: boolean
   defaultValue?: string
 }
 
@@ -18,7 +16,6 @@ function AddEditForm({
   placeholder,
   close,
   handleSubmit,
-  // isLoading,
   defaultValue,
 }: AddEditFormProps) {
   const { reset } = useFormContext()

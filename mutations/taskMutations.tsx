@@ -1,4 +1,4 @@
-import { TRPCContextType } from "@/types/trpc"
+import type { TRPCContextType } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
 
 export const createNewTask = (

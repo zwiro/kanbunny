@@ -9,7 +9,7 @@ import useAddUser from "@/hooks/useAddUser"
 import { trpc } from "@/utils/trpc"
 import type { Project } from "@prisma/client"
 import { LoadingDots } from "./LoadingDots"
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import Board from "./Board"
@@ -19,8 +19,8 @@ import { GoGrabber } from "react-icons/go"
 import {
   DragDropContext,
   Draggable,
-  DraggableProvidedDragHandleProps,
-  DropResult,
+  type DraggableProvidedDragHandleProps,
+  type DropResult,
   Droppable,
 } from "@hello-pangea/dnd"
 import {

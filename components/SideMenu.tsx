@@ -11,7 +11,7 @@ import {
   DragDropContext,
   Droppable,
   Draggable,
-  DropResult,
+  type DropResult,
 } from "@hello-pangea/dnd"
 import { trpc } from "@/utils/trpc"
 import { reorderProjects } from "@/mutations/projectMutations"

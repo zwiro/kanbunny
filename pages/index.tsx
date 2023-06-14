@@ -1,4 +1,10 @@
-import { useEffect, useContext, useState, useRef, ChangeEvent } from "react"
+import {
+  useEffect,
+  useContext,
+  useState,
+  useRef,
+  type ChangeEvent,
+} from "react"
 import PlusIcon from "@/components/PlusIcon"
 import List from "@/components/List"
 import SideMenu from "@/components/SideMenu"
@@ -12,14 +18,14 @@ import ListContainer from "@/components/ListContainer"
 import useBooleanState from "@/hooks/useBooleanState"
 import { trpc } from "@/utils/trpc"
 import { z } from "zod"
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import ColorDot from "@/components/ColorDot"
 import { listSchema } from "@/utils/schemas"
 import {
   DragDropContext,
   Draggable,
-  DropResult,
+  type DropResult,
   Droppable,
 } from "@hello-pangea/dnd"
 import { createNewList, reorderLists } from "@/mutations/listMutations"
