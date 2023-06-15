@@ -15,6 +15,7 @@ import {
 } from "@hello-pangea/dnd"
 import { trpc } from "@/utils/trpc"
 import { reorderProjects } from "@/mutations/projectMutations"
+import ProjectSkeleton from "./ProjectSkeleton"
 
 interface SideMenuProps {
   data:
@@ -73,7 +74,12 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
             new project <PlusIcon />
           </AddButton>
         ) : (
-          <LoadingDots />
+          <>
+            <div className=" mx-auto h-[68px] w-[164px] animate-pulse bg-zinc-900 px-4 py-5 lg:mx-0" />
+            <ProjectSkeleton />
+            <ProjectSkeleton />
+            <ProjectSkeleton />
+          </>
         )}
         <DragDropContext onDragEnd={onDragEnd}>
           {!!data?.length && (
