@@ -169,7 +169,7 @@ export default function Home() {
                 <ColorDot color={chosenBoard.color} />
                 <h1 className="text-2xl font-bold">{chosenBoard.name}</h1>
               </div>
-              <MenuWrapper direction="right">
+              <MenuWrapper>
                 <MenuItem handleClick={add}>add list</MenuItem>
                 <MenuItem handleClick={toggleSideMenu}>more options</MenuItem>
               </MenuWrapper>

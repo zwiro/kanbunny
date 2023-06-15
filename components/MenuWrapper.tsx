@@ -1,4 +1,4 @@
-import { useRef, useContext } from "react"
+import { useRef, useContext, RefObject, useEffect, useState } from "react"
 import { AnimatePresence } from "framer-motion"
 import { motion } from "framer-motion"
 import useClickOutside from "@/hooks/useClickOutside"
@@ -6,35 +6,23 @@ import MenuContext, { MenuProvider } from "@/context/MenuContext"
 
 interface MenuWrapperProps {
   children: React.ReactNode
-  direction?: "left" | "right"
   isLoading?: boolean
 }
 
-function MenuWrapper({
-  children,
-  direction = "left",
-  isLoading = false,
-}: MenuWrapperProps) {
+function MenuWrapper({ children, isLoading = false }: MenuWrapperProps) {
   return (
     <MenuProvider>
-      <MenuButton direction={direction} isLoading={isLoading}>
-        {children}
-      </MenuButton>
+      <MenuButton isLoading={isLoading}>{children}</MenuButton>
     </MenuProvider>
   )
 }
 
 interface MenuButtonProps {
   children: React.ReactNode
-  direction: "left" | "right"
   isLoading?: boolean
 }
 
-function MenuButton({
-  children,
-  direction,
-  isLoading = false,
-}: MenuButtonProps) {
+function MenuButton({ children, isLoading = false }: MenuButtonProps) {
   const { isMenuOpened, closeMenu, openMenu } = useContext(MenuContext)
 
   const menuRef = useRef<HTMLDivElement>(null)
@@ -56,7 +44,7 @@ function MenuButton({
       <AnimatePresence>
         {isMenuOpened && (
           <div ref={menuRef}>
-            <Menu direction={direction}>{children}</Menu>
+            <Menu>{children}</Menu>
           </div>
         )}
       </AnimatePresence>
@@ -66,24 +54,42 @@ function MenuButton({
 
 interface MenuProps {
   children: React.ReactNode
-  direction: "left" | "right"
 }
 
-function Menu({ children, direction }: MenuProps) {
+function Menu({ children }: MenuProps) {
   const menuAnimation = {
     initial: { opacity: 0, scale: 0 },
     animate: { opacity: 1, scale: 1 },
     exit: { opacity: 0, scale: 0 },
   }
 
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  const [xPosition, setXPosition] = useState<number>(0)
+  const [menuWidth, setMenuWidth] = useState<number>(0)
+
+  useEffect(() => {
+    if (menuRef.current) {
+      const { x } = menuRef.current.getBoundingClientRect()
+      setXPosition(x)
+      setMenuWidth(menuRef.current?.clientWidth)
+    }
+  }, [])
+
+  const getDirection = () => {
+    if (xPosition - menuWidth < 0) {
+      return "left-0 origin-top-left"
+    } else {
+      return "right-0 origin-top-right"
+    }
+  }
+
   return (
     <motion.div
+      id="menu"
+      ref={menuRef}
       {...menuAnimation}
-      className={`absolute top-5 z-50 w-max origin-top-left bg-zinc-900/95 py-4 text-lg ${
-        direction === "right"
-          ? "left-0 origin-top-left"
-          : "right-0 origin-top-right"
-      } `}
+      className={`absolute top-5 z-50 w-max bg-zinc-900/95 py-4 text-lg ${getDirection()}`}
     >
       <ul className="flex flex-col gap-2">{children}</ul>
     </motion.div>
