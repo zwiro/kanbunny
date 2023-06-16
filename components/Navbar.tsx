@@ -2,7 +2,7 @@ import Link from "next/link"
 import { GiRabbit } from "react-icons/gi"
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/router"
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 import LayoutContext from "@/context/LayoutContext"
 import { LoadingDots } from "./LoadingDots"
 
@@ -12,6 +12,10 @@ function Navbar() {
   const router = useRouter()
 
   const { toggleSideMenu } = useContext(LayoutContext)
+
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/auth/login")
+  }, [router, status])
 
   if (router.pathname === "/auth/login") return null
 
