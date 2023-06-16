@@ -18,14 +18,18 @@ function AuthPage() {
             join <strong>kanbunny</strong> and start creating kanban boards
             today
           </p>
-          <p>manage your projects efficiently</p>
-          <p>invite your co-workers</p>
+          <p>
+            manage your <strong>projects</strong> efficiently
+          </p>
+          <p>
+            <strong>invite</strong> your co-workers
+          </p>
           <button
             onClick={() => signIn("github")}
             className="mx-8 flex items-center justify-center gap-1 bg-zinc-950 px-8 py-4 font-bold transition-colors hover:bg-zinc-900"
           >
             <AiFillGithub />
-            sign in with GitHub
+            sign in with github
           </button>
         </div>
       </div>

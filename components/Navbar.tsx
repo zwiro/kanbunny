@@ -13,6 +13,8 @@ function Navbar() {
 
   const { toggleSideMenu } = useContext(LayoutContext)
 
+  if (router.pathname === "/auth/login") return null
+
   return (
     <nav className="sticky top-0 z-20 flex items-center gap-4 border-b border-neutral-800 bg-zinc-800 p-4 text-lg sm:text-2xl xl:px-12 2xl:px-24">
       <button
