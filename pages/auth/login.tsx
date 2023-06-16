@@ -9,10 +9,6 @@ function AuthPage() {
   const { data: session } = useSession()
   const router = useRouter()
 
-  useEffect(() => {
-    if (session) router.push("/")
-  }, [router, session])
-
   return (
     <div className="relative mx-auto grid h-[calc(100vh-4rem)] max-w-4xl place-items-center">
       <div>
