@@ -90,29 +90,17 @@ export const reorderProjects = (utils: TRPCContextType) =>
 
 export const leaveOneProject = (utils: TRPCContextType) =>
   trpc.project.leave.useMutation({
-    // async onMutate(input) {
-    //   await utils.project.getByUser.cancel()
-    //   const prevData = utils.project.getByUser.getData()
-    //   utils.project.getByUser.setData(undefined, (old) =>
-    //     old?.map((p) =>
-    //       p.id === input.draggableId
-    //         ? { ...p, order: input.itemTwoIndex }
-    //         : input.itemOneIndex > input.itemTwoIndex &&
-    //           p.order >= input.itemTwoIndex &&
-    //           p.order <= input.itemOneIndex
-    //         ? { ...p, order: p.order + 1 }
-    //         : input.itemOneIndex < input.itemTwoIndex &&
-    //           p.order <= input.itemTwoIndex &&
-    //           p.order >= input.itemOneIndex
-    //         ? { ...p, order: p.order - 1 }
-    //         : p
-    //     )
-    //   )
-    //   return { prevData }
-    // },
-    // onError(err, input, ctx) {
-    //   utils.project.getByUser.setData(undefined, ctx?.prevData)
-    // },
+    async onMutate(input) {
+      await utils.project.getByUser.cancel()
+      const prevData = utils.project.getByUser.getData()
+      utils.project.getByUser.setData(undefined, (old) =>
+        old?.filter((p) => p.id !== input)
+      )
+      return { prevData }
+    },
+    onError(err, input, ctx) {
+      utils.project.getByUser.setData(undefined, ctx?.prevData)
+    },
     onSettled() {
       utils.project.getByUser.invalidate()
     },
