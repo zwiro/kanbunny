@@ -40,8 +40,14 @@ import {
 } from "react-icons/ai"
 import DateTimePicker from "react-datetime-picker"
 import ListSkeleton from "@/components/ListSkeleton"
+import { useSession, getSession, GetSessionParams } from "next-auth/react"
+import { LoadingDots } from "@/components/LoadingDots"
+import { useRouter } from "next/router"
+import AddProjectModal from "@/components/AddProjectModal"
 
 export default function Home() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
     useContext(LayoutContext)
 
@@ -519,4 +525,19 @@ function FilterButton({
       </label>
     </>
   )
+}
+
+export async function getServerSideProps(params: GetSessionParams) {
+  const session = await getSession(params)
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/auth/login",
+      },
+    }
+  }
+
+  return {
+    props: {},
+  }
 }

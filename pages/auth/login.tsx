@@ -15,17 +15,17 @@ function AuthPage() {
         <Image alt="" src={loginBgImage} className="h-52 object-cover" />
         <div className="flex flex-col gap-8 bg-zinc-800 px-8 py-12 text-center text-2xl">
           <p>
-            join <strong>kanbunny</strong> and start creating kanban boards
-            today
+            join <span className="font-bold">kanbunny</span> and start creating
+            kanban boards today
           </p>
           <p>
-            manage your <strong>projects</strong> efficiently
+            manage your <span className="font-bold">projects</span> efficiently
           </p>
           <p>
-            <strong>invite</strong> your co-workers
+            <span className="font-bold">invite</span> your co-workers
           </p>
           <button
-            onClick={() => signIn("github")}
+            onClick={() => signIn("github", { callbackUrl: "/" })}
             className="mx-8 flex items-center justify-center gap-1 bg-zinc-950 px-8 py-4 font-bold transition-colors hover:bg-zinc-900"
           >
             <AiFillGithub />
