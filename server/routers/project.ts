@@ -212,41 +212,58 @@ export const projectRouter = createTRPCRouter({
 
       return { success: true }
     }),
-  delete: publicProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
-    const projectUser = await ctx.prisma.projectUser.findFirst({
-      where: { projectId: input },
-      include: { project: true },
-    })
+  leave: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: input },
+        include: { users: true },
+      })
+      if (!project) throw new Error("Project does not exist")
+      if (!project.users.map((u) => u.userId).includes(ctx.session.user.id))
+        throw new Error("You are not a member of this project")
+      await ctx.prisma.projectUser.deleteMany({
+        where: { projectId: input, userId: ctx.session!.user.id },
+      })
+      return { success: true }
+    }),
+  delete: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const projectUser = await ctx.prisma.projectUser.findFirst({
+        where: { projectId: input },
+        include: { project: true },
+      })
 
-    if (projectUser?.project.ownerId !== ctx.session!.user.id) {
-      throw new Error("You are not the owner of this project")
-    }
+      if (projectUser?.project.ownerId !== ctx.session!.user.id) {
+        throw new Error("You are not the owner of this project")
+      }
 
-    const users = await ctx.prisma.user.findMany({
-      where: {
-        projects_in: { some: { id: input } },
-      },
-    })
-    users.map(async (user) => {
-      await ctx.prisma.user.update({
-        where: { id: user.id },
-        data: {
-          projects_in: { disconnect: { id: input } },
+      const users = await ctx.prisma.user.findMany({
+        where: {
+          projects_in: { some: { id: input } },
         },
       })
-    })
-    await ctx.prisma.projectUser.deleteMany({
-      where: { projectId: input },
-    })
-    await ctx.prisma.project.deleteMany({
-      where: { id: input },
-    })
-    await ctx.prisma.projectUser.updateMany({
-      where: {
-        AND: [{ NOT: { id: input } }, { order: { gt: projectUser.order } }],
-      },
-      data: { order: { decrement: 1 } },
-    })
-    return { success: true }
-  }),
+      users.map(async (user) => {
+        await ctx.prisma.user.update({
+          where: { id: user.id },
+          data: {
+            projects_in: { disconnect: { id: input } },
+          },
+        })
+      })
+      await ctx.prisma.projectUser.deleteMany({
+        where: { projectId: input },
+      })
+      await ctx.prisma.project.deleteMany({
+        where: { id: input },
+      })
+      await ctx.prisma.projectUser.updateMany({
+        where: {
+          AND: [{ NOT: { id: input } }, { order: { gt: projectUser.order } }],
+        },
+        data: { order: { decrement: 1 } },
+      })
+      return { success: true }
+    }),
 })

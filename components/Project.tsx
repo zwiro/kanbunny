@@ -25,11 +25,13 @@ import {
 } from "@hello-pangea/dnd"
 import {
   deleteOneProject,
+  leaveOneProject,
   updateProjectName,
   updateProjectUsers,
 } from "@/mutations/projectMutations"
 import { createNewBoard, reorderBoards } from "@/mutations/boardMutations"
 import AddUsersInput from "./AddUsersInput"
+import { useSession } from "next-auth/react"
 
 interface ProjectProps {
   boards: Board[]
@@ -47,6 +49,8 @@ function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
       setAllUsers(data?.map((user) => user.name!))
     },
   })
+  const { data: session, status } = useSession()
+  const isOwner = session?.user?.id === owner.id
 
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
@@ -62,6 +66,7 @@ function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
   const updateUsers = updateProjectUsers(utils)
   const updateName = updateProjectName(utils, closeEditName)
   const deleteProject = deleteOneProject(utils)
+  const leaveProject = leaveOneProject(utils)
 
   const boardMethods = useForm<BoardAndProjectSchema>({
     defaultValues: { projectId: id },
@@ -123,11 +128,20 @@ function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
           </p>
           <MenuWrapper>
             <MenuItem handleClick={add}>add board</MenuItem>
-            <MenuItem handleClick={editUsers}>edit users</MenuItem>
-            <MenuItem handleClick={editName}>edit project name</MenuItem>
-            <MenuItem handleClick={() => deleteProject.mutate(id)}>
-              delete project
-            </MenuItem>
+            {!isOwner && (
+              <MenuItem handleClick={() => leaveProject.mutate(id)}>
+                leave project
+              </MenuItem>
+            )}
+            {isOwner && (
+              <>
+                <MenuItem handleClick={editUsers}>edit users</MenuItem>
+                <MenuItem handleClick={editName}>edit project name</MenuItem>
+                <MenuItem handleClick={() => deleteProject.mutate(id)}>
+                  delete project
+                </MenuItem>
+              </>
+            )}
           </MenuWrapper>
 
           <div {...dragHandleProps} className="ml-auto cursor-grab">
