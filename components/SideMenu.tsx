@@ -3,7 +3,7 @@ import AddButton from "./AddButton"
 import { AnimatePresence, motion } from "framer-motion"
 import useBooleanState from "@/hooks/useBooleanState"
 import AddProjectModal from "./AddProjectModal"
-import React from "react"
+import React, { useRef } from "react"
 import { LoadingDots } from "./LoadingDots"
 import Project from "./Project"
 import type { Board, User } from "@prisma/client"
@@ -48,7 +48,9 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
 
   const utils = trpc.useContext()
 
-  const reorder = reorderProjects(utils)
+  const projectMutationCounter = useRef(0)
+
+  const reorder = reorderProjects(utils, projectMutationCounter)
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
@@ -108,6 +110,7 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
                               <Project
                                 key={project.id}
                                 dragHandleProps={provided.dragHandleProps}
+                                mutationCounter={projectMutationCounter}
                                 {...project}
                               />
                             </motion.div>

@@ -1,4 +1,4 @@
-import { type FormEventHandler, useContext } from "react"
+import { type FormEventHandler, useContext, MutableRefObject } from "react"
 import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
@@ -55,6 +55,8 @@ interface ListProps extends ListType {
   dateFilter: string | Date | null
   assignedFilter: string | null
   isUpdating: boolean
+  taskMutationCounter: React.MutableRefObject<number>
+  mutationCounter: React.MutableRefObject<number>
 }
 
 const colorVariants = {
@@ -76,6 +78,8 @@ function List({
   dateFilter,
   assignedFilter,
   isUpdating,
+  mutationCounter,
+  taskMutationCounter,
 }: ListProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
@@ -86,9 +90,19 @@ function List({
 
   const utils = trpc.useContext()
 
-  const updateName = updateListName(chosenBoard?.id!, utils, closeEditName)
-  const updateColor = updateListColor(chosenBoard?.id!, utils, closeEditColor)
-  const deleteList = deleteOneList(chosenBoard?.id!, utils)
+  const updateName = updateListName(
+    chosenBoard?.id!,
+    utils,
+    closeEditName,
+    mutationCounter
+  )
+  const updateColor = updateListColor(
+    chosenBoard?.id!,
+    utils,
+    closeEditColor,
+    mutationCounter
+  )
+  const deleteList = deleteOneList(chosenBoard?.id!, utils, mutationCounter)
 
   type ListSchema = z.infer<typeof editListSchema>
 
@@ -214,6 +228,7 @@ function List({
                           dragHandleProps={provided.dragHandleProps}
                           isDragging={snapshot.isDragging}
                           length={tasks.length}
+                          mutationCounter={taskMutationCounter}
                           {...task}
                         />
                       </motion.div>
@@ -238,6 +253,7 @@ interface TaskProps extends TaskWithAssignedTo {
   dragHandleProps: DraggableProvidedDragHandleProps | null
   isDragging: boolean
   length: number
+  mutationCounter: React.MutableRefObject<number>
 }
 
 function Task({
@@ -249,6 +265,7 @@ function Task({
   dragHandleProps,
   isDragging,
   due_to,
+  mutationCounter,
 }: TaskProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
@@ -280,10 +297,21 @@ function Task({
     chosenBoard?.id!,
     listId,
     utils,
-    closeEditName
+    closeEditName,
+    mutationCounter
   )
-  const updateUsers = updateTaskUsers(chosenBoard?.id!, utils, closeEditUsers)
-  const deleteTask = deleteOneTask(chosenBoard?.id!, listId, utils)
+  const updateUsers = updateTaskUsers(
+    chosenBoard?.id!,
+    utils,
+    closeEditUsers,
+    mutationCounter
+  )
+  const deleteTask = deleteOneTask(
+    chosenBoard?.id!,
+    listId,
+    utils,
+    mutationCounter
+  )
 
   const onSubmit: SubmitHandler<TaskSchema> = (data: any) => {
     updateName.mutate({ name: data.name, id, listId })
@@ -306,7 +334,8 @@ function Task({
     chosenBoard?.id!,
     listId,
     utils,
-    closeEditColor
+    closeEditColor,
+    mutationCounter
   )
 
   const isLoading = updateName.isLoading || updateColor.isLoading

@@ -5,11 +5,13 @@ import type { UseFormReturn } from "react-hook-form"
 export const updateListName = (
   boardId: string,
   utils: TRPCContextType,
-  closeEditName: () => void
+  closeEditName: () => void,
+  counter: React.MutableRefObject<number>
 ) =>
   trpc.list.editName.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
+      counter.current = +1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.map((l) => (l.id === input.id ? { ...l, name: input.name } : l))
@@ -21,18 +23,21 @@ export const updateListName = (
       utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled: () => {
-      utils.list.getByBoard.invalidate(boardId)
+      counter.current -= 1
+      counter.current === 0 && utils.list.getByBoard.invalidate(boardId)
     },
   })
 
 export const updateListColor = (
   boardId: string,
   utils: TRPCContextType,
-  closeEditColor: () => void
+  closeEditColor: () => void,
+  counter: React.MutableRefObject<number>
 ) =>
   trpc.list.editColor.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
+      counter.current = +1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.map((l) => (l.id === input.id ? { ...l, color: input.color } : l))
@@ -44,14 +49,20 @@ export const updateListColor = (
       utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled: () => {
-      utils.list.getByBoard.invalidate(boardId)
+      counter.current -= 1
+      counter.current === 0 && utils.list.getByBoard.invalidate(boardId)
     },
   })
 
-export const deleteOneList = (boardId: string, utils: TRPCContextType) =>
+export const deleteOneList = (
+  boardId: string,
+  utils: TRPCContextType,
+  counter: React.MutableRefObject<number>
+) =>
   trpc.list.delete.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
+      counter.current = +1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.filter((list) => list.id !== input)
@@ -62,7 +73,8 @@ export const deleteOneList = (boardId: string, utils: TRPCContextType) =>
       utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled() {
-      utils.list.getByBoard.invalidate(boardId)
+      counter.current -= 1
+      counter.current === 0 && utils.list.getByBoard.invalidate(boardId)
     },
   })
 
@@ -102,10 +114,15 @@ export const createNewList = (
     },
   })
 
-export const reorderLists = (boardId: string, utils: TRPCContextType) =>
+export const reorderLists = (
+  boardId: string,
+  utils: TRPCContextType,
+  counter: React.MutableRefObject<number>
+) =>
   trpc.list.reorder.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
+      counter.current = +1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.map((l) =>
@@ -128,6 +145,7 @@ export const reorderLists = (boardId: string, utils: TRPCContextType) =>
       utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled() {
-      utils.list.getByBoard.invalidate(boardId)
+      counter.current -= 1
+      counter.current === 0 && utils.list.getByBoard.invalidate(boardId)
     },
   })

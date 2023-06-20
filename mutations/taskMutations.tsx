@@ -1,5 +1,6 @@
 import type { TRPCContextType } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
+import { MutableRefObject } from "react"
 
 export const createNewTask = (
   boardId: string,
@@ -17,11 +18,13 @@ export const updatedTaskName = (
   boardId: string,
   listId: string,
   utils: TRPCContextType,
-  closeEditName: () => void
+  closeEditName: () => void,
+  counter: MutableRefObject<number>
 ) =>
   trpc.task.editName.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
+      counter.current += 1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.map((l) =>
@@ -42,18 +45,21 @@ export const updatedTaskName = (
       utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled() {
-      utils.list.getByBoard.invalidate(boardId)
+      counter.current -= 1
+      counter.current === 0 && utils.list.getByBoard.invalidate(boardId)
     },
   })
 
 export const updateTaskUsers = (
   boardId: string,
   utils: TRPCContextType,
-  closeEditUsers: () => void
+  closeEditUsers: () => void,
+  counter: MutableRefObject<number>
 ) =>
   trpc.task.editUsers.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
+      counter.current += 1
       const prevData = utils.list.getByBoard.getData()
 
       return { prevData }
@@ -62,7 +68,8 @@ export const updateTaskUsers = (
       utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled() {
-      utils.list.getByBoard.invalidate(boardId)
+      counter.current -= 1
+      counter.current === 0 && utils.list.getByBoard.invalidate(boardId)
       closeEditUsers()
     },
   })
@@ -70,11 +77,13 @@ export const updateTaskUsers = (
 export const deleteOneTask = (
   boardId: string,
   listId: string,
-  utils: TRPCContextType
+  utils: TRPCContextType,
+  counter: MutableRefObject<number>
 ) =>
   trpc.task.delete.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
+      counter.current += 1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.map((l) =>
@@ -92,7 +101,8 @@ export const deleteOneTask = (
       utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled() {
-      utils.list.getByBoard.invalidate(boardId)
+      counter.current -= 1
+      counter.current === 0 && utils.list.getByBoard.invalidate(boardId)
     },
   })
 
@@ -100,11 +110,13 @@ export const updateTaskColor = (
   boardId: string,
   listId: string,
   utils: TRPCContextType,
-  closeEditColor: () => void
+  closeEditColor: () => void,
+  counter: MutableRefObject<number>
 ) =>
   trpc.task.editColor.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
+      counter.current += 1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.map((l) =>
@@ -125,14 +137,20 @@ export const updateTaskColor = (
       utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled: () => {
-      utils.list.getByBoard.invalidate(boardId)
+      counter.current -= 1
+      counter.current === 0 && utils.list.getByBoard.invalidate(boardId)
     },
   })
 
-export const reorderTasks = (boardId: string, utils: TRPCContextType) =>
+export const reorderTasks = (
+  boardId: string,
+  utils: TRPCContextType,
+  counter: MutableRefObject<number>
+) =>
   trpc.task.reorder.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
+      counter.current += 1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) => {
         const taskDragged = old
@@ -194,6 +212,7 @@ export const reorderTasks = (boardId: string, utils: TRPCContextType) =>
       utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled() {
-      utils.list.getByBoard.invalidate(boardId)
+      counter.current -= 1
+      counter.current === 0 && utils.list.getByBoard.invalidate(boardId)
     },
   })

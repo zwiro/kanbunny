@@ -3,7 +3,7 @@ import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import useBooleanState from "@/hooks/useBooleanState"
-import React, { useContext, useState } from "react"
+import React, { useContext, useRef, useState } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useAddUser from "@/hooks/useAddUser"
 import { trpc } from "@/utils/trpc"
@@ -40,11 +40,19 @@ interface ProjectProps {
   name: string
   owner: User
   dragHandleProps: DraggableProvidedDragHandleProps | null
+  mutationCounter: React.MutableRefObject<number>
 }
 
 type BoardAndProjectSchema = z.infer<typeof boardAndProjectSchema>
 
-function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
+function Project({
+  id,
+  name,
+  boards,
+  owner,
+  dragHandleProps,
+  mutationCounter,
+}: ProjectProps) {
   trpc.project.getUsers.useQuery(id, {
     onSuccess(data) {
       setAllUsers(data?.map((user) => user.name!))
@@ -65,12 +73,14 @@ function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
 
   const { chosenBoard } = useContext(LayoutContext)
 
+  const boardMutationCounter = useRef(0)
+
   const utils = trpc.useContext()
 
   const updateUsers = updateProjectUsers(utils)
-  const updateName = updateProjectName(utils, closeEditName)
-  const deleteProject = deleteOneProject(utils)
-  const leaveProject = leaveOneProject(utils)
+  const updateName = updateProjectName(utils, closeEditName, mutationCounter)
+  const deleteProject = deleteOneProject(utils, mutationCounter)
+  const leaveProject = leaveOneProject(utils, mutationCounter)
 
   const boardMethods = useForm<BoardAndProjectSchema>({
     defaultValues: { projectId: id },
@@ -103,7 +113,7 @@ function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
     exit: { height: 0, opacity: 0 },
   }
 
-  const reorder = reorderBoards(id, utils)
+  const reorder = reorderBoards(id, utils, boardMutationCounter)
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
@@ -292,6 +302,7 @@ function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
                                   dragHandleProps={provided.dragHandleProps}
                                   isUpdating={createBoard.isLoading}
                                   owner={owner.name!}
+                                  mutationCounter={boardMutationCounter}
                                   {...board}
                                 />
                               </motion.div>

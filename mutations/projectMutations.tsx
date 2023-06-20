@@ -1,5 +1,6 @@
 import type { TRPCContextType } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
+import React from "react"
 
 export const createNewProject = (utils: TRPCContextType, close: () => void) =>
   trpc.project.create.useMutation({
@@ -18,11 +19,13 @@ export const updateProjectUsers = (utils: TRPCContextType) =>
 
 export const updateProjectName = (
   utils: TRPCContextType,
-  closeEditName: () => void
+  closeEditName: () => void,
+  counter: React.MutableRefObject<number>
 ) =>
   trpc.project.editName.useMutation({
     async onMutate(input) {
       await utils.project.getByUser.cancel()
+      counter.current += 1
       const prevData = utils.project.getByUser.getData()
       utils.project.getByUser.setData(undefined, (old) =>
         old?.map((p) =>
@@ -36,14 +39,19 @@ export const updateProjectName = (
       utils.project.getByUser.setData(undefined, ctx?.prevData)
     },
     onSettled() {
-      utils.project.getByUser.invalidate()
+      counter.current -= 1
+      counter.current === 0 && utils.project.getByUser.invalidate()
     },
   })
 
-export const deleteOneProject = (utils: TRPCContextType) =>
+export const deleteOneProject = (
+  utils: TRPCContextType,
+  counter: React.MutableRefObject<number>
+) =>
   trpc.project.delete.useMutation({
     async onMutate(input) {
       await utils.project.getByUser.cancel()
+      counter.current += 1
       const prevData = utils.project.getByUser.getData()
       utils.project.getByUser.setData(undefined, (old) =>
         old?.filter((p) => p.id !== input)
@@ -54,14 +62,19 @@ export const deleteOneProject = (utils: TRPCContextType) =>
       utils.project.getByUser.setData(undefined, ctx?.prevData)
     },
     onSettled() {
-      utils.project.getByUser.invalidate()
+      counter.current -= 1
+      counter.current === 0 && utils.project.getByUser.invalidate()
     },
   })
 
-export const reorderProjects = (utils: TRPCContextType) =>
+export const reorderProjects = (
+  utils: TRPCContextType,
+  counter: React.MutableRefObject<number>
+) =>
   trpc.project.reorder.useMutation({
     async onMutate(input) {
       await utils.project.getByUser.cancel()
+      counter.current += 1
       const prevData = utils.project.getByUser.getData()
       utils.project.getByUser.setData(undefined, (old) =>
         old?.map((p) =>
@@ -84,14 +97,19 @@ export const reorderProjects = (utils: TRPCContextType) =>
       utils.project.getByUser.setData(undefined, ctx?.prevData)
     },
     onSettled() {
-      utils.project.getByUser.invalidate()
+      counter.current -= 1
+      counter.current === 0 && utils.project.getByUser.invalidate()
     },
   })
 
-export const leaveOneProject = (utils: TRPCContextType) =>
+export const leaveOneProject = (
+  utils: TRPCContextType,
+  counter: React.MutableRefObject<number>
+) =>
   trpc.project.leave.useMutation({
     async onMutate(input) {
       await utils.project.getByUser.cancel()
+      counter.current += 1
       const prevData = utils.project.getByUser.getData()
       utils.project.getByUser.setData(undefined, (old) =>
         old?.filter((p) => p.id !== input)
@@ -102,6 +120,7 @@ export const leaveOneProject = (utils: TRPCContextType) =>
       utils.project.getByUser.setData(undefined, ctx?.prevData)
     },
     onSettled() {
-      utils.project.getByUser.invalidate()
+      counter.current -= 1
+      counter.current === 0 && utils.project.getByUser.invalidate()
     },
   })

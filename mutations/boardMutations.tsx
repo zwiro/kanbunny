@@ -1,16 +1,19 @@
 import type { TRPCContextType } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
 import type { Board } from "@prisma/client"
+import React, { RefObject } from "react"
 import type { UseFormReturn } from "react-hook-form"
 
 export const updateBoardName = (
   projectId: string,
   utils: TRPCContextType,
-  closeEditName: () => void
+  closeEditName: () => void,
+  counter: React.MutableRefObject<number>
 ) =>
   trpc.board.editName.useMutation({
     async onMutate(input) {
       await utils.project.getByUser.cancel()
+      counter.current += 1
       const prevData = utils.project.getByUser.getData()
       utils.project.getByUser.setData(undefined, (old) =>
         old?.map((p) =>
@@ -31,18 +34,21 @@ export const updateBoardName = (
       utils.project.getByUser.setData(undefined, ctx?.prevData)
     },
     onSettled() {
-      utils.project.getByUser.invalidate()
+      counter.current -= 1
+      counter.current === 0 && utils.project.getByUser.invalidate()
     },
   })
 
 export const updateBoardColor = (
   projectId: string,
   utils: TRPCContextType,
-  closeEditColor: () => void
+  closeEditColor: () => void,
+  counter: React.MutableRefObject<number>
 ) =>
   trpc.board.editColor.useMutation({
     async onMutate(input) {
       await utils.project.getByUser.cancel()
+      counter.current += 1
       const prevData = utils.project.getByUser.getData()
       utils.project.getByUser.setData(undefined, (old) =>
         old?.map((p) =>
@@ -63,18 +69,21 @@ export const updateBoardColor = (
       utils.project.getByUser.setData(undefined, ctx?.prevData)
     },
     onSettled: () => {
-      utils.project.getByUser.invalidate()
+      counter.current -= 1
+      counter.current === 0 && utils.project.getByUser.invalidate()
     },
   })
 
 export const deleteOneBoard = (
   projectId: string,
   utils: TRPCContextType,
-  unselectBoard: () => void
+  unselectBoard: () => void,
+  counter: React.MutableRefObject<number>
 ) =>
   trpc.board.delete.useMutation({
     async onMutate(input) {
       await utils.project.getByUser.cancel()
+      counter.current += 1
       unselectBoard()
       const prevData = utils.project.getByUser.getData()
       utils.project.getByUser.setData(undefined, (old) =>
@@ -93,7 +102,8 @@ export const deleteOneBoard = (
       utils.project.getByUser.setData(undefined, ctx?.prevData)
     },
     onSettled() {
-      utils.project.getByUser.invalidate()
+      counter.current -= 1
+      counter.current === 0 && utils.project.getByUser.invalidate()
     },
   })
 
@@ -137,10 +147,15 @@ export const createNewBoard = (
     },
   })
 
-export const reorderBoards = (projectId: string, utils: TRPCContextType) =>
+export const reorderBoards = (
+  projectId: string,
+  utils: TRPCContextType,
+  counter: React.MutableRefObject<number>
+) =>
   trpc.board.reorder.useMutation({
     async onMutate(input) {
       await utils.project.getByUser.cancel()
+      counter.current += 1
       const prevData = utils.project.getByUser.getData()
       utils.project.getByUser.setData(undefined, (old) =>
         old?.map((p) =>
@@ -170,6 +185,7 @@ export const reorderBoards = (projectId: string, utils: TRPCContextType) =>
       utils.project.getByUser.setData(undefined, ctx?.prevData)
     },
     onSettled() {
-      utils.project.getByUser.invalidate()
+      counter.current -= 1
+      counter.current === 0 && utils.project.getByUser.invalidate()
     },
   })

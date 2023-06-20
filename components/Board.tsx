@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useRef } from "react"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { GoGrabber } from "react-icons/go"
@@ -31,6 +31,7 @@ interface BoardProps {
   dragHandleProps: DraggableProvidedDragHandleProps | null
   isDragging: boolean
   isUpdating: boolean
+  mutationCounter: React.MutableRefObject<number>
 }
 
 function Board({
@@ -42,6 +43,7 @@ function Board({
   dragHandleProps,
   isDragging,
   isUpdating,
+  mutationCounter,
 }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
@@ -57,9 +59,24 @@ function Board({
     }
   }
 
-  const updateName = updateBoardName(projectId, utils, closeEditName)
-  const updateColor = updateBoardColor(projectId, utils, closeEditColor)
-  const deleteBoard = deleteOneBoard(projectId, utils, unselectBoard)
+  const updateName = updateBoardName(
+    projectId,
+    utils,
+    closeEditName,
+    mutationCounter
+  )
+  const updateColor = updateBoardColor(
+    projectId,
+    utils,
+    closeEditColor,
+    mutationCounter
+  )
+  const deleteBoard = deleteOneBoard(
+    projectId,
+    utils,
+    unselectBoard,
+    mutationCounter
+  )
 
   type BoardSchema = z.infer<typeof boardSchema>
 

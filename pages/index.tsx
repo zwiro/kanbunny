@@ -75,6 +75,9 @@ export default function Home() {
     setAssignedFilter(null)
   }
 
+  const taskMutationCounter = useRef(0)
+  const listMutationCounter = useRef(0)
+
   const lists = trpc.list.getByBoard.useQuery(chosenBoard?.id!, {
     enabled: !!chosenBoard?.id,
   })
@@ -120,9 +123,13 @@ export default function Home() {
     exit: { backdropFilter: "blur(0px)" },
   }
 
-  const reorder = reorderLists(chosenBoard?.id!, utils)
+  const reorder = reorderLists(chosenBoard?.id!, utils, listMutationCounter)
 
-  const reorderDisplayedTasks = reorderTasks(chosenBoard?.id!, utils)
+  const reorderDisplayedTasks = reorderTasks(
+    chosenBoard?.id!,
+    utils,
+    taskMutationCounter
+  )
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
@@ -241,6 +248,8 @@ export default function Home() {
                                       dateFilter={dateFilter}
                                       assignedFilter={assignedFilter}
                                       isUpdating={createList.isLoading}
+                                      taskMutationCounter={taskMutationCounter}
+                                      mutationCounter={listMutationCounter}
                                       {...list}
                                     />
                                   </motion.div>
