@@ -98,7 +98,7 @@ export const createNewList = (
     },
     onSettled() {
       listMethods.reset()
-      utils.list.getByBoard.invalidate()
+      utils.list.getByBoard.invalidate(boardId)
     },
   })
 
@@ -128,6 +128,6 @@ export const reorderLists = (boardId: string, utils: TRPCContextType) =>
       utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled() {
-      utils.list.getByBoard.invalidate()
+      utils.list.getByBoard.invalidate(boardId)
     },
   })

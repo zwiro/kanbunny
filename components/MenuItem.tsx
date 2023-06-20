@@ -17,6 +17,7 @@ function MenuItem({
   return (
     <li className="px-8 hover:cursor-pointer hover:bg-zinc-800">
       <button
+        className="w-full text-left"
         onClick={() => {
           handleClick && handleClick()
           closeOnClickInside && closeMenu()

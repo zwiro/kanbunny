@@ -194,6 +194,6 @@ export const reorderTasks = (boardId: string, utils: TRPCContextType) =>
       utils.list.getByBoard.setData(boardId, ctx?.prevData)
     },
     onSettled() {
-      utils.list.getByBoard.invalidate()
+      utils.list.getByBoard.invalidate(boardId)
     },
   })
