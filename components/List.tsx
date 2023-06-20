@@ -155,14 +155,16 @@ function List({
                 <MenuItem handleClick={openPopup}>delete list</MenuItem>
               </MenuWrapper>
             </div>
-            {isPopupOpened && (
-              <ConfirmPopup
-                name={name}
-                type="list"
-                handleClick={() => deleteList.mutate(id)}
-                close={() => closePopup()}
-              />
-            )}
+            <AnimatePresence>
+              {isPopupOpened && (
+                <ConfirmPopup
+                  name={name}
+                  type="list"
+                  handleClick={() => deleteList.mutate(id)}
+                  close={() => closePopup()}
+                />
+              )}
+            </AnimatePresence>
             <div
               {...dragHandleProps}
               className={`cursor-grab`}

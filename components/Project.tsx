@@ -150,27 +150,29 @@ function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
               </>
             )}
           </MenuWrapper>
-          {!isLeaving ? (
-            isPopupOpened && (
+          <AnimatePresence>
+            {!isLeaving ? (
+              isPopupOpened && (
+                <ConfirmPopup
+                  name={name}
+                  type="project"
+                  handleClick={() => deleteProject.mutate(id)}
+                  close={() => closePopup()}
+                />
+              )
+            ) : (
               <ConfirmPopup
                 name={name}
                 type="project"
-                handleClick={() => deleteProject.mutate(id)}
-                close={() => closePopup()}
+                action="leave"
+                handleClick={() => leaveProject.mutate(id)}
+                close={() => {
+                  setIsLeaving(false)
+                  closePopup()
+                }}
               />
-            )
-          ) : (
-            <ConfirmPopup
-              name={name}
-              type="project"
-              action="leave"
-              handleClick={() => leaveProject.mutate(id)}
-              close={() => {
-                setIsLeaving(false)
-                closePopup()
-              }}
-            />
-          )}
+            )}
+          </AnimatePresence>
           <div {...dragHandleProps} className="ml-auto cursor-grab">
             <GoGrabber />
           </div>

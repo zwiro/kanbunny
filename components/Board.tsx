@@ -117,14 +117,16 @@ function Board({
               <MenuItem handleClick={openPopup}>delete board</MenuItem>
             </MenuWrapper>
           </div>
-          {isPopupOpened && (
-            <ConfirmPopup
-              name={name}
-              type="board"
-              handleClick={() => deleteBoard.mutate(id)}
-              close={() => closePopup()}
-            />
-          )}
+          <AnimatePresence>
+            {isPopupOpened && (
+              <ConfirmPopup
+                name={name}
+                type="board"
+                handleClick={() => deleteBoard.mutate(id)}
+                close={() => closePopup()}
+              />
+            )}
+          </AnimatePresence>
           <div
             {...dragHandleProps}
             className={`ml-auto cursor-grab group-hover:visible ${
