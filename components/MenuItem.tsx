@@ -15,14 +15,15 @@ function MenuItem({
   const { closeMenu } = useContext(MenuContext)
 
   return (
-    <li
-      onClick={() => {
-        handleClick && handleClick()
-        closeOnClickInside && closeMenu()
-      }}
-      className="px-8 hover:cursor-pointer hover:bg-zinc-800"
-    >
-      {children}
+    <li className="px-8 hover:cursor-pointer hover:bg-zinc-800">
+      <button
+        onClick={() => {
+          handleClick && handleClick()
+          closeOnClickInside && closeMenu()
+        }}
+      >
+        {children}
+      </button>
     </li>
   )
 }

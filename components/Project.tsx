@@ -117,6 +117,8 @@ function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
     })
   }
 
+  const isLoading = createBoard.isLoading || updateName.isLoading
+
   return (
     <section className="my-4 border-b border-neutral-700">
       {!isEditingName ? (
@@ -130,7 +132,7 @@ function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
           >
             {name}
           </p>
-          <MenuWrapper>
+          <MenuWrapper isLoading={isLoading}>
             <MenuItem handleClick={add}>add board</MenuItem>
             {!isOwner && (
               <MenuItem

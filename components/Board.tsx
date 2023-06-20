@@ -72,6 +72,8 @@ function Board({
     updateName.mutate({ name: data.name, id })
   }
 
+  const isLoading = isUpdating || updateName.isLoading || updateColor.isLoading
+
   return (
     <li
       onClick={() => chooseOpenedBoard({ id, color, name, owner })}
@@ -107,11 +109,7 @@ function Board({
                 : "group-hover:visible group-hover:scale-100"
             } `}
           >
-            <MenuWrapper
-              isLoading={
-                isUpdating || updateName.isLoading || updateColor.isLoading
-              }
-            >
+            <MenuWrapper isLoading={isLoading}>
               <MenuItem handleClick={editName}>edit board name</MenuItem>
               <MenuItem handleClick={editColor}>change color</MenuItem>
               <MenuItem handleClick={openPopup}>delete board</MenuItem>

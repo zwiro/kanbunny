@@ -104,6 +104,7 @@ function List({
   const { data: session } = useSession()
   const userId = session?.user?.id
 
+  const isLoading = isUpdating || updateName.isLoading || updateColor.isLoading
   return (
     <section
       className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-t-4 bg-zinc-800 p-4 ${
@@ -144,11 +145,7 @@ function List({
               <PlusIcon />
             </button>
             <div className="ml-auto pr-2">
-              <MenuWrapper
-                isLoading={
-                  isUpdating || updateName.isLoading || updateColor.isLoading
-                }
-              >
+              <MenuWrapper isLoading={isLoading}>
                 <MenuItem handleClick={add}>add task</MenuItem>
                 <MenuItem handleClick={editName}>edit list name</MenuItem>
                 <MenuItem handleClick={editColor}>change color</MenuItem>
@@ -312,13 +309,15 @@ function Task({
     closeEditColor
   )
 
+  const isLoading = updateName.isLoading || updateColor.isLoading
+
   return (
     <>
       <div
         className={`group flex items-center justify-between border-l-8 ${
           colorVariants[color]
         } bg-zinc-700 p-2
-        ${(updateColor.isLoading || updateName.isLoading) && "opacity-50"}
+        ${isLoading && "opacity-50"}
         `}
       >
         {!isEditingName ? (
@@ -360,7 +359,7 @@ function Task({
               </ul>
             </div>
             <div className="z-20 ml-auto scale-0 transition-transform group-hover:scale-100">
-              <MenuWrapper>
+              <MenuWrapper isLoading={isLoading}>
                 <MenuItem handleClick={editName}>edit task name</MenuItem>
                 <MenuItem handleClick={editUsers}>assign user</MenuItem>
                 <MenuItem handleClick={editColor}>change color</MenuItem>
