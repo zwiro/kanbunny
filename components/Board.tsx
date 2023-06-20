@@ -20,6 +20,7 @@ import {
   updateBoardColor,
   updateBoardName,
 } from "@/mutations/boardMutations"
+import ConfirmPopup from "./ConfirmPopup"
 
 interface BoardProps {
   name: string
@@ -44,6 +45,7 @@ function Board({
 }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
+  const [isPopupOpened, openPopup, closePopup] = useBooleanState()
 
   const { chosenBoard, chooseOpenedBoard } = useContext(LayoutContext)
 
@@ -112,11 +114,17 @@ function Board({
             >
               <MenuItem handleClick={editName}>edit board name</MenuItem>
               <MenuItem handleClick={editColor}>change color</MenuItem>
-              <MenuItem handleClick={() => deleteBoard.mutate(id)}>
-                delete board
-              </MenuItem>
+              <MenuItem handleClick={openPopup}>delete board</MenuItem>
             </MenuWrapper>
           </div>
+          {isPopupOpened && (
+            <ConfirmPopup
+              name={name}
+              type="board"
+              handleClick={() => deleteBoard.mutate(id)}
+              close={() => closePopup()}
+            />
+          )}
           <div
             {...dragHandleProps}
             className={`ml-auto cursor-grab group-hover:visible ${

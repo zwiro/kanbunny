@@ -42,6 +42,7 @@ import {
 import { useSession } from "next-auth/react"
 import getFilteredTasks from "@/utils/getFilteredTasks"
 import type { UseTRPCQueryResult } from "@trpc/react-query/shared"
+import ConfirmPopup from "./ConfirmPopup"
 
 type TaskWithAssignedTo = Prisma.TaskGetPayload<{
   include: { assigned_to: true }
@@ -79,6 +80,7 @@ function List({
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
   const [isAdding, add, closeAdd] = useBooleanState()
+  const [isPopupOpened, openPopup, closePopup] = useBooleanState()
 
   const { chosenBoard } = useContext(LayoutContext)
 
@@ -150,11 +152,17 @@ function List({
                 <MenuItem handleClick={add}>add task</MenuItem>
                 <MenuItem handleClick={editName}>edit list name</MenuItem>
                 <MenuItem handleClick={editColor}>change color</MenuItem>
-                <MenuItem handleClick={() => deleteList.mutate(id)}>
-                  delete list
-                </MenuItem>
+                <MenuItem handleClick={openPopup}>delete list</MenuItem>
               </MenuWrapper>
             </div>
+            {isPopupOpened && (
+              <ConfirmPopup
+                name={name}
+                type="list"
+                handleClick={() => deleteList.mutate(id)}
+                close={() => closePopup()}
+              />
+            )}
             <div
               {...dragHandleProps}
               className={`cursor-grab`}

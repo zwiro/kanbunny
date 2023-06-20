@@ -3,7 +3,7 @@ import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import useBooleanState from "@/hooks/useBooleanState"
-import React, { useContext } from "react"
+import React, { useContext, useState } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import useAddUser from "@/hooks/useAddUser"
 import { trpc } from "@/utils/trpc"
@@ -32,6 +32,7 @@ import {
 import { createNewBoard, reorderBoards } from "@/mutations/boardMutations"
 import AddUsersInput from "./AddUsersInput"
 import { useSession } from "next-auth/react"
+import ConfirmPopup from "./ConfirmPopup"
 
 interface ProjectProps {
   boards: Board[]
@@ -52,8 +53,11 @@ function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
   const { data: session, status } = useSession()
   const isOwner = session?.user?.id === owner.id
 
+  const [isLeaving, setIsLeaving] = useState(false)
+
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
+  const [isPopupOpened, openPopup, closePopup] = useBooleanState()
 
   const [isAdding, add, closeAdd] = useBooleanState()
   const { user, users, addUser, removeUser, handleChange, setAllUsers } =
@@ -129,7 +133,12 @@ function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
           <MenuWrapper>
             <MenuItem handleClick={add}>add board</MenuItem>
             {!isOwner && (
-              <MenuItem handleClick={() => leaveProject.mutate(id)}>
+              <MenuItem
+                handleClick={() => {
+                  setIsLeaving(true)
+                  openPopup()
+                }}
+              >
                 leave project
               </MenuItem>
             )}
@@ -137,13 +146,31 @@ function Project({ id, name, boards, owner, dragHandleProps }: ProjectProps) {
               <>
                 <MenuItem handleClick={editUsers}>edit users</MenuItem>
                 <MenuItem handleClick={editName}>edit project name</MenuItem>
-                <MenuItem handleClick={() => deleteProject.mutate(id)}>
-                  delete project
-                </MenuItem>
+                <MenuItem handleClick={openPopup}>delete project</MenuItem>
               </>
             )}
           </MenuWrapper>
-
+          {!isLeaving ? (
+            isPopupOpened && (
+              <ConfirmPopup
+                name={name}
+                type="project"
+                handleClick={() => deleteProject.mutate(id)}
+                close={() => closePopup()}
+              />
+            )
+          ) : (
+            <ConfirmPopup
+              name={name}
+              type="project"
+              action="leave"
+              handleClick={() => leaveProject.mutate(id)}
+              close={() => {
+                setIsLeaving(false)
+                closePopup()
+              }}
+            />
+          )}
           <div {...dragHandleProps} className="ml-auto cursor-grab">
             <GoGrabber />
           </div>

@@ -44,6 +44,7 @@ import { useSession, getSession, GetSessionParams } from "next-auth/react"
 import { LoadingDots } from "@/components/LoadingDots"
 import { useRouter } from "next/router"
 import AddProjectModal from "@/components/AddProjectModal"
+import ConfirmPopup from "@/components/ConfirmPopup"
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -161,141 +162,143 @@ export default function Home() {
   }
 
   return (
-    <div
-      onClick={() => {
-        closeSideMenu()
-      }}
-      className="flex flex-col"
-    >
-      {chosenBoard ? (
-        <>
-          <div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1 [&>div]:cursor-default">
-                <ColorDot color={chosenBoard.color} />
-                <h1 className="text-2xl font-bold">{chosenBoard.name}</h1>
-              </div>
-              <MenuWrapper>
-                <MenuItem handleClick={add}>add list</MenuItem>
-                <MenuItem handleClick={toggleSideMenu}>more options</MenuItem>
-              </MenuWrapper>
-              <Filters
-                searchQuery={searchQuery}
-                search={search}
-                assignedFilter={assignedFilter}
-                dateFilter={dateFilter}
-                handleDateFilterChange={handleDateFilterChange}
-                handleAssignedFilterChange={handleAssignedFilterChange}
-                clearFilters={clearFilters}
-                setDateFilter={setDateFilter}
-              />
-            </div>
-            <p className="text-slate-300">owner: {chosenBoard.owner}</p>
-          </div>
-          <div className="flex gap-4 overflow-y-hidden overflow-x-scroll pb-48 lg:gap-8 xl:gap-16">
-            {lists.isLoading && (
-              <>
-                <ListSkeleton />
-                <ListSkeleton />
-                <ListSkeleton />
-              </>
-            )}
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable
-                droppableId="board"
-                direction="horizontal"
-                type="boards"
-              >
-                {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16"
-                  >
-                    {!!lists.data?.length &&
-                      lists.data
-                        ?.sort((a, b) => a.order - b.order)
-                        .map((list, i) => (
-                          <Draggable
-                            key={`list-${i}-${list.id}`}
-                            draggableId={list.id || `placeholder-${i}`}
-                            index={list.order}
-                            isDragDisabled={createList.isLoading}
-                          >
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                              >
-                                <motion.div
-                                  animate={{
-                                    rotate: snapshot.isDragging ? -5 : 0,
-                                  }}
-                                >
-                                  <List
-                                    key={list.id}
-                                    dragHandleProps={provided.dragHandleProps}
-                                    searchQuery={searchQuery}
-                                    dateFilter={dateFilter}
-                                    assignedFilter={assignedFilter}
-                                    isUpdating={createList.isLoading}
-                                    {...list}
-                                  />
-                                </motion.div>
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-
-            {isAdding ? (
-              <ListContainer>
-                <div className="flex flex-col">
-                  <FormProvider {...listMethods}>
-                    <AddEditForm
-                      name="name"
-                      placeholder="list name"
-                      close={closeAdd}
-                      handleSubmit={listMethods.handleSubmit(onSubmit)}
-                    />
-                  </FormProvider>
-                  {listMethods.formState.errors && (
-                    <p role="alert" className="text-base text-red-500">
-                      {listMethods.formState.errors?.name?.message as string}
-                    </p>
-                  )}
-                </div>
-              </ListContainer>
-            ) : (
-              <AddButton onClick={add}>
-                new list <PlusIcon />
-              </AddButton>
-            )}
-          </div>
-        </>
-      ) : (
-        <p className="text-center font-bold text-neutral-500">
-          open or create a new board
-        </p>
-      )}
-
-      <AnimatePresence>
-        {isSideMenuOpen && (
+    <>
+      <div
+        onClick={() => {
+          closeSideMenu()
+        }}
+        className="flex flex-col"
+      >
+        {chosenBoard ? (
           <>
-            <motion.div {...bgBlurAnimation} className="fixed inset-0" />
-            <SideMenu
-              data={userProjects.data}
-              isLoading={userProjects.isLoading}
-            />
+            <div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1 [&>div]:cursor-default">
+                  <ColorDot color={chosenBoard.color} />
+                  <h1 className="text-2xl font-bold">{chosenBoard.name}</h1>
+                </div>
+                <MenuWrapper>
+                  <MenuItem handleClick={add}>add list</MenuItem>
+                  <MenuItem handleClick={toggleSideMenu}>more options</MenuItem>
+                </MenuWrapper>
+                <Filters
+                  searchQuery={searchQuery}
+                  search={search}
+                  assignedFilter={assignedFilter}
+                  dateFilter={dateFilter}
+                  handleDateFilterChange={handleDateFilterChange}
+                  handleAssignedFilterChange={handleAssignedFilterChange}
+                  clearFilters={clearFilters}
+                  setDateFilter={setDateFilter}
+                />
+              </div>
+              <p className="text-slate-300">owner: {chosenBoard.owner}</p>
+            </div>
+            <div className="flex gap-4 overflow-y-hidden overflow-x-scroll pb-48 lg:gap-8 xl:gap-16">
+              {lists.isLoading && (
+                <>
+                  <ListSkeleton />
+                  <ListSkeleton />
+                  <ListSkeleton />
+                </>
+              )}
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable
+                  droppableId="board"
+                  direction="horizontal"
+                  type="boards"
+                >
+                  {(provided) => (
+                    <div
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16"
+                    >
+                      {!!lists.data?.length &&
+                        lists.data
+                          ?.sort((a, b) => a.order - b.order)
+                          .map((list, i) => (
+                            <Draggable
+                              key={`list-${i}-${list.id}`}
+                              draggableId={list.id || `placeholder-${i}`}
+                              index={list.order}
+                              isDragDisabled={createList.isLoading}
+                            >
+                              {(provided, snapshot) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                >
+                                  <motion.div
+                                    animate={{
+                                      rotate: snapshot.isDragging ? -5 : 0,
+                                    }}
+                                  >
+                                    <List
+                                      key={list.id}
+                                      dragHandleProps={provided.dragHandleProps}
+                                      searchQuery={searchQuery}
+                                      dateFilter={dateFilter}
+                                      assignedFilter={assignedFilter}
+                                      isUpdating={createList.isLoading}
+                                      {...list}
+                                    />
+                                  </motion.div>
+                                </div>
+                              )}
+                            </Draggable>
+                          ))}
+
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
+
+              {isAdding ? (
+                <ListContainer>
+                  <div className="flex flex-col">
+                    <FormProvider {...listMethods}>
+                      <AddEditForm
+                        name="name"
+                        placeholder="list name"
+                        close={closeAdd}
+                        handleSubmit={listMethods.handleSubmit(onSubmit)}
+                      />
+                    </FormProvider>
+                    {listMethods.formState.errors && (
+                      <p role="alert" className="text-base text-red-500">
+                        {listMethods.formState.errors?.name?.message as string}
+                      </p>
+                    )}
+                  </div>
+                </ListContainer>
+              ) : (
+                <AddButton onClick={add}>
+                  new list <PlusIcon />
+                </AddButton>
+              )}
+            </div>
           </>
+        ) : (
+          <p className="text-center font-bold text-neutral-500">
+            open or create a new board
+          </p>
         )}
-      </AnimatePresence>
-    </div>
+
+        <AnimatePresence>
+          {isSideMenuOpen && (
+            <>
+              <motion.div {...bgBlurAnimation} className="fixed inset-0" />
+              <SideMenu
+                data={userProjects.data}
+                isLoading={userProjects.isLoading}
+              />
+            </>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
   )
 }
 

@@ -1,6 +1,7 @@
 import { LayoutProvider } from "@/context/LayoutContext"
 import { Jura } from "next/font/google"
 import Navbar from "./Navbar"
+import ConfirmPopup from "./ConfirmPopup"
 
 const jura = Jura({ subsets: ["latin"], weight: ["400", "700"] })
 
