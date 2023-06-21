@@ -9,6 +9,7 @@ interface AddEditFormProps {
   projectId?: string
   handleSubmit?: SubmitHandler<any>
   defaultValue?: string
+  className?: string
 }
 
 function AddEditForm({
@@ -17,11 +18,15 @@ function AddEditForm({
   close,
   handleSubmit,
   defaultValue,
+  className,
 }: AddEditFormProps) {
   const { reset } = useFormContext()
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-1">
+    <form
+      onSubmit={handleSubmit}
+      className={`flex items-center gap-1 ${className} `}
+    >
       <TextInput
         name={name}
         placeholder={placeholder}

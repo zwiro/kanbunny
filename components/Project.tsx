@@ -190,7 +190,7 @@ function Project({
           </div>
         </div>
       ) : (
-        <div className="pt-1.5">
+        <div>
           <FormProvider {...projectMethods}>
             <AddEditForm
               name="name"
@@ -198,6 +198,7 @@ function Project({
               handleSubmit={projectMethods.handleSubmit(onSubmitName)}
               defaultValue={name}
               close={closeEditName}
+              className="pt-[3px]"
             />
           </FormProvider>
           {projectMethods.formState.errors && (

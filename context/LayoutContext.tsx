@@ -36,6 +36,7 @@ export function LayoutProvider({ children }: LayoutProviderProps) {
   const toggleSideMenu = () => {
     setIsSideMenuOpen((prevOpen) => !prevOpen)
   }
+
   const closeSideMenu = () => {
     setIsSideMenuOpen(false)
   }

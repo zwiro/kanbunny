@@ -131,7 +131,10 @@ function List({
       }`}
     >
       <div className="flex items-center gap-2">
-        <ColorDot editColor={editColor} color={color}>
+        <ColorDot
+          editColor={!isEditingName ? editColor : undefined}
+          color={color}
+        >
           <AnimatePresence>
             {isEditingColor && (
               <ColorPicker
@@ -191,6 +194,7 @@ function List({
               placeholder="list name"
               close={closeEditName}
               handleSubmit={listMethods.handleSubmit(onSubmit)}
+              className="[&>input]:h-9"
             />
           </FormProvider>
         )}
@@ -415,6 +419,7 @@ function Task({
                 placeholder="task name"
                 close={closeEditName}
                 handleSubmit={taskMethods.handleSubmit(onSubmit)}
+                className="[&>input]:h-9"
               />
             </FormProvider>
           </div>
@@ -473,7 +478,7 @@ function EditTaskUsers({
 
   return (
     <motion.form onSubmit={onSubmit} {...taskAnimation}>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 pt-8">
         {users.data?.map((user) => (
           <UserCheckbox
             key={user.id}

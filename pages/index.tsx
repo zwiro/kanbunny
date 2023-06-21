@@ -49,7 +49,7 @@ import ConfirmPopup from "@/components/ConfirmPopup"
 export default function Home() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const { isSideMenuOpen, closeSideMenu, toggleSideMenu } =
+  const { isSideMenuOpen, toggleSideMenu, closeSideMenu } =
     useContext(LayoutContext)
 
   const [isAdding, add, closeAdd] = useBooleanState()
@@ -186,7 +186,6 @@ export default function Home() {
                 </div>
                 <MenuWrapper>
                   <MenuItem handleClick={add}>add list</MenuItem>
-                  <MenuItem handleClick={toggleSideMenu}>more options</MenuItem>
                 </MenuWrapper>
                 <Filters
                   searchQuery={searchQuery}
