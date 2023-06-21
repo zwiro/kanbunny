@@ -121,7 +121,7 @@ function List({
   const isLoading = isUpdating || updateName.isLoading || updateColor.isLoading
   return (
     <section
-      className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-t-4 bg-zinc-800 p-4 ${
+      className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 ${
         colorVariants[color]
       } ${isUpdating && !id && "opacity-50"}       ${
         ((isUpdating && !id) ||
@@ -343,7 +343,7 @@ function Task({
   return (
     <>
       <div
-        className={`group flex items-center justify-between border-l-8 ${
+        className={`group flex items-center justify-between border-b border-l-8 border-r border-t border-b-neutral-800 border-r-neutral-800 border-t-neutral-800 ${
           colorVariants[color]
         } bg-zinc-700 p-2
         ${isLoading && "opacity-50"}

@@ -3,7 +3,7 @@ import getRandomWidth from "@/utils/getRandomWidth"
 function ListSkeleton() {
   return (
     <section
-      className={`mt-4 flex min-w-[18rem] animate-pulse flex-col gap-4 border-t-4 border-t-green-500 bg-zinc-800 p-4`}
+      className={`mt-4 flex min-w-[18rem] animate-pulse flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 border-t-green-500 bg-zinc-800 p-4`}
     >
       <div className="flex h-9 items-center gap-2">
         <div className="h-4 w-4 bg-zinc-700" />
@@ -26,7 +26,7 @@ function ListSkeleton() {
 function TaskSkeleton() {
   return (
     <div
-      className={`group flex h-[52px] items-center justify-between border-l-8 border-l-blue-500 bg-zinc-700 p-2`}
+      className={`group flex h-[52px] items-center justify-between border-b border-l-8 border-r border-t border-b-neutral-800 border-l-blue-500 border-r-neutral-800 border-t-neutral-800 bg-zinc-700 p-2`}
     >
       <div className="relative flex flex-col">
         <div
