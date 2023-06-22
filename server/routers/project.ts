@@ -19,20 +19,14 @@ export const projectRouter = createTRPCRouter({
         },
       },
     })
+
     const modifiedProjects = projects.map((project) => ({
       ...project.project,
       order: project.project.users[0].order,
     }))
+
     return modifiedProjects
   }),
-  getById: protectedProcedure
-    .input(z.string())
-    .query(async ({ ctx, input }) => {
-      const project = await ctx.prisma.project.findUnique({
-        where: { id: input },
-      })
-      return project
-    }),
   getUsers: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -44,32 +38,20 @@ export const projectRouter = createTRPCRouter({
           ],
         },
       })
+
       return users
     }),
-  getOrder: protectedProcedure
-    .input(z.string())
-    .query(async ({ ctx, input }) => {
-      const order = await ctx.prisma.projectUser.findFirst({
-        where: { projectId: input },
-        select: { order: true },
-      })
-      return order
-    }),
-  getLength: protectedProcedure.query(async ({ ctx }) => {
-    const length = await ctx.prisma.projectUser.count({
-      where: { userId: ctx.session.user.id },
-    })
-    return length
-  }),
   create: protectedProcedure
     .input(projectSchema)
     .mutation(async ({ ctx, input }) => {
       const users = await ctx.prisma.user.findMany({
         where: { name: { in: input.users } },
       })
+
       const userIds = users
         .filter((user) => user.id !== ctx.session.user.id)
         .map((user) => ({ userId: user.id, order: 0 }))
+
       const project = await ctx.prisma.project.create({
         data: {
           name: input.name,
@@ -81,10 +63,12 @@ export const projectRouter = createTRPCRouter({
           },
         },
       })
+
       await ctx.prisma.projectUser.updateMany({
         where: { NOT: { projectId: project.id } },
         data: { order: { increment: 1 } },
       })
+
       return project
     }),
   editUsers: protectedProcedure
@@ -95,9 +79,11 @@ export const projectRouter = createTRPCRouter({
       const project = await ctx.prisma.project.findUnique({
         where: { id: input.projectId },
       })
+
       if (project?.ownerId !== ctx.session.user.id) {
         throw new Error("You are not the owner of this project")
       }
+
       const toDeleteUsers = await ctx.prisma.user.findMany({
         where: {
           AND: [
@@ -106,6 +92,7 @@ export const projectRouter = createTRPCRouter({
           ],
         },
       })
+
       const newUsers = await ctx.prisma.user.findMany({
         where: {
           AND: [
@@ -118,6 +105,7 @@ export const projectRouter = createTRPCRouter({
           ],
         },
       })
+
       await ctx.prisma.projectUser.deleteMany({
         where: {
           AND: [
@@ -131,6 +119,7 @@ export const projectRouter = createTRPCRouter({
           ],
         },
       })
+
       for (let user of newUsers) {
         await ctx.prisma.projectUser.create({
           data: {
@@ -151,16 +140,18 @@ export const projectRouter = createTRPCRouter({
       const project = await ctx.prisma.project.findUnique({
         where: { id: input.projectId },
       })
+
       if (project?.ownerId !== ctx.session.user.id) {
         throw new Error("You are not the owner of this project")
       }
-      await ctx.prisma.project.update({
+
+      const updatedProject = await ctx.prisma.project.update({
         where: { id: project.id },
         data: {
           name: input.name,
         },
       })
-      return project
+      return updatedProject
     }),
   reorder: protectedProcedure
     .input(reorderSchema)
@@ -169,10 +160,14 @@ export const projectRouter = createTRPCRouter({
         where: { order: input.itemOneIndex },
         include: { project: { include: { users: true } } },
       })
-      if (!projectDragged) throw new Error("Project does not exist")
+
+      if (!projectDragged) {
+        throw new Error("Project does not exist")
+      }
+
       if (
         projectDragged.project.ownerId !== ctx.session.user.id &&
-        !projectDragged?.project.users
+        !projectDragged.project.users
           .map((u) => u.userId)
           .includes(ctx.session.user.id)
       ) {
@@ -180,7 +175,7 @@ export const projectRouter = createTRPCRouter({
       }
 
       await ctx.prisma.projectUser.update({
-        where: { id: projectDragged?.id },
+        where: { id: projectDragged.id },
         data: { order: input.itemTwoIndex },
       })
 
@@ -190,7 +185,7 @@ export const projectRouter = createTRPCRouter({
             AND: [
               { order: { gte: input.itemTwoIndex } },
               { order: { lte: input.itemOneIndex } },
-              { NOT: { id: projectDragged?.id } },
+              { NOT: { id: projectDragged.id } },
             ],
           },
           data: { order: { increment: 1 } },
@@ -203,7 +198,7 @@ export const projectRouter = createTRPCRouter({
             AND: [
               { order: { lte: input.itemTwoIndex } },
               { order: { gte: input.itemOneIndex } },
-              { NOT: { id: projectDragged?.id } },
+              { NOT: { id: projectDragged.id } },
             ],
           },
           data: { order: { decrement: 1 } },
@@ -219,12 +214,17 @@ export const projectRouter = createTRPCRouter({
         where: { id: input },
         include: { users: true },
       })
-      if (!project) throw new Error("Project does not exist")
+
+      if (!project) {
+        throw new Error("Project does not exist")
+      }
+
       if (!project.users.map((u) => u.userId).includes(ctx.session.user.id))
         throw new Error("You are not a member of this project")
       await ctx.prisma.projectUser.deleteMany({
         where: { projectId: input, userId: ctx.session!.user.id },
       })
+
       return { success: true }
     }),
   delete: protectedProcedure
@@ -244,6 +244,7 @@ export const projectRouter = createTRPCRouter({
           projects_in: { some: { id: input } },
         },
       })
+
       users.map(async (user) => {
         await ctx.prisma.user.update({
           where: { id: user.id },
@@ -252,18 +253,22 @@ export const projectRouter = createTRPCRouter({
           },
         })
       })
+
       await ctx.prisma.projectUser.deleteMany({
         where: { projectId: input },
       })
+
       await ctx.prisma.project.deleteMany({
         where: { id: input },
       })
+
       await ctx.prisma.projectUser.updateMany({
         where: {
           AND: [{ NOT: { id: input } }, { order: { gt: projectUser.order } }],
         },
         data: { order: { decrement: 1 } },
       })
+
       return { success: true }
     }),
 })
