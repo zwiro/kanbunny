@@ -144,7 +144,7 @@ export const listRouter = createTRPCRouter({
       }
 
       await ctx.prisma.list.update({
-        where: { id: listDragged?.id },
+        where: { id: listDragged.id },
         data: { order: input.itemTwoIndex },
       })
 
@@ -154,8 +154,8 @@ export const listRouter = createTRPCRouter({
             AND: [
               { order: { gte: input.itemTwoIndex } },
               { order: { lte: input.itemOneIndex } },
-              { NOT: { id: listDragged?.id } },
-              { boardId: listDragged?.boardId },
+              { NOT: { id: listDragged.id } },
+              { boardId: listDragged.boardId },
             ],
           },
           data: { order: { increment: 1 } },
@@ -168,8 +168,8 @@ export const listRouter = createTRPCRouter({
             AND: [
               { order: { lte: input.itemTwoIndex } },
               { order: { gte: input.itemOneIndex } },
-              { NOT: { id: listDragged?.id } },
-              { boardId: listDragged?.boardId },
+              { NOT: { id: listDragged.id } },
+              { boardId: listDragged.boardId },
             ],
           },
           data: { order: { decrement: 1 } },

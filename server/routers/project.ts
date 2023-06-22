@@ -113,7 +113,7 @@ export const projectRouter = createTRPCRouter({
             {
               userId: {
                 in: toDeleteUsers.map((u) => u.id),
-                not: ctx.session.user.id!,
+                not: ctx.session.user.id,
               },
             },
           ],
@@ -222,7 +222,7 @@ export const projectRouter = createTRPCRouter({
       if (!project.users.map((u) => u.userId).includes(ctx.session.user.id))
         throw new Error("You are not a member of this project")
       await ctx.prisma.projectUser.deleteMany({
-        where: { projectId: input, userId: ctx.session!.user.id },
+        where: { projectId: input, userId: ctx.session.user.id },
       })
 
       return { success: true }
@@ -235,7 +235,7 @@ export const projectRouter = createTRPCRouter({
         include: { project: true },
       })
 
-      if (projectUser?.project.ownerId !== ctx.session!.user.id) {
+      if (projectUser?.project.ownerId !== ctx.session.user.id) {
         throw new Error("You are not the owner of this project")
       }
 

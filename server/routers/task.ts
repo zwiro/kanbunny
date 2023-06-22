@@ -191,7 +191,7 @@ export const taskRouter = createTRPCRouter({
         throw new Error("You are not a member of this project")
       }
 
-      const prevListId = taskDragged?.listId
+      const prevListId = taskDragged.listId
 
       if (prevListId !== input.listId) {
         await ctx.prisma.task.update({
