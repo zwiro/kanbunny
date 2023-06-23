@@ -41,6 +41,22 @@ export const projectRouter = createTRPCRouter({
 
       return users
     }),
+  getAllUsers: protectedProcedure
+    .input(z.string().or(z.undefined()))
+    .query(async ({ ctx, input }) => {
+      if (!input) {
+        return []
+      }
+
+      const users = await ctx.prisma.user.findMany({
+        where: {
+          // NOT: { id: ctx.session.user.id },
+          name: { contains: input },
+        },
+      })
+
+      return users
+    }),
   create: protectedProcedure
     .input(projectSchema)
     .mutation(async ({ ctx, input }) => {

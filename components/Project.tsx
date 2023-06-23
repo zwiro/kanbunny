@@ -33,6 +33,7 @@ import { createNewBoard, reorderBoards } from "@/mutations/boardMutations"
 import AddUsersInput from "./AddUsersInput"
 import { useSession } from "next-auth/react"
 import ConfirmPopup from "./ConfirmPopup"
+import UserSelect from "./UserSelect"
 
 interface ProjectProps {
   boards: Board[]
@@ -215,14 +216,15 @@ function Project({
             className="flex flex-col gap-2 pt-4 text-base"
           >
             <form onSubmit={handleSubmitUsers} className="flex flex-col gap-2">
-              <AddUsersInput
+              {/* <AddUsersInput
                 value={user}
                 onChange={handleChange}
                 addUser={addUser}
                 removeUser={removeUser}
                 length={users.length}
                 users={users}
-              />
+              /> */}
+              <UserSelect />
               <div className="flex items-center gap-1">
                 {!updateUsers.isLoading ? (
                   <>
