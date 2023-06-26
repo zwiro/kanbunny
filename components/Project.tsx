@@ -56,7 +56,7 @@ function Project({
 }: ProjectProps) {
   trpc.project.getUsers.useQuery(id, {
     onSuccess(data) {
-      setAllUsers(data?.map((user) => user.name!))
+      setSelectedUsers(data?.map((user) => user.name!))
     },
   })
   const { data: session, status } = useSession()
@@ -69,8 +69,8 @@ function Project({
   const [isPopupOpened, openPopup, closePopup] = useBooleanState()
 
   const [isAdding, add, closeAdd] = useBooleanState()
-  const { user, users, addUser, removeUser, handleChange, setAllUsers } =
-    useAddUser()
+
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
 
   const { chosenBoard } = useContext(LayoutContext)
 
@@ -105,7 +105,8 @@ function Project({
 
   const handleSubmitUsers = (e: React.FormEvent) => {
     e.preventDefault()
-    updateUsers.mutate({ projectId: id, participants: users })
+    updateUsers.mutate({ projectId: id, participants: selectedUsers })
+    closeEditUsers()
   }
 
   const projectUsersAnimation = {
@@ -216,15 +217,14 @@ function Project({
             className="flex flex-col gap-2 pt-4 text-base"
           >
             <form onSubmit={handleSubmitUsers} className="flex flex-col gap-2">
-              {/* <AddUsersInput
-                value={user}
-                onChange={handleChange}
-                addUser={addUser}
-                removeUser={removeUser}
-                length={users.length}
-                users={users}
-              /> */}
-              <UserSelect />
+              <p>
+                {selectedUsers.length} participant
+                {selectedUsers.length === 1 ? "" : "s"}
+              </p>
+              <UserSelect
+                selectedUsers={selectedUsers}
+                setSelectedUsers={setSelectedUsers}
+              />
               <div className="flex items-center gap-1">
                 {!updateUsers.isLoading ? (
                   <>

@@ -50,7 +50,7 @@ export const projectRouter = createTRPCRouter({
 
       const users = await ctx.prisma.user.findMany({
         where: {
-          // NOT: { id: ctx.session.user.id },
+          NOT: { id: ctx.session.user.id },
           name: { contains: input },
         },
       })

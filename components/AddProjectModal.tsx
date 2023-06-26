@@ -11,13 +11,15 @@ import PlusIcon from "./PlusIcon"
 import TextInput from "./TextInput"
 import { createNewProject } from "@/mutations/projectMutations"
 import AddUsersInput from "./AddUsersInput"
+import UserSelect from "./UserSelect"
+import { useState } from "react"
 
 interface AddProjectModalProps {
   close: () => void
 }
 
 function AddProjectModal({ close }: AddProjectModalProps) {
-  const { user, users, addUser, removeUser, handleChange } = useAddUser()
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
 
   const utils = trpc.useContext()
 
@@ -32,7 +34,7 @@ function AddProjectModal({ close }: AddProjectModalProps) {
   const onSubmit: SubmitHandler<ProjectSchema> = (data: any) => {
     createProject.mutate({
       name: data.name,
-      users,
+      users: selectedUsers,
     })
   }
 
@@ -50,13 +52,14 @@ function AddProjectModal({ close }: AddProjectModalProps) {
           )}
         </FormFieldContainer>
         <FormFieldContainer>
-          <AddUsersInput
-            value={user}
-            onChange={handleChange}
-            addUser={addUser}
-            removeUser={removeUser}
-            length={users.length}
-            users={users}
+          <label htmlFor="name">add users</label>
+          <p className="text-sm text-zinc-300">
+            {selectedUsers.length} participant
+            {selectedUsers.length === 1 ? "" : "s"}
+          </p>
+          <UserSelect
+            selectedUsers={selectedUsers}
+            setSelectedUsers={setSelectedUsers}
           />
         </FormFieldContainer>
         <AddButton disabled={createProject.isLoading}>

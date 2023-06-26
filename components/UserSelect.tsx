@@ -1,11 +1,14 @@
 import { trpc } from "@/utils/trpc"
-import { User } from "@prisma/client"
 import React, { useEffect, useState } from "react"
-import AsyncSelect from "react-select/async"
 import Select from "react-select"
 import { useDebounce } from "@/hooks/useDebounce"
 
-function UserSelect() {
+interface UserSelectProps {
+  selectedUsers: string[]
+  setSelectedUsers: React.Dispatch<React.SetStateAction<string[]>>
+}
+
+function UserSelect({ selectedUsers, setSelectedUsers }: UserSelectProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedQuery = useDebounce<string>(searchQuery, 500)
 
@@ -23,19 +26,29 @@ function UserSelect() {
   return (
     <Select
       options={
-        filteredOptions.map((u) => ({ label: u.name, value: u.name })) || []
+        filteredOptions.map((u) => ({ label: u.name!, value: u.name! })) || []
       }
       inputValue={searchQuery}
       onInputChange={(value) => setSearchQuery(value)}
-      placeholder="find user"
+      defaultValue={selectedUsers.map((u) => ({ label: u, value: u }))}
+      onChange={(value) => setSelectedUsers(value.map((v) => v.value!))}
+      isMulti
+      placeholder="type to find user"
       noOptionsMessage={() =>
-        userOptions.isLoading ? "loading" : "no users found"
+        userOptions.isLoading ? "loading..." : "no users found"
       }
       styles={{
-        control: (base) => ({ ...base, backgroundColor: "rgb(24 24 27)" }),
+        control: (base) => ({
+          ...base,
+          backgroundColor: "rgb(24 24 27)",
+          height: 40,
+        }),
         singleValue: (base) => ({ ...base, color: "rgb(241 245 249)" }),
         menu: (base) => ({ ...base, backgroundColor: "rgb(24 24 27)" }),
+        input: (base) => ({ ...base, color: "rgb(241 245 249)" }),
         dropdownIndicator: (base) => ({ ...base, color: "rgb(241 245 249)" }),
+        multiValue: (base) => ({ ...base, backgroundColor: "rgb(63 63 70)" }),
+        multiValueLabel: (base) => ({ ...base, color: "rgb(241 245 249)" }),
         option: (base, state) => ({
           ...base,
           backgroundColor:
