@@ -1,18 +1,13 @@
-import { AnimatePresence, motion } from "framer-motion"
-import MenuWrapper from "./MenuWrapper"
-import MenuItem from "./MenuItem"
-import AddEditForm from "./AddEditForm"
-import useBooleanState from "@/hooks/useBooleanState"
-import React, { useContext, useRef, useState } from "react"
+import { useContext, useRef, useState } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
-import { trpc } from "@/utils/trpc"
-import type { Project, User } from "@prisma/client"
-import { LoadingDots } from "./LoadingDots"
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useSession } from "next-auth/react"
+import { AnimatePresence, motion } from "framer-motion"
+import type { Project, User } from "@prisma/client"
+import { trpc } from "@/utils/trpc"
 import { z } from "zod"
-import Board from "./Board"
-import LayoutContext from "@/context/LayoutContext"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { LoadingDots } from "./LoadingDots"
 import { boardAndProjectSchema } from "@/utils/schemas"
 import { GoGrabber } from "react-icons/go"
 import {
@@ -29,7 +24,12 @@ import {
   updateProjectUsers,
 } from "@/mutations/projectMutations"
 import { createNewBoard, reorderBoards } from "@/mutations/boardMutations"
-import { useSession } from "next-auth/react"
+import LayoutContext from "@/context/LayoutContext"
+import useBooleanState from "@/hooks/useBooleanState"
+import Board from "./Board"
+import MenuWrapper from "./MenuWrapper"
+import MenuItem from "./MenuItem"
+import AddEditForm from "./AddEditForm"
 import ConfirmPopup from "./ConfirmPopup"
 import UserSelect from "./UserSelect"
 
@@ -57,41 +57,41 @@ function Project({
       setSelectedUsers(data?.map((user) => user.name!))
     },
   })
-  const { data: session, status } = useSession()
+
+  const { data: session } = useSession()
+
   const isOwner = session?.user?.id === owner.id
 
   const [isLeaving, setIsLeaving] = useState(false)
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
 
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
   const [isPopupOpened, openPopup, closePopup] = useBooleanState()
-
   const [isAdding, add, closeAdd] = useBooleanState()
-
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
 
   const { chosenBoard } = useContext(LayoutContext)
 
-  const boardMutationCounter = useRef(0)
-
   const utils = trpc.useContext()
-
-  const updateUsers = updateProjectUsers(utils)
-  const updateName = updateProjectName(utils, closeEditName, mutationCounter)
-  const deleteProject = deleteOneProject(utils, mutationCounter)
-  const leaveProject = leaveOneProject(utils, mutationCounter)
 
   const boardMethods = useForm<BoardAndProjectSchema>({
     defaultValues: { projectId: id },
     resolver: zodResolver(boardAndProjectSchema),
   })
 
-  const createBoard = createNewBoard(utils, closeAdd, boardMethods)
-
   const projectMethods = useForm<BoardAndProjectSchema>({
     defaultValues: { projectId: id, name },
     resolver: zodResolver(boardAndProjectSchema),
   })
+
+  const boardMutationCounter = useRef(0)
+
+  const updateUsers = updateProjectUsers(utils)
+  const updateName = updateProjectName(utils, closeEditName, mutationCounter)
+  const deleteProject = deleteOneProject(utils, mutationCounter)
+  const leaveProject = leaveOneProject(utils, mutationCounter)
+  const createBoard = createNewBoard(utils, closeAdd, boardMethods)
+  const reorder = reorderBoards(id, utils, boardMutationCounter)
 
   const onSubmit: SubmitHandler<BoardAndProjectSchema> = (data: any) => {
     createBoard.mutate({ name: data.name, projectId: id })
@@ -112,8 +112,6 @@ function Project({
     animate: { height: "auto", opacity: 1 },
     exit: { height: 0, opacity: 0 },
   }
-
-  const reorder = reorderBoards(id, utils, boardMutationCounter)
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result

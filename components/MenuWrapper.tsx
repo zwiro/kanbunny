@@ -1,4 +1,4 @@
-import { useRef, useContext, RefObject, useEffect, useState } from "react"
+import { useRef, useContext, useEffect, useState } from "react"
 import { AnimatePresence } from "framer-motion"
 import { motion } from "framer-motion"
 import useClickOutside from "@/hooks/useClickOutside"

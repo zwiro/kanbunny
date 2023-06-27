@@ -2,7 +2,7 @@ import Link from "next/link"
 import { GiRabbit } from "react-icons/gi"
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/router"
-import { useContext, useEffect } from "react"
+import { useContext } from "react"
 import LayoutContext from "@/context/LayoutContext"
 import { LoadingDots } from "./LoadingDots"
 

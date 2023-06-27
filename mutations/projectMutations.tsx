@@ -1,6 +1,5 @@
 import type { TRPCContextType } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
-import React from "react"
 
 export const createNewProject = (utils: TRPCContextType, close: () => void) =>
   trpc.project.create.useMutation({

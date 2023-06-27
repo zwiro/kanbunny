@@ -1,20 +1,19 @@
-import PlusIcon from "./PlusIcon"
-import AddButton from "./AddButton"
+import { useRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import useBooleanState from "@/hooks/useBooleanState"
-import AddProjectModal from "./AddProjectModal"
-import React, { useRef } from "react"
-import { LoadingDots } from "./LoadingDots"
-import Project from "./Project"
-import type { Board, User } from "@prisma/client"
+import { trpc } from "@/utils/trpc"
 import {
   DragDropContext,
   Droppable,
   Draggable,
   type DropResult,
 } from "@hello-pangea/dnd"
-import { trpc } from "@/utils/trpc"
+import type { Board, User } from "@prisma/client"
 import { reorderProjects } from "@/mutations/projectMutations"
+import PlusIcon from "./PlusIcon"
+import AddButton from "./AddButton"
+import useBooleanState from "@/hooks/useBooleanState"
+import AddProjectModal from "./AddProjectModal"
+import Project from "./Project"
 import ProjectSkeleton from "./ProjectSkeleton"
 
 interface SideMenuProps {

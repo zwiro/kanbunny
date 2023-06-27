@@ -1,40 +1,25 @@
-import { type FormEventHandler, useContext } from "react"
+import { useContext } from "react"
 import { useSession } from "next-auth/react"
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { AnimatePresence, motion } from "framer-motion"
-import type { UseTRPCQueryResult } from "@trpc/react-query/shared"
 import { trpc } from "@/utils/trpc"
-import {
-  AiOutlineCheck,
-  AiOutlineClockCircle,
-  AiOutlineClose,
-} from "react-icons/ai"
 import { GoGrabber } from "react-icons/go"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import type {
-  List as ListType,
-  Prisma,
-  Task as TaskType,
-  User,
-} from "@prisma/client"
-import { editListSchema, editTaskSchema } from "@/utils/schemas"
+import type { List as ListType } from "@prisma/client"
+import { editListSchema } from "@/utils/schemas"
 import {
   Draggable,
   type DraggableProvidedDragHandleProps,
   Droppable,
 } from "@hello-pangea/dnd"
 import {
-  deleteOneTask,
-  updateTaskColor,
-  updateTaskUsers,
-  updatedTaskName,
-} from "@/mutations/taskMutations"
-import {
   deleteOneList,
   updateListColor,
   updateListName,
 } from "@/mutations/listMutations"
+import { TaskWithAssignedTo } from "@/types/trpc"
+import { colorVariants } from "@/utils/colorVariants"
 import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
@@ -42,15 +27,11 @@ import AddEditForm from "./AddEditForm"
 import AddTaskModal from "./AddTaskModal"
 import useBooleanState from "@/hooks/useBooleanState"
 import ColorPicker from "./ColorPicker"
-import UserCheckbox from "./UserCheckbox"
 import ColorDot from "./ColorDot"
 import LayoutContext from "@/context/LayoutContext"
-import useAssignUser from "@/hooks/useAssignUser"
 import getFilteredTasks from "@/utils/getFilteredTasks"
 import ConfirmPopup from "./ConfirmPopup"
-import { TaskWithAssignedTo } from "@/types/trpc"
 import Task from "./Task"
-import { colorVariants } from "@/utils/colorVariants"
 
 interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]
@@ -77,6 +58,9 @@ function List({
   mutationCounter,
   taskMutationCounter,
 }: ListProps) {
+  const { data: session } = useSession()
+  const userId = session?.user?.id
+
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
   const [isAdding, add, closeAdd] = useBooleanState()
@@ -111,10 +95,8 @@ function List({
     updateName.mutate({ name: data.name, id, boardId })
   }
 
-  const { data: session } = useSession()
-  const userId = session?.user?.id
-
   const isLoading = isUpdating || updateName.isLoading || updateColor.isLoading
+
   return (
     <section
       className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 ${

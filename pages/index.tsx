@@ -52,20 +52,17 @@ import { appRouter } from "@/server/routers/_app"
 import superjson from "superjson"
 
 export default function Home() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const { isSideMenuOpen, toggleSideMenu, closeSideMenu } =
-    useContext(LayoutContext)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [dateFilter, setDateFilter] = useState<string | Date | null>(null)
+  const [assignedFilter, setAssignedFilter] = useState<string | null>(null)
+
+  const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
 
   const [isAdding, add, closeAdd] = useBooleanState()
 
   const { chosenBoard } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
-
-  const [searchQuery, setSearchQuery] = useState("")
-  const [dateFilter, setDateFilter] = useState<string | Date | null>(null)
-  const [assignedFilter, setAssignedFilter] = useState<string | null>(null)
 
   const handleDateFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDateFilter(e.target.value)
@@ -110,10 +107,6 @@ export default function Home() {
     closeAdd,
     listMethods
   )
-
-  useEffect(() => {
-    listMethods.reset({ boardId: chosenBoard?.id })
-  }, [chosenBoard?.id, listMethods, board.data])
 
   const onSubmit: SubmitHandler<ListSchema> = (data: any) => {
     createList.mutate({
@@ -172,6 +165,10 @@ export default function Home() {
       })
     }
   }
+
+  useEffect(() => {
+    listMethods.reset({ boardId: chosenBoard?.id })
+  }, [chosenBoard?.id, listMethods, board.data])
 
   return (
     <>

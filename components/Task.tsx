@@ -1,35 +1,35 @@
+import { FormEventHandler, useContext } from "react"
 import {
   AiOutlineCheck,
   AiOutlineClockCircle,
   AiOutlineClose,
 } from "react-icons/ai"
-import UserCheckbox from "./UserCheckbox"
-import { FormEventHandler, useContext } from "react"
 import { UseTRPCQueryResult } from "@trpc/react-query/shared"
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { User } from "@prisma/client"
 import { motion, AnimatePresence } from "framer-motion"
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
-import AddEditForm from "./AddEditForm"
 import { GoGrabber } from "react-icons/go"
-import MenuWrapper from "./MenuWrapper"
-import MenuItem from "./MenuItem"
-import ColorPicker from "./ColorPicker"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { TaskWithAssignedTo } from "@/types/trpc"
+import { trpc } from "@/utils/trpc"
 import {
   deleteOneTask,
   updateTaskColor,
   updateTaskUsers,
   updatedTaskName,
 } from "@/mutations/taskMutations"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { trpc } from "@/utils/trpc"
+import { editTaskSchema } from "@/utils/schemas"
+import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
+import { colorVariants } from "@/utils/colorVariants"
+import UserCheckbox from "./UserCheckbox"
+import AddEditForm from "./AddEditForm"
+import MenuWrapper from "./MenuWrapper"
+import MenuItem from "./MenuItem"
+import ColorPicker from "./ColorPicker"
 import useAssignUser from "@/hooks/useAssignUser"
 import LayoutContext from "@/context/LayoutContext"
 import useBooleanState from "@/hooks/useBooleanState"
-import { editTaskSchema } from "@/utils/schemas"
-import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
-import { z } from "zod"
-import { TaskWithAssignedTo } from "@/types/trpc"
-import { colorVariants } from "@/utils/colorVariants"
 
 type TaskSchema = z.infer<typeof editTaskSchema>
 
@@ -53,6 +53,7 @@ function Task({
 }: TaskProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
+
   const { chosenBoard } = useContext(LayoutContext)
 
   const assignedToIds = assigned_to.map((u) => u.id)
@@ -60,12 +61,12 @@ function Task({
   const { assignedUsers, assignUser } = useAssignUser(assignedToIds)
 
   const utils = trpc.useContext()
+
   const relativeTimeFormat = new Intl.RelativeTimeFormat("en", {
     numeric: "auto",
   })
 
   const timeDiff = due_to ? due_to.getTime() - new Date().getTime() : 0
-
   const daysLeft = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
   const hoursLeft = Math.floor(
     (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)

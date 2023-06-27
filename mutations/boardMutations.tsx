@@ -1,7 +1,6 @@
 import type { TRPCContextType } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
 import type { Board } from "@prisma/client"
-import React, { RefObject } from "react"
 import type { UseFormReturn } from "react-hook-form"
 
 export const createNewBoard = (
