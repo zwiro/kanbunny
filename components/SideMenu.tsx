@@ -78,9 +78,9 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
         ) : (
           <>
             <div className=" mx-auto h-[68px] w-[164px] animate-pulse bg-zinc-900 px-4 py-5 lg:mx-0" />
-            <ProjectSkeleton />
-            <ProjectSkeleton />
-            <ProjectSkeleton />
+            <ProjectSkeleton width={60} />
+            <ProjectSkeleton width={120} />
+            <ProjectSkeleton width={180} />
           </>
         )}
         <DragDropContext onDragEnd={onDragEnd}>

@@ -203,9 +203,9 @@ export default function Home() {
             <div className="flex gap-4 overflow-y-hidden overflow-x-scroll pb-48 lg:gap-8 xl:gap-16">
               {lists.isLoading && (
                 <>
-                  <ListSkeleton />
-                  <ListSkeleton />
-                  <ListSkeleton />
+                  <ListSkeleton width={60} />
+                  <ListSkeleton width={130} />
+                  <ListSkeleton width={100} />
                 </>
               )}
               <DragDropContext onDragEnd={onDragEnd}>

@@ -31,7 +31,7 @@ interface LayoutProviderProps {
 }
 
 export function LayoutProvider({ children }: LayoutProviderProps) {
-  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(true)
 
   const toggleSideMenu = () => {
     setIsSideMenuOpen((prevOpen) => !prevOpen)

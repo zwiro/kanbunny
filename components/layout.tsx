@@ -12,12 +12,12 @@ interface LayoutProps {
 
 function Layout({ children }: LayoutProps) {
   const { data: session, status } = useSession()
+  const title = `kanbunny ${session ? `| ${session.user.name}` : ""}`
 
   return (
     <LayoutProvider>
       <Head>
-        <title>kanbunny {session ? `| ${session.user.name}` : ""}</title>
-
+        <title>{title}</title>
         <link
           rel="apple-touch-icon"
           sizes="180x180"
