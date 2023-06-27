@@ -21,7 +21,6 @@ import {
 } from "@/mutations/taskMutations"
 import { editTaskSchema } from "@/utils/schemas"
 import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
-import { colorVariants } from "@/utils/colorVariants"
 import UserCheckbox from "./UserCheckbox"
 import AddEditForm from "./AddEditForm"
 import MenuWrapper from "./MenuWrapper"
@@ -122,6 +121,14 @@ function Task({
     closeEditColor,
     mutationCounter
   )
+
+  const colorVariants = {
+    blue: "border-blue-500",
+    red: "border-red-500",
+    yellow: "border-yellow-500",
+    green: "border-green-500",
+    pink: "border-pink-500",
+  }
 
   const isLoading = updateName.isLoading || updateColor.isLoading
 

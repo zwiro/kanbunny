@@ -41,7 +41,7 @@ function ModalForm({ children, close, handleSubmit }: ModalFormProps) {
     >
       <form
         onSubmit={handleSubmit}
-        className="grid h-full w-3/4 place-items-center"
+        className="grid h-full w-3/4 max-w-2xl place-items-center"
       >
         <motion.div
           ref={modalRef}

@@ -173,7 +173,13 @@ export const projectRouter = createTRPCRouter({
     .input(reorderSchema)
     .mutation(async ({ ctx, input }) => {
       const projectDragged = await ctx.prisma.projectUser.findFirst({
-        where: { order: input.itemOneIndex },
+        where: {
+          AND: [
+            { projectId: input.draggableId },
+            { userId: ctx.session.user.id },
+            { order: input.itemOneIndex },
+          ],
+        },
         include: { project: { include: { users: true } } },
       })
 
@@ -190,8 +196,13 @@ export const projectRouter = createTRPCRouter({
         throw new Error("You are not a member of this project")
       }
 
-      await ctx.prisma.projectUser.update({
-        where: { id: projectDragged.id },
+      await ctx.prisma.projectUser.updateMany({
+        where: {
+          AND: [
+            { projectId: projectDragged.projectId },
+            { userId: ctx.session.user.id },
+          ],
+        },
         data: { order: input.itemTwoIndex },
       })
 
@@ -199,9 +210,10 @@ export const projectRouter = createTRPCRouter({
         await ctx.prisma.projectUser.updateMany({
           where: {
             AND: [
+              { userId: ctx.session.user.id },
               { order: { gte: input.itemTwoIndex } },
               { order: { lte: input.itemOneIndex } },
-              { NOT: { id: projectDragged.id } },
+              { NOT: { projectId: projectDragged.projectId } },
             ],
           },
           data: { order: { increment: 1 } },
@@ -212,9 +224,10 @@ export const projectRouter = createTRPCRouter({
         await ctx.prisma.projectUser.updateMany({
           where: {
             AND: [
+              { userId: ctx.session.user.id },
               { order: { lte: input.itemTwoIndex } },
               { order: { gte: input.itemOneIndex } },
-              { NOT: { id: projectDragged.id } },
+              { NOT: { projectId: projectDragged.projectId } },
             ],
           },
           data: { order: { decrement: 1 } },

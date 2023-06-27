@@ -19,7 +19,6 @@ import {
   updateListName,
 } from "@/mutations/listMutations"
 import { TaskWithAssignedTo } from "@/types/trpc"
-import { colorVariants } from "@/utils/colorVariants"
 import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
@@ -93,6 +92,14 @@ function List({
 
   const onSubmit: SubmitHandler<ListSchema> = (data: any) => {
     updateName.mutate({ name: data.name, id, boardId })
+  }
+
+  const colorVariants = {
+    blue: "border-blue-500",
+    red: "border-red-500",
+    yellow: "border-yellow-500",
+    green: "border-green-500",
+    pink: "border-pink-500",
   }
 
   const isLoading = isUpdating || updateName.isLoading || updateColor.isLoading
