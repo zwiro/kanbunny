@@ -44,29 +44,6 @@ export const updateProjectName = (
     },
   })
 
-export const deleteOneProject = (
-  utils: TRPCContextType,
-  counter: React.MutableRefObject<number>
-) =>
-  trpc.project.delete.useMutation({
-    async onMutate(input) {
-      await utils.project.getByUser.cancel()
-      counter.current += 1
-      const prevData = utils.project.getByUser.getData()
-      utils.project.getByUser.setData(undefined, (old) =>
-        old?.filter((p) => p.id !== input)
-      )
-      return { prevData }
-    },
-    onError(err, input, ctx) {
-      utils.project.getByUser.setData(undefined, ctx?.prevData)
-    },
-    onSettled() {
-      counter.current -= 1
-      counter.current === 0 && utils.project.getByUser.invalidate()
-    },
-  })
-
 export const reorderProjects = (
   utils: TRPCContextType,
   counter: React.MutableRefObject<number>
@@ -107,6 +84,29 @@ export const leaveOneProject = (
   counter: React.MutableRefObject<number>
 ) =>
   trpc.project.leave.useMutation({
+    async onMutate(input) {
+      await utils.project.getByUser.cancel()
+      counter.current += 1
+      const prevData = utils.project.getByUser.getData()
+      utils.project.getByUser.setData(undefined, (old) =>
+        old?.filter((p) => p.id !== input)
+      )
+      return { prevData }
+    },
+    onError(err, input, ctx) {
+      utils.project.getByUser.setData(undefined, ctx?.prevData)
+    },
+    onSettled() {
+      counter.current -= 1
+      counter.current === 0 && utils.project.getByUser.invalidate()
+    },
+  })
+
+export const deleteOneProject = (
+  utils: TRPCContextType,
+  counter: React.MutableRefObject<number>
+) =>
+  trpc.project.delete.useMutation({
     async onMutate(input) {
       await utils.project.getByUser.cancel()
       counter.current += 1

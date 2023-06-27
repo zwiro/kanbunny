@@ -4,6 +4,46 @@ import type { Board } from "@prisma/client"
 import React, { RefObject } from "react"
 import type { UseFormReturn } from "react-hook-form"
 
+export const createNewBoard = (
+  utils: TRPCContextType,
+  closeAdd: () => void,
+  boardMethods: UseFormReturn<
+    {
+      name: string
+      projectId: string
+    },
+    any
+  >
+) =>
+  trpc.board.create.useMutation({
+    async onMutate(input) {
+      await utils.project.getByUser.cancel()
+      const prevData = utils.project.getByUser.getData()
+      utils.project.getByUser.setData(undefined, (old) =>
+        old?.map((p) =>
+          p.id === input.projectId
+            ? {
+                ...p,
+                boards: [
+                  { ...input, color: "red", order: 0 } as Board,
+                  ...p.boards,
+                ],
+              }
+            : p
+        )
+      )
+      closeAdd()
+      return { prevData }
+    },
+    onError(err, input, ctx) {
+      utils.project.getByUser.setData(undefined, ctx?.prevData)
+    },
+    onSettled() {
+      utils.project.getByUser.invalidate()
+      boardMethods.reset()
+    },
+  })
+
 export const updateBoardName = (
   projectId: string,
   utils: TRPCContextType,
@@ -74,79 +114,6 @@ export const updateBoardColor = (
     },
   })
 
-export const deleteOneBoard = (
-  projectId: string,
-  utils: TRPCContextType,
-  unselectBoard: () => void,
-  counter: React.MutableRefObject<number>
-) =>
-  trpc.board.delete.useMutation({
-    async onMutate(input) {
-      await utils.project.getByUser.cancel()
-      counter.current += 1
-      unselectBoard()
-      const prevData = utils.project.getByUser.getData()
-      utils.project.getByUser.setData(undefined, (old) =>
-        old?.map((p) =>
-          p.id === projectId
-            ? {
-                ...p,
-                boards: p.boards.filter((b) => b.id !== input),
-              }
-            : p
-        )
-      )
-      return { prevData }
-    },
-    onError(err, input, ctx) {
-      utils.project.getByUser.setData(undefined, ctx?.prevData)
-    },
-    onSettled() {
-      counter.current -= 1
-      counter.current === 0 && utils.project.getByUser.invalidate()
-    },
-  })
-
-export const createNewBoard = (
-  utils: TRPCContextType,
-  closeAdd: () => void,
-  boardMethods: UseFormReturn<
-    {
-      name: string
-      projectId: string
-    },
-    any
-  >
-) =>
-  trpc.board.create.useMutation({
-    async onMutate(input) {
-      await utils.project.getByUser.cancel()
-      const prevData = utils.project.getByUser.getData()
-      utils.project.getByUser.setData(undefined, (old) =>
-        old?.map((p) =>
-          p.id === input.projectId
-            ? {
-                ...p,
-                boards: [
-                  { ...input, color: "red", order: 0 } as Board,
-                  ...p.boards,
-                ],
-              }
-            : p
-        )
-      )
-      closeAdd()
-      return { prevData }
-    },
-    onError(err, input, ctx) {
-      utils.project.getByUser.setData(undefined, ctx?.prevData)
-    },
-    onSettled() {
-      utils.project.getByUser.invalidate()
-      boardMethods.reset()
-    },
-  })
-
 export const reorderBoards = (
   projectId: string,
   utils: TRPCContextType,
@@ -175,6 +142,39 @@ export const reorderBoards = (
                     ? { ...b, order: b.order - 1 }
                     : b
                 ),
+              }
+            : p
+        )
+      )
+      return { prevData }
+    },
+    onError(err, input, ctx) {
+      utils.project.getByUser.setData(undefined, ctx?.prevData)
+    },
+    onSettled() {
+      counter.current -= 1
+      counter.current === 0 && utils.project.getByUser.invalidate()
+    },
+  })
+
+export const deleteOneBoard = (
+  projectId: string,
+  utils: TRPCContextType,
+  unselectBoard: () => void,
+  counter: React.MutableRefObject<number>
+) =>
+  trpc.board.delete.useMutation({
+    async onMutate(input) {
+      await utils.project.getByUser.cancel()
+      counter.current += 1
+      unselectBoard()
+      const prevData = utils.project.getByUser.getData()
+      utils.project.getByUser.setData(undefined, (old) =>
+        old?.map((p) =>
+          p.id === projectId
+            ? {
+                ...p,
+                boards: p.boards.filter((b) => b.id !== input),
               }
             : p
         )

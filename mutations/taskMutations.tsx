@@ -74,38 +74,6 @@ export const updateTaskUsers = (
     },
   })
 
-export const deleteOneTask = (
-  boardId: string,
-  listId: string,
-  utils: TRPCContextType,
-  counter: MutableRefObject<number>
-) =>
-  trpc.task.delete.useMutation({
-    async onMutate(input) {
-      await utils.list.getByBoard.cancel()
-      counter.current += 1
-      const prevData = utils.list.getByBoard.getData()
-      utils.list.getByBoard.setData(boardId, (old) =>
-        old?.map((l) =>
-          l.id === listId
-            ? {
-                ...l,
-                tasks: l.tasks.filter((t) => t.id !== input),
-              }
-            : l
-        )
-      )
-      return { prevData }
-    },
-    onError(err, input, ctx) {
-      utils.list.getByBoard.setData(boardId, ctx?.prevData)
-    },
-    onSettled() {
-      counter.current -= 1
-      counter.current === 0 && utils.list.getByBoard.invalidate(boardId)
-    },
-  })
-
 export const updateTaskColor = (
   boardId: string,
   listId: string,
@@ -206,6 +174,38 @@ export const reorderTasks = (
           } else return l
         }) as any
       })
+      return { prevData }
+    },
+    onError(err, input, ctx) {
+      utils.list.getByBoard.setData(boardId, ctx?.prevData)
+    },
+    onSettled() {
+      counter.current -= 1
+      counter.current === 0 && utils.list.getByBoard.invalidate(boardId)
+    },
+  })
+
+export const deleteOneTask = (
+  boardId: string,
+  listId: string,
+  utils: TRPCContextType,
+  counter: MutableRefObject<number>
+) =>
+  trpc.task.delete.useMutation({
+    async onMutate(input) {
+      await utils.list.getByBoard.cancel()
+      counter.current += 1
+      const prevData = utils.list.getByBoard.getData()
+      utils.list.getByBoard.setData(boardId, (old) =>
+        old?.map((l) =>
+          l.id === listId
+            ? {
+                ...l,
+                tasks: l.tasks.filter((t) => t.id !== input),
+              }
+            : l
+        )
+      )
       return { prevData }
     },
     onError(err, input, ctx) {
