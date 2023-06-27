@@ -1,10 +1,10 @@
-import useClickOutside from "@/hooks/useClickOutside"
 import { useRef } from "react"
 import { motion } from "framer-motion"
 import { z } from "zod"
 import { UseTRPCMutationResult } from "@trpc/react-query/shared"
 import type { Board, List, Task } from "@prisma/client"
 import { colorSchema } from "@/utils/schemas"
+import useClickOutside from "@/hooks/useClickOutside"
 
 type ColorSchema = z.infer<typeof colorSchema>
 

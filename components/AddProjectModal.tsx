@@ -1,16 +1,16 @@
-import { z } from "zod"
+import { useState } from "react"
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form"
+import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { trpc } from "@/utils/trpc"
 import { projectSchema } from "@/utils/schemas"
-import AddButton from "./AddButton"
+import { createNewProject } from "@/mutations/projectMutations"
 import FormFieldContainer from "./FormFieldContainer"
+import AddButton from "./AddButton"
 import ModalForm from "./ModalForm"
 import PlusIcon from "./PlusIcon"
 import TextInput from "./TextInput"
-import { createNewProject } from "@/mutations/projectMutations"
 import UserSelect from "./UserSelect"
-import { useState } from "react"
 
 interface AddProjectModalProps {
   close: () => void

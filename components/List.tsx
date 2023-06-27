@@ -1,28 +1,24 @@
-import { type FormEventHandler, useContext, MutableRefObject } from "react"
-import MenuWrapper from "./MenuWrapper"
-import MenuItem from "./MenuItem"
-import PlusIcon from "./PlusIcon"
+import { type FormEventHandler, useContext } from "react"
+import { useSession } from "next-auth/react"
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
+import { AnimatePresence, motion } from "framer-motion"
+import type { UseTRPCQueryResult } from "@trpc/react-query/shared"
+import { trpc } from "@/utils/trpc"
 import {
   AiOutlineCheck,
   AiOutlineClockCircle,
   AiOutlineClose,
 } from "react-icons/ai"
-import AddEditForm from "./AddEditForm"
-import AddTaskModal from "./AddTaskModal"
-import useBooleanState from "@/hooks/useBooleanState"
-import { AnimatePresence, motion } from "framer-motion"
-import ColorPicker from "./ColorPicker"
-import UserCheckbox from "./UserCheckbox"
-import type { List as ListType, Prisma, Task, User } from "@prisma/client"
-import ColorDot from "./ColorDot"
-import { trpc } from "@/utils/trpc"
-import LayoutContext from "@/context/LayoutContext"
-import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
+import { GoGrabber } from "react-icons/go"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import useAssignUser from "@/hooks/useAssignUser"
+import type {
+  List as ListType,
+  Prisma,
+  Task as TaskType,
+  User,
+} from "@prisma/client"
 import { editListSchema, editTaskSchema } from "@/utils/schemas"
-import { GoGrabber } from "react-icons/go"
 import {
   Draggable,
   type DraggableProvidedDragHandleProps,
@@ -39,14 +35,22 @@ import {
   updateListColor,
   updateListName,
 } from "@/mutations/listMutations"
-import { useSession } from "next-auth/react"
+import MenuWrapper from "./MenuWrapper"
+import MenuItem from "./MenuItem"
+import PlusIcon from "./PlusIcon"
+import AddEditForm from "./AddEditForm"
+import AddTaskModal from "./AddTaskModal"
+import useBooleanState from "@/hooks/useBooleanState"
+import ColorPicker from "./ColorPicker"
+import UserCheckbox from "./UserCheckbox"
+import ColorDot from "./ColorDot"
+import LayoutContext from "@/context/LayoutContext"
+import useAssignUser from "@/hooks/useAssignUser"
 import getFilteredTasks from "@/utils/getFilteredTasks"
-import type { UseTRPCQueryResult } from "@trpc/react-query/shared"
 import ConfirmPopup from "./ConfirmPopup"
-
-type TaskWithAssignedTo = Prisma.TaskGetPayload<{
-  include: { assigned_to: true }
-}>
+import { TaskWithAssignedTo } from "@/types/trpc"
+import Task from "./Task"
+import { colorVariants } from "@/utils/colorVariants"
 
 interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]
@@ -57,14 +61,6 @@ interface ListProps extends ListType {
   isUpdating: boolean
   taskMutationCounter: React.MutableRefObject<number>
   mutationCounter: React.MutableRefObject<number>
-}
-
-const colorVariants = {
-  blue: "border-blue-500",
-  red: "border-red-500",
-  yellow: "border-yellow-500",
-  green: "border-green-500",
-  pink: "border-pink-500",
 }
 
 function List({
@@ -248,271 +244,6 @@ function List({
         {isAdding && <AddTaskModal close={closeAdd} listId={id} />}
       </AnimatePresence>
     </section>
-  )
-}
-
-type TaskSchema = z.infer<typeof editTaskSchema>
-
-interface TaskProps extends TaskWithAssignedTo {
-  dragHandleProps: DraggableProvidedDragHandleProps | null
-  isDragging: boolean
-  length: number
-  mutationCounter: React.MutableRefObject<number>
-}
-
-function Task({
-  name,
-  id,
-  listId,
-  assigned_to,
-  color,
-  dragHandleProps,
-  isDragging,
-  due_to,
-  mutationCounter,
-}: TaskProps) {
-  const [isEditingName, editName, closeEditName] = useBooleanState()
-  const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
-  const { chosenBoard } = useContext(LayoutContext)
-
-  const assignedToIds = assigned_to.map((u) => u.id)
-
-  const { assignedUsers, assignUser } = useAssignUser(assignedToIds)
-
-  const utils = trpc.useContext()
-  const relativeTimeFormat = new Intl.RelativeTimeFormat("en", {
-    numeric: "auto",
-  })
-
-  const timeDiff = due_to ? due_to.getTime() - new Date().getTime() : 0
-
-  const daysLeft = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
-  const hoursLeft = Math.floor(
-    (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-  )
-  const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))
-
-  const taskMethods = useForm<TaskSchema>({
-    defaultValues: { name, id, listId },
-    resolver: zodResolver(editTaskSchema),
-  })
-
-  const updateName = updatedTaskName(
-    chosenBoard?.id!,
-    listId,
-    utils,
-    closeEditName,
-    mutationCounter
-  )
-  const updateUsers = updateTaskUsers(
-    chosenBoard?.id!,
-    utils,
-    closeEditUsers,
-    mutationCounter
-  )
-  const deleteTask = deleteOneTask(
-    chosenBoard?.id!,
-    listId,
-    utils,
-    mutationCounter
-  )
-
-  const onSubmit: SubmitHandler<TaskSchema> = (data: any) => {
-    updateName.mutate({ name: data.name, id, listId })
-  }
-
-  const users = trpc.board.getUsers.useQuery(chosenBoard?.id!)
-
-  const onSubmitUsers: SubmitHandler<TaskSchema> = (data: any) => {
-    updateUsers.mutate({
-      assigned_to: assignedUsers,
-      id,
-      listId,
-      name,
-    })
-  }
-
-  const [isEditingColor, editColor, closeEditColor] = useBooleanState()
-
-  const updateColor = updateTaskColor(
-    chosenBoard?.id!,
-    listId,
-    utils,
-    closeEditColor,
-    mutationCounter
-  )
-
-  const isLoading = updateName.isLoading || updateColor.isLoading
-
-  return (
-    <>
-      <div
-        className={`group flex items-center justify-between border-b border-l-8 border-r border-t border-b-neutral-800 border-r-neutral-800 border-t-neutral-800 ${
-          colorVariants[color]
-        } bg-zinc-700 p-2
-        ${isLoading && "opacity-50"}
-        `}
-      >
-        {!isEditingName ? (
-          <>
-            <div className="relative flex flex-col">
-              <AnimatePresence>
-                {isEditingColor && (
-                  <ColorPicker
-                    id={id}
-                    close={closeEditColor}
-                    editColor={updateColor}
-                    currentColor={color}
-                  />
-                )}
-              </AnimatePresence>
-              <div className="flex items-center gap-2">
-                <p
-                  className={`font-bold ${minutesLeft < 0 && "text-zinc-400"}`}
-                >
-                  {name}
-                </p>
-                {daysLeft <= 0 && minutesLeft > 0 && <AiOutlineClockCircle />}
-              </div>
-              <p className="text-sm text-zinc-300">
-                {due_to &&
-                  timeDiff > 0 &&
-                  (daysLeft > 0
-                    ? relativeTimeFormat.format(daysLeft, "day")
-                    : hoursLeft > 0
-                    ? relativeTimeFormat.format(hoursLeft, "hour")
-                    : relativeTimeFormat.format(minutesLeft, "minute"))}
-              </p>
-              <ul className="flex flex-wrap gap-1">
-                {assigned_to.map((user) => (
-                  <li key={user.id} className="text-sm text-neutral-500">
-                    {user.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="z-20 ml-auto scale-0 transition-transform group-hover:scale-100">
-              <MenuWrapper isLoading={isLoading}>
-                <MenuItem handleClick={editName}>edit task name</MenuItem>
-                <MenuItem handleClick={editUsers}>assign user</MenuItem>
-                <MenuItem handleClick={editColor}>change color</MenuItem>
-                <MenuItem handleClick={() => deleteTask.mutate(id)}>
-                  delete task
-                </MenuItem>
-              </MenuWrapper>
-            </div>
-            <div
-              {...dragHandleProps}
-              className={`cursor-grab group-hover:visible ${
-                isDragging ? "visible" : "invisible"
-              }`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <GoGrabber size={24} />
-            </div>
-          </>
-        ) : (
-          <div className="[&>form>input]:py-1.5 [&>form>input]:text-base">
-            <FormProvider {...taskMethods}>
-              <AddEditForm
-                name="name"
-                placeholder="task name"
-                close={closeEditName}
-                handleSubmit={taskMethods.handleSubmit(onSubmit)}
-                className="[&>input]:h-9"
-              />
-            </FormProvider>
-          </div>
-        )}
-      </div>
-      <AnimatePresence>
-        {isEditingUsers && (
-          <EditTaskUsers
-            assignUser={assignUser}
-            assignedUsers={assignedUsers}
-            closeEditUsers={closeEditUsers}
-            assignedToIds={assignedToIds}
-            listId={listId}
-            name={name}
-            onSubmit={taskMethods.handleSubmit(onSubmitUsers)}
-            taskId={id}
-            updateUsers={updateUsers}
-            users={users}
-          />
-        )}
-      </AnimatePresence>
-    </>
-  )
-}
-
-interface EditTaskUsersProps {
-  onSubmit: FormEventHandler<HTMLFormElement>
-  users: UseTRPCQueryResult<User[], any>
-  assignUser: (userId: string) => void
-  assignedToIds: string[]
-  updateUsers: any
-  assignedUsers: string[]
-  closeEditUsers: () => void
-  taskId: string
-  listId: string
-  name: string
-}
-
-function EditTaskUsers({
-  onSubmit,
-  users,
-  assignUser,
-  assignedToIds,
-  updateUsers,
-  assignedUsers,
-  closeEditUsers,
-  taskId,
-  listId,
-  name,
-}: EditTaskUsersProps) {
-  const taskAnimation = {
-    initial: { height: 0, opacity: 0, padding: 0 },
-    animate: { height: "auto", opacity: 1 },
-    exit: { height: 0, opacity: 0, padding: 0 },
-  }
-
-  return (
-    <motion.form onSubmit={onSubmit} {...taskAnimation}>
-      <div className="flex flex-wrap gap-2 pt-8">
-        {users.data?.map((user) => (
-          <UserCheckbox
-            key={user.id}
-            name={user.name!}
-            id={user.id}
-            assignUser={assignUser}
-            isAssigned={assignedToIds.includes(user.id)}
-          />
-        ))}
-      </div>
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() =>
-            updateUsers.mutate({
-              taskId,
-              name,
-              listId,
-              assigned_to: assignedUsers,
-            })
-          }
-          disabled={updateUsers.isLoading}
-          className="ml-auto transition-transform hover:scale-110"
-        >
-          <AiOutlineCheck size={20} />
-        </button>
-        <button
-          type="button"
-          onClick={closeEditUsers}
-          className="transition-transform hover:scale-110"
-        >
-          <AiOutlineClose size={20} />
-        </button>
-      </div>
-    </motion.form>
   )
 }
 

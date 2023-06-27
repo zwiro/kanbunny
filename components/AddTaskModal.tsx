@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { trpc } from "@/utils/trpc"
 import { taskSchema } from "@/utils/schemas"
+import { createNewTask } from "@/mutations/taskMutations"
 import LayoutContext from "@/context/LayoutContext"
 import useAssignUser from "@/hooks/useAssignUser"
 import TextInput from "./TextInput"
@@ -14,7 +15,6 @@ import PlusIcon from "./PlusIcon"
 import UserCheckbox from "./UserCheckbox"
 import ModalForm from "./ModalForm"
 import FormFieldContainer from "./FormFieldContainer"
-import { createNewTask } from "@/mutations/taskMutations"
 
 interface AddTaskModalProps {
   close: () => void

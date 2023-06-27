@@ -1,13 +1,18 @@
-import React, { useContext, useRef } from "react"
+import { useContext } from "react"
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { GoGrabber } from "react-icons/go"
 import { z } from "zod"
 import type { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
 import { AnimatePresence } from "framer-motion"
-import type { Board, Color } from "@prisma/client"
 import { trpc } from "@/utils/trpc"
+import type { Board, Color } from "@prisma/client"
 import { boardSchema } from "@/utils/schemas"
+import {
+  deleteOneBoard,
+  updateBoardColor,
+  updateBoardName,
+} from "@/mutations/boardMutations"
 import LayoutContext from "@/context/LayoutContext"
 import useBooleanState from "@/hooks/useBooleanState"
 import MenuWrapper from "./MenuWrapper"
@@ -15,11 +20,6 @@ import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import ColorPicker from "./ColorPicker"
 import ColorDot from "./ColorDot"
-import {
-  deleteOneBoard,
-  updateBoardColor,
-  updateBoardName,
-} from "@/mutations/boardMutations"
 import ConfirmPopup from "./ConfirmPopup"
 
 interface BoardProps {
