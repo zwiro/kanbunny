@@ -45,6 +45,11 @@ import { LoadingDots } from "@/components/LoadingDots"
 import { useRouter } from "next/router"
 import AddProjectModal from "@/components/AddProjectModal"
 import ConfirmPopup from "@/components/ConfirmPopup"
+import { createServerSideHelpers } from "@trpc/react-query/server"
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
+import { prisma } from "@/server/db"
+import { appRouter } from "@/server/routers/_app"
+import superjson from "superjson"
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -547,8 +552,15 @@ export async function getServerSideProps(params: GetSessionParams) {
       },
     }
   }
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: { prisma, session },
+    transformer: superjson,
+  })
+
+  await helpers.project.getByUser.prefetch()
 
   return {
-    props: {},
+    props: { trpcState: helpers.dehydrate() },
   }
 }
