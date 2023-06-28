@@ -70,7 +70,7 @@ function Project({
   const [isPopupOpened, openPopup, closePopup] = useBooleanState()
   const [isAdding, add, closeAdd] = useBooleanState()
 
-  const { chosenBoard } = useContext(LayoutContext)
+  const { chosenBoard, chooseOpenedBoard } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
 
@@ -86,10 +86,16 @@ function Project({
 
   const boardMutationCounter = useRef(0)
 
+  const unselectBoard = () => {
+    if (boards.map((b) => b.id).includes(chosenBoard?.id!)) {
+      chooseOpenedBoard(undefined)
+    }
+  }
+
   const updateUsers = updateProjectUsers(utils)
   const updateName = updateProjectName(utils, closeEditName, mutationCounter)
-  const deleteProject = deleteOneProject(utils, mutationCounter)
-  const leaveProject = leaveOneProject(utils, mutationCounter)
+  const deleteProject = deleteOneProject(utils, mutationCounter, unselectBoard)
+  const leaveProject = leaveOneProject(utils, mutationCounter, unselectBoard)
   const createBoard = createNewBoard(utils, closeAdd, boardMethods)
   const reorder = reorderBoards(id, utils, boardMutationCounter)
 

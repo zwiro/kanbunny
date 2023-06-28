@@ -80,11 +80,13 @@ export const reorderProjects = (
 
 export const leaveOneProject = (
   utils: TRPCContextType,
-  counter: React.MutableRefObject<number>
+  counter: React.MutableRefObject<number>,
+  unselectBoard: () => void
 ) =>
   trpc.project.leave.useMutation({
     async onMutate(input) {
       await utils.project.getByUser.cancel()
+      unselectBoard()
       counter.current += 1
       const prevData = utils.project.getByUser.getData()
       utils.project.getByUser.setData(undefined, (old) =>
@@ -103,11 +105,13 @@ export const leaveOneProject = (
 
 export const deleteOneProject = (
   utils: TRPCContextType,
-  counter: React.MutableRefObject<number>
+  counter: React.MutableRefObject<number>,
+  unselectBoard: () => void
 ) =>
   trpc.project.delete.useMutation({
     async onMutate(input) {
       await utils.project.getByUser.cancel()
+      unselectBoard()
       counter.current += 1
       const prevData = utils.project.getByUser.getData()
       utils.project.getByUser.setData(undefined, (old) =>
