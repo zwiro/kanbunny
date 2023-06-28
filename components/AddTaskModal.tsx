@@ -65,9 +65,17 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
             </p>
           )}
         </FormFieldContainer>
+
         <FormFieldContainer>
           <p>assign users</p>
           <div className="flex flex-wrap gap-2">
+            {users.isLoading && (
+              <>
+                <div className="block h-[42px] w-16 animate-pulse bg-zinc-700 p-2" />
+                <div className="block h-[42px] w-12 animate-pulse bg-zinc-700 p-2" />
+                <div className="block h-[42px] w-24 animate-pulse bg-zinc-700 p-2" />
+              </>
+            )}
             {users.data?.map((user) => (
               <UserCheckbox
                 key={user.id}

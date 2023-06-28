@@ -30,9 +30,7 @@ function Navbar() {
       {status === "loading" ? (
         <LoadingDots />
       ) : (
-        <Link href="/" className="ml-auto hover:underline">
-          {session?.user?.name}
-        </Link>
+        <p className="ml-auto">{session?.user?.name}</p>
       )}
       <button
         onClick={() => signOut({ callbackUrl: "/auth/login" })}

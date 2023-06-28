@@ -94,8 +94,10 @@ function Board({
   return (
     <li
       onClick={() => chooseOpenedBoard({ id, color, name, owner })}
-      className={`group flex cursor-pointer items-center gap-2 px-2 text-xl transition-colors hover:bg-zinc-900/40 ${
-        chosenBoard?.id === id && id && "bg-zinc-900"
+      className={`group flex cursor-pointer items-center gap-2 px-2 text-xl transition-colors ${
+        chosenBoard?.id === id && id
+          ? "bg-zinc-900 hover:bg-zinc-900"
+          : "hover:bg-zinc-900/40"
       } ${
         ((isUpdating && !id) ||
           updateName.isLoading ||

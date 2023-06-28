@@ -27,7 +27,7 @@ function ConfirmPopup({
       role="alert"
       className="absolute inset-0 z-50 grid cursor-default place-content-center text-center text-lg"
     >
-      <div className="space-y-8 border border-neutral-700 bg-zinc-900 p-8">
+      <div className="space-y-8 bg-zinc-900 p-8 shadow-md shadow-black">
         <p>
           you are going to {action} <strong>{name}</strong> {type}
         </p>

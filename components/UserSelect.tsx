@@ -38,10 +38,15 @@ function UserSelect({ selectedUsers, setSelectedUsers }: UserSelectProps) {
         userOptions.isLoading ? "loading..." : "no users found"
       }
       styles={{
-        control: (base) => ({
+        control: (base, state) => ({
           ...base,
           backgroundColor: "rgb(24 24 27)",
           height: 40,
+          border: state.isFocused ? "rgb(248 250 252)" : "none",
+          borderRadius: 0,
+          boxShadow: state.isFocused
+            ? "0px 0px 0px 1px rgba(248, 250, 252, 1)"
+            : "none",
         }),
         singleValue: (base) => ({ ...base, color: "rgb(241 245 249)" }),
         menu: (base) => ({ ...base, backgroundColor: "rgb(24 24 27)" }),
@@ -49,6 +54,7 @@ function UserSelect({ selectedUsers, setSelectedUsers }: UserSelectProps) {
         dropdownIndicator: (base) => ({ ...base, color: "rgb(241 245 249)" }),
         multiValue: (base) => ({ ...base, backgroundColor: "rgb(63 63 70)" }),
         multiValueLabel: (base) => ({ ...base, color: "rgb(241 245 249)" }),
+        placeholder: (base) => ({ ...base, color: "rgb(115 115 115)" }),
         option: (base, state) => ({
           ...base,
           backgroundColor:

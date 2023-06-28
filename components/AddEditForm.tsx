@@ -1,6 +1,8 @@
+import { useRef } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import { SubmitHandler, useFormContext } from "react-hook-form"
 import TextInput from "./TextInput"
+import useClickOutside from "@/hooks/useClickOutside"
 
 interface AddEditFormProps {
   name: string
@@ -22,8 +24,12 @@ function AddEditForm({
 }: AddEditFormProps) {
   const { reset } = useFormContext()
 
+  const formRef = useRef<HTMLFormElement>(null)
+  useClickOutside([formRef], close)
+
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
       className={`flex items-center gap-1 ${className} `}
     >

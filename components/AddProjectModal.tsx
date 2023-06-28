@@ -51,7 +51,7 @@ function AddProjectModal({ close }: AddProjectModalProps) {
         </FormFieldContainer>
         <FormFieldContainer>
           <label htmlFor="name">add users</label>
-          <p className="text-sm text-zinc-300">
+          <p className="text-sm text-neutral-500">
             {selectedUsers.length} participant
             {selectedUsers.length === 1 ? "" : "s"}
           </p>

@@ -124,7 +124,7 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
           )}
         </DragDropContext>
         {!data?.length && !isLoading && (
-          <p className="text-netural-500 text-center">no projects yet</p>
+          <p className="pt-12 text-center text-neutral-500">no projects yet</p>
         )}
       </motion.aside>
       <AnimatePresence>

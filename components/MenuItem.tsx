@@ -15,9 +15,9 @@ function MenuItem({
   const { closeMenu } = useContext(MenuContext)
 
   return (
-    <li className="px-8 hover:cursor-pointer hover:bg-zinc-800">
+    <li className="hover:cursor-pointer hover:bg-zinc-800">
       <button
-        className="w-full text-left"
+        className="w-full px-8 text-left"
         onClick={() => {
           handleClick && handleClick()
           closeOnClickInside && closeMenu()

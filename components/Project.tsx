@@ -255,26 +255,28 @@ function Project({
         )}
       </AnimatePresence>
       <ul className="flex flex-col gap-2 py-4 lg:gap-4">
-        {isAdding && (
-          <>
-            <div className="flex items-center gap-2">
-              <div className="h-4 w-4 bg-red-500" />
-              <FormProvider {...boardMethods}>
-                <AddEditForm
-                  name="name"
-                  placeholder="board name"
-                  handleSubmit={boardMethods.handleSubmit(onSubmit)}
-                  close={closeAdd}
-                />
-              </FormProvider>
-            </div>
-            {boardMethods.formState.errors && (
-              <p role="alert" className="pl-6 text-base text-red-500">
-                {boardMethods.formState.errors?.name?.message as string}
-              </p>
-            )}
-          </>
-        )}
+        <AnimatePresence>
+          {isAdding && (
+            <>
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 bg-red-500" />
+                <FormProvider {...boardMethods}>
+                  <AddEditForm
+                    name="name"
+                    placeholder="board name"
+                    handleSubmit={boardMethods.handleSubmit(onSubmit)}
+                    close={closeAdd}
+                  />
+                </FormProvider>
+              </div>
+              {boardMethods.formState.errors && (
+                <p role="alert" className="pl-6 text-base text-red-500">
+                  {boardMethods.formState.errors?.name?.message as string}
+                </p>
+              )}
+            </>
+          )}
+        </AnimatePresence>
         <AnimatePresence>
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="projects">
