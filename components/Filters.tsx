@@ -44,29 +44,52 @@ function Filters({
           {dateFilter || assignedFilter ? (
             <AiFillFilter size={32} />
           ) : (
-            <AiOutlineFilter size={32} />
+            <AiOutlineFilter
+              size={32}
+              className="transition-transform hover:scale-110"
+            />
           )}
         </button>
         <div className="flex">
-          <button onClick={toggleSearch}>
-            {isSearchOpen ? (
-              <AiOutlineClose size={32} />
-            ) : (
-              <AiOutlineSearch size={32} />
-            )}
-          </button>
+          <AnimatePresence>
+            <motion.button
+              onClick={toggleSearch}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0 }}
+            >
+              {isSearchOpen ? (
+                <div>
+                  <AiOutlineClose
+                    size={32}
+                    className="transition-transform hover:scale-110"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <AiOutlineSearch
+                    size={32}
+                    className="transition-transform hover:scale-110"
+                  />
+                </div>
+              )}
+            </motion.button>
+          </AnimatePresence>
           <AnimatePresence>
             {isSearchOpen && (
-              <motion.input
-                initial={{ width: 0 }}
-                animate={{ width: "auto" }}
-                exit={{ width: 0 }}
-                value={searchQuery}
-                onChange={search}
-                type="search"
-                placeholder="add dark mode..."
-                className="bg-zinc-900 p-1"
-              />
+              <motion.div
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: "auto", opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+              >
+                <input
+                  value={searchQuery}
+                  onChange={search}
+                  type="search"
+                  placeholder="add dark mode..."
+                  className="h-full w-full bg-zinc-900 px-1"
+                />
+              </motion.div>
             )}
           </AnimatePresence>
         </div>

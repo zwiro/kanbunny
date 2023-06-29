@@ -102,12 +102,6 @@ export default function Home() {
     })
   }
 
-  const bgBlurAnimation = {
-    initial: { backdropFilter: "blur(0px)" },
-    animate: { backdropFilter: "blur(10px)" },
-    exit: { backdropFilter: "blur(0px)" },
-  }
-
   const reorder = reorderLists(chosenBoard?.id!, utils, listMutationCounter)
 
   const reorderDisplayedTasks = reorderTasks(
@@ -153,13 +147,19 @@ export default function Home() {
     }
   }
 
+  const bgBlurAnimation = {
+    initial: { backdropFilter: "blur(0px)" },
+    animate: { backdropFilter: "blur(10px)" },
+    exit: { backdropFilter: "blur(0px)" },
+  }
+
   useEffect(() => {
     listMethods.reset({ boardId: chosenBoard?.id })
   }, [chosenBoard?.id, listMethods, board.data])
 
   return (
     <>
-      <div
+      <main
         onClick={() => {
           closeSideMenu()
         }}
@@ -189,13 +189,13 @@ export default function Home() {
               </div>
               <p className="text-slate-300">owner: {chosenBoard.owner}</p>
             </div>
-            <div className="flex gap-4 overflow-y-hidden overflow-x-scroll pb-48 lg:gap-8 xl:gap-16">
+            <div className={`flex overflow-y-hidden overflow-x-scroll pb-48`}>
               {lists.isLoading && (
-                <>
+                <div className="flex gap-4 lg:gap-8 xl:gap-16">
                   <ListSkeleton width={60} />
                   <ListSkeleton width={130} />
                   <ListSkeleton width={100} />
-                </>
+                </div>
               )}
               <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable
@@ -271,9 +271,17 @@ export default function Home() {
                   </div>
                 </ListContainer>
               ) : (
-                <AddButton onClick={add}>
-                  new list <PlusIcon />
-                </AddButton>
+                <div
+                  className={`${
+                    lists.data?.length || lists.isLoading
+                      ? "ml-4 lg:ml-8 xl:ml-16"
+                      : "ml-0"
+                  } `}
+                >
+                  <AddButton onClick={add}>
+                    new list <PlusIcon />
+                  </AddButton>
+                </div>
               )}
             </div>
           </>
@@ -294,7 +302,7 @@ export default function Home() {
             </>
           )}
         </AnimatePresence>
-      </div>
+      </main>
     </>
   )
 }

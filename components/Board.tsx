@@ -120,7 +120,7 @@ function Board({
       </ColorDot>
       {!isEditingName ? (
         <>
-          <div>{name}</div>
+          <h3>{name}</h3>
           <div
             className={`invisible z-10 scale-0 transition-transform ${
               isEditingColor

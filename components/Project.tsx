@@ -137,7 +137,7 @@ function Project({
     <section className="my-4 border-b border-neutral-700">
       {!isEditingName ? (
         <div className="flex items-center gap-4">
-          <p
+          <h2
             className={`relative after:absolute after:-bottom-1 after:left-0 after:z-10 after:h-1 after:w-0 after:bg-white after:transition-all ${
               boards.map((b) => b.id).includes(chosenBoard?.id!) &&
               chosenBoard &&
@@ -145,7 +145,7 @@ function Project({
             } ${updateName.isLoading && "opacity-50"}`}
           >
             {name}
-          </p>
+          </h2>
           <MenuWrapper isLoading={isLoading}>
             <MenuItem handleClick={add}>add board</MenuItem>
             {!isOwner && (

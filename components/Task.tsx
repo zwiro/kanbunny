@@ -155,11 +155,11 @@ function Task({
                 )}
               </AnimatePresence>
               <div className="flex items-center gap-2">
-                <p
+                <h3
                   className={`font-bold ${minutesLeft < 0 && "text-zinc-400"}`}
                 >
                   {name}
-                </p>
+                </h3>
                 {daysLeft <= 0 && minutesLeft > 0 && <AiOutlineClockCircle />}
               </div>
               <p className="text-sm text-zinc-300">
