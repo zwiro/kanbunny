@@ -37,6 +37,19 @@ function Filters({
   const filterRef = useRef<HTMLDivElement>(null)
   useClickOutside([filterRef], closeFilter)
 
+  const buttonAnimation = {
+    initial: { opacity: 0, rotate: -360 },
+    animate: { opacity: 1, rotate: 0 },
+    exit: { opacity: 0, rotate: 360 },
+    transition: { duration: 0.3 },
+  }
+
+  const inputAnimation = {
+    initial: { width: 0, opacity: 0 },
+    animate: { width: "auto", opacity: 1 },
+    exit: { width: 0, opacity: 0 },
+  }
+
   return (
     <div className="relative ml-auto">
       <div className="flex items-center justify-end gap-1">
@@ -51,37 +64,30 @@ function Filters({
           )}
         </button>
         <div className="flex">
-          <AnimatePresence>
-            <motion.button
-              onClick={toggleSearch}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0 }}
-            >
-              {isSearchOpen ? (
-                <div>
-                  <AiOutlineClose
-                    size={32}
-                    className="transition-transform hover:scale-110"
-                  />
-                </div>
-              ) : (
-                <div>
-                  <AiOutlineSearch
-                    size={32}
-                    className="transition-transform hover:scale-110"
-                  />
-                </div>
-              )}
-            </motion.button>
-          </AnimatePresence>
+          <button onClick={toggleSearch}>
+            <AnimatePresence mode="wait">
+              <motion.div>
+                {isSearchOpen ? (
+                  <motion.div {...buttonAnimation} key="glass">
+                    <AiOutlineClose
+                      size={32}
+                      className="transition-transform hover:scale-110"
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.div {...buttonAnimation} key="close">
+                    <AiOutlineSearch
+                      size={32}
+                      className="transition-transform hover:scale-110"
+                    />
+                  </motion.div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </button>
           <AnimatePresence>
             {isSearchOpen && (
-              <motion.div
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: "auto", opacity: 1 }}
-                exit={{ width: 0, opacity: 0 }}
-              >
+              <motion.div {...inputAnimation}>
                 <input
                   value={searchQuery}
                   onChange={search}
