@@ -11,7 +11,7 @@ interface LayoutProps {
 }
 
 function Layout({ children }: LayoutProps) {
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const title = `kanbunny ${session ? `| ${session.user.name}` : ""}`
 
   return (

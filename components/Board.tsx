@@ -126,7 +126,7 @@ function Board({
               isEditingColor
                 ? "group-hover:scale-0"
                 : "group-hover:visible group-hover:scale-100"
-            } `}
+            }`}
           >
             <MenuWrapper isLoading={isLoading}>
               <MenuItem handleClick={editName}>edit board name</MenuItem>

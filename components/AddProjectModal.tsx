@@ -66,13 +66,11 @@ function AddProjectModal({ close }: AddProjectModalProps) {
             <PlusIcon />
           </div>
         </AddButton>
-        <>
-          {createProject.error && (
-            <p role="alert" className="text-center text-red-500">
-              something went wrong
-            </p>
-          )}
-        </>
+        {createProject.error && (
+          <p role="alert" className="text-center text-red-500">
+            something went wrong
+          </p>
+        )}
       </ModalForm>
     </FormProvider>
   )

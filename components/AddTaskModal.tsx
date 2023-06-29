@@ -65,7 +65,6 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
             </p>
           )}
         </FormFieldContainer>
-
         <FormFieldContainer>
           <p>assign users</p>
           <div className="flex flex-wrap gap-2">
@@ -105,13 +104,11 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
             <PlusIcon />
           </div>
         </AddButton>
-        <>
-          {createTask.error && (
-            <p role="alert" className="text-center text-red-500">
-              something went wrong
-            </p>
-          )}
-        </>
+        {createTask.error && (
+          <p role="alert" className="text-center text-red-500">
+            something went wrong
+          </p>
+        )}
       </ModalForm>
     </FormProvider>
   )

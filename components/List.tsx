@@ -137,12 +137,7 @@ function List({
             <button
               onClick={add}
               className={`group py-2 ${isEditingColor && "scale-0"} `}
-              disabled={
-                isUpdating ||
-                isEditingColor ||
-                updateColor.isLoading ||
-                updateName.isLoading
-              }
+              disabled={isEditingColor || isLoading}
             >
               <PlusIcon />
             </button>

@@ -38,21 +38,19 @@ function AddEditForm({
         placeholder={placeholder}
         defaultValue={defaultValue}
       />
-      <>
-        <button type="submit" className="transition-transform hover:scale-110">
-          <AiOutlineCheck size={20} />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            reset({}, { keepDefaultValues: true })
-            close()
-          }}
-          className="transition-transform hover:scale-110"
-        >
-          <AiOutlineClose size={20} />
-        </button>
-      </>
+      <button type="submit" className="transition-transform hover:scale-110">
+        <AiOutlineCheck size={20} />
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          reset({}, { keepDefaultValues: true })
+          close()
+        }}
+        className="transition-transform hover:scale-110"
+      >
+        <AiOutlineClose size={20} />
+      </button>
     </form>
   )
 }
