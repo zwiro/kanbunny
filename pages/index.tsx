@@ -23,7 +23,6 @@ import { getSession, GetSessionParams } from "next-auth/react"
 import { createServerSideHelpers } from "@trpc/react-query/server"
 import { prisma } from "@/server/db"
 import { appRouter } from "@/server/routers/_app"
-import useCloseOnEscape from "@/hooks/useCloseOnEscape"
 import ListSkeleton from "@/components/ListSkeleton"
 import superjson from "superjson"
 import ColorDot from "@/components/ColorDot"
@@ -45,8 +44,6 @@ export default function Home() {
   const [assignedFilter, setAssignedFilter] = useState<string | null>(null)
 
   const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
-
-  useCloseOnEscape(closeSideMenu)
 
   const [isAdding, add, closeAdd] = useBooleanState()
 

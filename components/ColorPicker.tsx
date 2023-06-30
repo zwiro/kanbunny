@@ -5,6 +5,7 @@ import { UseTRPCMutationResult } from "@trpc/react-query/shared"
 import type { Board, List, Task } from "@prisma/client"
 import { colorSchema } from "@/utils/schemas"
 import useClickOutside from "@/hooks/useClickOutside"
+import useCloseOnEscape from "@/hooks/useCloseOnEscape"
 
 type ColorSchema = z.infer<typeof colorSchema>
 
@@ -18,6 +19,8 @@ interface ColorPickerProps {
 function ColorPicker({ close, id, editColor, currentColor }: ColorPickerProps) {
   const pickerRef = useRef(null)
   useClickOutside([pickerRef], close)
+
+  useCloseOnEscape(close)
 
   const pickColor = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (e.target instanceof HTMLButtonElement) {

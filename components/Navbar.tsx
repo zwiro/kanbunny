@@ -5,40 +5,43 @@ import { useRouter } from "next/router"
 import { useContext } from "react"
 import LayoutContext from "@/context/LayoutContext"
 import { LoadingDots } from "./LoadingDots"
+import FocusLock from "react-focus-lock"
 
 function Navbar() {
   const { data: session, status } = useSession()
 
   const router = useRouter()
 
-  const { toggleSideMenu } = useContext(LayoutContext)
+  const { isSideMenuOpen, toggleSideMenu } = useContext(LayoutContext)
 
   if (router.pathname === "/auth/login") return null
 
   return (
-    <nav className="sticky top-0 z-20 flex items-center gap-4 border-b border-neutral-700 bg-zinc-800 p-4 text-lg sm:text-2xl xl:px-12 2xl:px-24">
-      <button
-        onClick={toggleSideMenu}
-        className="py-2 transition-transform hover:scale-110 focus:scale-110"
-      >
-        <BurgerMenu />
-      </button>
-      <div className="flex items-center">
-        <GiRabbit className="h-8 w-8 xl:h-12 xl:w-12" />
-        <p className="font-bold">kanbunny</p>
-      </div>
-      {status === "loading" ? (
-        <LoadingDots />
-      ) : (
-        <p className="ml-auto">{session?.user?.name}</p>
-      )}
-      <button
-        onClick={() => signOut({ callbackUrl: "/auth/login" })}
-        className="hover:underline focus:underline"
-      >
-        sign out
-      </button>
-    </nav>
+    <FocusLock group="aside-nav" disabled={!isSideMenuOpen}>
+      <nav className="sticky top-0 z-20 flex w-full items-center gap-4 border-b border-neutral-700 bg-zinc-800 p-4 text-lg sm:text-2xl xl:px-12 2xl:px-24">
+        <button
+          onClick={toggleSideMenu}
+          className="py-2 transition-transform hover:scale-110 focus:scale-110"
+        >
+          <BurgerMenu />
+        </button>
+        <div className="flex items-center">
+          <GiRabbit className="h-8 w-8 xl:h-12 xl:w-12" />
+          <p className="font-bold">kanbunny</p>
+        </div>
+        {status === "loading" ? (
+          <LoadingDots />
+        ) : (
+          <p className="ml-auto">{session?.user?.name}</p>
+        )}
+        <button
+          onClick={() => signOut({ callbackUrl: "/auth/login" })}
+          className="hover:underline focus:underline"
+        >
+          sign out
+        </button>
+      </nav>
+    </FocusLock>
   )
 }
 
