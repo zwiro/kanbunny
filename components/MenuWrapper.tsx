@@ -3,6 +3,7 @@ import { AnimatePresence } from "framer-motion"
 import { motion } from "framer-motion"
 import useClickOutside from "@/hooks/useClickOutside"
 import MenuContext, { MenuProvider } from "@/context/MenuContext"
+import useCloseOnEscape from "@/hooks/useCloseOnEscape"
 
 interface MenuWrapperProps {
   children: React.ReactNode
@@ -24,6 +25,8 @@ interface MenuButtonProps {
 
 function MenuButton({ children, isLoading = false }: MenuButtonProps) {
   const { isMenuOpened, closeMenu, openMenu } = useContext(MenuContext)
+
+  useCloseOnEscape(closeMenu)
 
   const menuRef = useRef<HTMLDivElement>(null)
 

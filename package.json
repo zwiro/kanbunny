@@ -31,6 +31,7 @@
     "react": "18.2.0",
     "react-datetime-picker": "^5.0.3",
     "react-dom": "18.2.0",
+    "react-focus-lock": "^2.9.4",
     "react-hook-form": "^7.43.9",
     "react-icons": "^4.8.0",
     "react-select": "^5.7.3",

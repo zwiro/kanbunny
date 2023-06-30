@@ -3,6 +3,7 @@ import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import { SubmitHandler, useFormContext } from "react-hook-form"
 import TextInput from "./TextInput"
 import useClickOutside from "@/hooks/useClickOutside"
+import useCloseOnEscape from "@/hooks/useCloseOnEscape"
 
 interface AddEditFormProps {
   name: string
@@ -24,7 +25,10 @@ function AddEditForm({
 }: AddEditFormProps) {
   const { reset } = useFormContext()
 
+  useCloseOnEscape(close)
+
   const formRef = useRef<HTMLFormElement>(null)
+
   useClickOutside([formRef], close)
 
   return (
