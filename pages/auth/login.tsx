@@ -26,7 +26,7 @@ function AuthPage() {
           </p>
           <button
             onClick={() => signIn("github", { callbackUrl: "/" })}
-            className="mx-8 flex items-center justify-center gap-1 bg-zinc-950 px-8 py-4 font-bold transition-colors hover:bg-zinc-900"
+            className="mx-8 flex items-center justify-center gap-1 bg-zinc-950 px-8 py-4 font-bold transition-colors hover:bg-zinc-900 focus:bg-zinc-900"
           >
             <AiFillGithub />
             sign in with github

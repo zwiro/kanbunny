@@ -42,7 +42,10 @@ function AddEditForm({
         placeholder={placeholder}
         defaultValue={defaultValue}
       />
-      <button type="submit" className="transition-transform hover:scale-110">
+      <button
+        type="submit"
+        className="transition-transform hover:scale-110 focus:scale-110"
+      >
         <AiOutlineCheck size={20} />
       </button>
       <button
@@ -51,7 +54,7 @@ function AddEditForm({
           reset({}, { keepDefaultValues: true })
           close()
         }}
-        className="transition-transform hover:scale-110"
+        className="transition-transform hover:scale-110 focus:scale-110"
       >
         <AiOutlineClose size={20} />
       </button>

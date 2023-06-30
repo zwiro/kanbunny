@@ -95,10 +95,13 @@ function Board({
     <div
       tabIndex={0}
       onClick={() => chooseOpenedBoard({ id, color, name, owner })}
+      onKeyDown={(e) =>
+        e.key === "Enter" && chooseOpenedBoard({ id, color, name, owner })
+      }
       className={`group flex cursor-pointer items-center gap-2 px-2 text-xl transition-colors ${
         chosenBoard?.id === id && id
-          ? "bg-zinc-900 hover:bg-zinc-900"
-          : "hover:bg-zinc-900/40"
+          ? "bg-zinc-900 hover:bg-zinc-900 focus:bg-zinc-900"
+          : "hover:bg-zinc-900/40 focus:bg-zinc-900/40"
       } ${
         ((isUpdating && !id) ||
           updateName.isLoading ||
@@ -125,8 +128,8 @@ function Board({
           <div
             className={`invisible z-10 scale-0 transition-transform ${
               isEditingColor
-                ? "group-hover:scale-0"
-                : "group-hover:visible group-hover:scale-100"
+                ? "group-hover:scale-0 group-focus:scale-0"
+                : "group-hover:visible group-hover:scale-100 group-focus:visible group-focus:scale-100"
             }`}
           >
             <MenuWrapper isLoading={isLoading}>
@@ -147,7 +150,7 @@ function Board({
           </AnimatePresence>
           <div
             {...dragHandleProps}
-            className={`ml-auto cursor-grab group-hover:visible ${
+            className={`ml-auto cursor-grab group-hover:visible group-focus:visible ${
               isDragging ? "visible" : "invisible"
             }`}
             onClick={(e) => e.stopPropagation()}

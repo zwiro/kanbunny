@@ -57,7 +57,7 @@ function ColorPicker({ close, id, editColor, currentColor }: ColorPickerProps) {
           className={`relative h-4 w-4 ${colorVariants[color]} ${
             color === currentColor
               ? "ring-2 ring-inset ring-zinc-900 "
-              : "hover:brightness-125"
+              : "hover:brightness-125 focus:brightness-125"
           } `}
           data-color={color}
         />

@@ -59,7 +59,7 @@ function Filters({
           ) : (
             <AiOutlineFilter
               size={32}
-              className="transition-transform hover:scale-110"
+              className="transition-transform hover:scale-110 focus:scale-110"
             />
           )}
         </button>
@@ -71,14 +71,14 @@ function Filters({
                   <motion.div {...buttonAnimation} key="glass">
                     <AiOutlineClose
                       size={32}
-                      className="transition-transform hover:scale-110"
+                      className="transition-transform focus:scale-110"
                     />
                   </motion.div>
                 ) : (
                   <motion.div {...buttonAnimation} key="close">
                     <AiOutlineSearch
                       size={32}
-                      className="transition-transform hover:scale-110"
+                      className="transition-transform hover:scale-110 focus:scale-110"
                     />
                   </motion.div>
                 )}

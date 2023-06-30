@@ -35,13 +35,13 @@ function ConfirmPopup({
         <div className="flex justify-between">
           <button
             onClick={handleClick}
-            className="border border-neutral-700 bg-zinc-900 px-4 py-2 hover:bg-zinc-950"
+            className="border border-neutral-700 bg-zinc-900 px-4 py-2 hover:bg-zinc-950 focus:bg-zinc-950"
           >
             confirm
           </button>
           <button
             onClick={close}
-            className="border border-neutral-700 bg-zinc-900 px-4 py-2 hover:bg-zinc-950"
+            className="border border-neutral-700 bg-zinc-900 px-4 py-2 hover:bg-zinc-950 focus:bg-zinc-950"
           >
             cancel
           </button>

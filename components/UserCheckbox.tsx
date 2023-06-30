@@ -18,7 +18,7 @@ function UserCheckbox({ name, id, assignUser, isAssigned }: UserCheckboxProps) {
       />
       <label
         htmlFor={name}
-        className={`block cursor-pointer border border-zinc-900 p-2 transition-colors hover:bg-zinc-950 peer-checked:bg-zinc-900`}
+        className={`block cursor-pointer border border-zinc-900 p-2 transition-colors hover:bg-zinc-950 focus:bg-zinc-950 peer-checked:bg-zinc-900`}
       >
         {name}
       </label>

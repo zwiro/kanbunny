@@ -5,14 +5,14 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { trpc } from "@/utils/trpc"
 import { projectSchema } from "@/utils/schemas"
 import { createNewProject } from "@/mutations/projectMutations"
+import FocusLock from "react-focus-lock"
 import FormFieldContainer from "./FormFieldContainer"
+import useCloseOnEscape from "@/hooks/useCloseOnEscape"
 import AddButton from "./AddButton"
 import ModalForm from "./ModalForm"
 import PlusIcon from "./PlusIcon"
 import TextInput from "./TextInput"
 import UserSelect from "./UserSelect"
-import useCloseOnEscape from "@/hooks/useCloseOnEscape"
-import FocusLock from "react-focus-lock"
 
 interface AddProjectModalProps {
   close: () => void

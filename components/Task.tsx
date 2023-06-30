@@ -179,7 +179,7 @@ function Task({
                 ))}
               </ul>
             </div>
-            <div className="z-20 ml-auto scale-0 transition-transform group-hover:scale-100">
+            <div className="z-20 ml-auto scale-0 transition-transform group-hover:scale-100 group-focus:scale-100">
               <MenuWrapper isLoading={isLoading}>
                 <MenuItem handleClick={editName}>edit task name</MenuItem>
                 <MenuItem handleClick={editUsers}>assign user</MenuItem>
@@ -191,7 +191,7 @@ function Task({
             </div>
             <div
               {...dragHandleProps}
-              className={`cursor-grab group-hover:visible ${
+              className={`cursor-grab group-hover:visible group-focus:visible ${
                 isDragging ? "visible" : "invisible"
               }`}
               onClick={(e) => e.stopPropagation()}
@@ -288,14 +288,14 @@ function EditTaskUsers({
             })
           }
           disabled={updateUsers.isLoading}
-          className="ml-auto transition-transform hover:scale-110"
+          className="ml-auto transition-transform hover:scale-110 focus:scale-110"
         >
           <AiOutlineCheck size={20} />
         </button>
         <button
           type="button"
           onClick={closeEditUsers}
-          className="transition-transform hover:scale-110"
+          className="transition-transform hover:scale-110 focus:scale-110"
         >
           <AiOutlineClose size={20} />
         </button>
