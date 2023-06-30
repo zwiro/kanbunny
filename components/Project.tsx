@@ -254,7 +254,7 @@ function Project({
           </motion.div>
         )}
       </AnimatePresence>
-      <ul className="flex flex-col gap-2 py-4 lg:gap-4">
+      <div className="flex flex-col gap-2 py-4 lg:gap-4">
         <AnimatePresence>
           {isAdding && (
             <>
@@ -326,7 +326,7 @@ function Project({
         {!boards.length && (
           <p className="text-base font-bold text-neutral-500">no boards yet</p>
         )}
-      </ul>
+      </div>
     </section>
   )
 }

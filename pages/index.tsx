@@ -159,7 +159,7 @@ export default function Home() {
 
   return (
     <>
-      <main
+      <div
         onClick={() => {
           closeSideMenu()
         }}
@@ -302,7 +302,7 @@ export default function Home() {
             </>
           )}
         </AnimatePresence>
-      </main>
+      </div>
     </>
   )
 }

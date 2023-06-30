@@ -11,12 +11,15 @@ import ModalForm from "./ModalForm"
 import PlusIcon from "./PlusIcon"
 import TextInput from "./TextInput"
 import UserSelect from "./UserSelect"
+import useCloseOnEscape from "@/hooks/useCloseOnEscape"
 
 interface AddProjectModalProps {
   close: () => void
 }
 
 function AddProjectModal({ close }: AddProjectModalProps) {
+  useCloseOnEscape(close)
+
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
 
   const utils = trpc.useContext()

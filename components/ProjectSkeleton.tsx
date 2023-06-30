@@ -18,11 +18,13 @@ function ProjectSkeleton({ width }: { width: number }) {
 
 function BoardSkeleton({ width }: { width: number }) {
   return (
-    <li className={`group flex cursor-pointer items-center gap-2 px-2 text-xl`}>
+    <div
+      className={`group flex cursor-pointer items-center gap-2 px-2 text-xl`}
+    >
       <div className="h-4 w-4 bg-zinc-700" />
       <div className="h-7 bg-zinc-700" style={{ width }} />
       <div className={`invisible z-10 scale-0 transition-transform`}></div>
-    </li>
+    </div>
   )
 }
 

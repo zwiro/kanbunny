@@ -15,6 +15,7 @@ import PlusIcon from "./PlusIcon"
 import UserCheckbox from "./UserCheckbox"
 import ModalForm from "./ModalForm"
 import FormFieldContainer from "./FormFieldContainer"
+import useCloseOnEscape from "@/hooks/useCloseOnEscape"
 
 interface AddTaskModalProps {
   close: () => void
@@ -22,6 +23,8 @@ interface AddTaskModalProps {
 }
 
 function AddTaskModal({ close, listId }: AddTaskModalProps) {
+  useCloseOnEscape(close)
+
   const [date, onChange] = useState<Date | null>()
 
   const { chosenBoard } = useContext(LayoutContext)

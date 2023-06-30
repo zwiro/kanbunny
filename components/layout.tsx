@@ -41,6 +41,10 @@ function Layout({ children }: LayoutProps) {
           href="images/safari-pinned-tab.svg"
           color="#5bbad5"
         />
+        <meta
+          name="description"
+          content="Boost your productivity and streamline your workflow with our intuitive kanban board application. Visualize your tasks, track progress, and collaborate seamlessly with team members. Stay organized and in control of your projects, whether you're working solo or as part of a team. Try kanbunny today and experience the power of efficient task management."
+        />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>

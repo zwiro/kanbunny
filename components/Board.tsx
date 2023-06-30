@@ -92,7 +92,8 @@ function Board({
   const isLoading = isUpdating || updateName.isLoading || updateColor.isLoading
 
   return (
-    <li
+    <div
+      tabIndex={0}
       onClick={() => chooseOpenedBoard({ id, color, name, owner })}
       className={`group flex cursor-pointer items-center gap-2 px-2 text-xl transition-colors ${
         chosenBoard?.id === id && id
@@ -172,7 +173,7 @@ function Board({
           )}
         </div>
       )}
-    </li>
+    </div>
   )
 }
 
