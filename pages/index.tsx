@@ -43,11 +43,10 @@ export default function Home() {
   const [dateFilter, setDateFilter] = useState<string | Date | null>(null)
   const [assignedFilter, setAssignedFilter] = useState<string | null>(null)
 
-  const { isSideMenuOpen, closeSideMenu } = useContext(LayoutContext)
+  const { isSideMenuOpen, closeSideMenu, chosenBoard } =
+    useContext(LayoutContext)
 
   const [isAdding, add, closeAdd] = useBooleanState()
-
-  const { chosenBoard } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
 
@@ -79,6 +78,10 @@ export default function Home() {
 
   const search = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
+  }
+
+  const resetQuery = () => {
+    setSearchQuery("")
   }
 
   type ListSchema = z.infer<typeof listSchema>
@@ -179,6 +182,7 @@ export default function Home() {
                 <Filters
                   searchQuery={searchQuery}
                   search={search}
+                  resetQuery={resetQuery}
                   assignedFilter={assignedFilter}
                   dateFilter={dateFilter}
                   handleDateFilterChange={handleDateFilterChange}

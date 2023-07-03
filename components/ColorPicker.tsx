@@ -3,6 +3,7 @@ import { motion } from "framer-motion"
 import { z } from "zod"
 import { UseTRPCMutationResult } from "@trpc/react-query/shared"
 import type { Board, List, Task } from "@prisma/client"
+import FocusLock from "react-focus-lock"
 import { colorSchema } from "@/utils/schemas"
 import useClickOutside from "@/hooks/useClickOutside"
 import useCloseOnEscape from "@/hooks/useCloseOnEscape"
@@ -48,24 +49,26 @@ function ColorPicker({ close, id, editColor, currentColor }: ColorPickerProps) {
   }
 
   return (
-    <motion.div
-      {...pickerAnimation}
-      ref={pickerRef}
-      className="absolute -left-2 -top-2 flex gap-2 bg-zinc-900 p-2"
-      onClick={pickColor}
-    >
-      {Object.values(colorSchema.shape.color.enum).map((color) => (
-        <button
-          key={color}
-          className={`relative h-4 w-4 ${colorVariants[color]} ${
-            color === currentColor
-              ? "ring-2 ring-inset ring-zinc-900 "
-              : "hover:brightness-125 focus:brightness-125"
-          } `}
-          data-color={color}
-        />
-      ))}
-    </motion.div>
+    <FocusLock>
+      <motion.div
+        {...pickerAnimation}
+        ref={pickerRef}
+        className="absolute -left-2 -top-2 flex gap-2 bg-zinc-900 p-2"
+        onClick={pickColor}
+      >
+        {Object.values(colorSchema.shape.color.enum).map((color) => (
+          <button
+            key={color}
+            className={`relative h-4 w-4 ${colorVariants[color]} ${
+              color === currentColor
+                ? "ring-2 ring-inset ring-zinc-900 "
+                : "hover:brightness-125 focus:brightness-125"
+            } `}
+            data-color={color}
+          />
+        ))}
+      </motion.div>
+    </FocusLock>
   )
 }
 

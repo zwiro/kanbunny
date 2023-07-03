@@ -9,10 +9,12 @@ import {
 import DateTimePicker from "react-datetime-picker"
 import useBooleanState from "@/hooks/useBooleanState"
 import useClickOutside from "@/hooks/useClickOutside"
+import useCloseOnEscape from "@/hooks/useCloseOnEscape"
 
 interface FiltersProps {
   searchQuery: string
   search: (e: ChangeEvent<HTMLInputElement>) => void
+  resetQuery: () => void
   assignedFilter: string | null
   dateFilter: Date | string | null
   handleAssignedFilterChange: (e: ChangeEvent<HTMLInputElement>) => void
@@ -24,6 +26,7 @@ interface FiltersProps {
 function Filters({
   searchQuery,
   search,
+  resetQuery,
   assignedFilter,
   dateFilter,
   handleAssignedFilterChange,
@@ -36,6 +39,11 @@ function Filters({
 
   const filterRef = useRef<HTMLDivElement>(null)
   useClickOutside([filterRef], closeFilter)
+
+  const closeSearchAndReset = () => {
+    resetQuery()
+    toggleSearch()
+  }
 
   const buttonAnimation = {
     initial: { opacity: 0, rotate: -360 },
@@ -64,7 +72,7 @@ function Filters({
           )}
         </button>
         <div className="flex">
-          <button onClick={toggleSearch}>
+          <button onClick={isSearchOpen ? closeSearchAndReset : toggleSearch}>
             <AnimatePresence mode="wait">
               <motion.div>
                 {isSearchOpen ? (
@@ -110,6 +118,7 @@ function Filters({
               handleAssignedFilterChange={handleAssignedFilterChange}
               handleDateFilterChange={handleDateFilterChange}
               setDateFilter={setDateFilter}
+              closeFilter={closeFilter}
             />
           )}
         </AnimatePresence>
@@ -125,6 +134,7 @@ interface FiltersMenuProps {
   dateFilter: string | Date | null
   setDateFilter: React.Dispatch<React.SetStateAction<Date | string | null>>
   clearFilters: () => void
+  closeFilter: () => void
 }
 
 function FiltersMenu({
@@ -134,7 +144,10 @@ function FiltersMenu({
   dateFilter,
   setDateFilter,
   clearFilters,
+  closeFilter,
 }: FiltersMenuProps) {
+  useCloseOnEscape(closeFilter)
+
   const filterAnimation = {
     initial: { opacity: 0, scale: 0 },
     animate: { opacity: 1, scale: 1 },
@@ -258,6 +271,12 @@ function FilterButton({
         className={`hidden ${inputClassName}`}
       />
       <label
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.currentTarget.click()
+          }
+        }}
+        tabIndex={0}
         htmlFor={value}
         className={`cursor-pointer border border-zinc-700 px-1 ${labelClassName}`}
       >

@@ -135,6 +135,7 @@ function Task({
   return (
     <>
       <div
+        tabIndex={0}
         className={`group flex items-center justify-between border-b border-l-8 border-r border-t border-b-neutral-800 border-r-neutral-800 border-t-neutral-800 ${
           colorVariants[color]
         } bg-zinc-700 p-2
@@ -179,7 +180,7 @@ function Task({
                 ))}
               </ul>
             </div>
-            <div className="z-20 ml-auto scale-0 transition-transform group-hover:scale-100 group-focus:scale-100">
+            <div className="z-20 ml-auto scale-0 transition-transform group-focus-within:scale-100 group-hover:scale-100">
               <MenuWrapper isLoading={isLoading}>
                 <MenuItem handleClick={editName}>edit task name</MenuItem>
                 <MenuItem handleClick={editUsers}>assign user</MenuItem>
