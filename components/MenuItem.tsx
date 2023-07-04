@@ -1,5 +1,5 @@
 import MenuContext from "@/context/MenuContext"
-import { useContext } from "react"
+import { useContext, useId } from "react"
 
 interface MenuItemProps {
   children: string
@@ -14,10 +14,13 @@ function MenuItem({
 }: MenuItemProps) {
   const { closeMenu } = useContext(MenuContext)
 
+  const id = useId()
+
   return (
-    <li className="hover:cursor-pointer hover:bg-zinc-800 focus:bg-zinc-800">
+    <li>
       <button
-        className="w-full px-8 text-left"
+        id={id}
+        className="w-full px-8 text-left hover:cursor-pointer hover:bg-zinc-800 focus:bg-zinc-800"
         onClick={() => {
           handleClick && handleClick()
           closeOnClickInside && closeMenu()

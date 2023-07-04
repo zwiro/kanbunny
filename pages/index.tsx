@@ -257,7 +257,7 @@ export default function Home() {
               </DragDropContext>
 
               {isAdding ? (
-                <ListContainer>
+                <ListContainer length={lists.data?.length || 0}>
                   <div className="flex flex-col">
                     <FormProvider {...listMethods}>
                       <AddEditForm
@@ -290,9 +290,9 @@ export default function Home() {
             </div>
           </>
         ) : (
-          <p className="text-center font-bold text-neutral-300">
+          <h2 className="text-center font-bold text-neutral-300">
             open or create a new board
-          </p>
+          </h2>
         )}
 
         <AnimatePresence>
