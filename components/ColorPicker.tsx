@@ -65,6 +65,7 @@ function ColorPicker({ close, id, editColor, currentColor }: ColorPickerProps) {
                 : "hover:brightness-125 focus:brightness-125"
             } `}
             data-color={color}
+            aria-label={`Change color to ${color}`}
           />
         ))}
       </motion.div>

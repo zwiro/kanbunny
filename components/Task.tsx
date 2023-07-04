@@ -157,11 +157,11 @@ function Task({
                 )}
               </AnimatePresence>
               <div className="flex items-center gap-2">
-                <h3
+                <h4
                   className={`font-bold ${minutesLeft < 0 && "text-zinc-400"}`}
                 >
                   {name}
-                </h3>
+                </h4>
                 {daysLeft <= 0 && minutesLeft > 0 && <AiOutlineClockCircle />}
               </div>
               <p className="text-sm text-zinc-300">
@@ -175,7 +175,7 @@ function Task({
               </p>
               <ul className="flex flex-wrap gap-1">
                 {assigned_to.map((user) => (
-                  <li key={user.id} className="text-sm text-neutral-500">
+                  <li key={user.id} className="text-sm text-neutral-300">
                     {user.name}
                   </li>
                 ))}
@@ -298,6 +298,7 @@ function EditTaskUsers({
               }
               disabled={updateUsers.isLoading}
               className="ml-auto transition-transform hover:scale-110 focus:scale-110"
+              aria-label="Submit users"
             >
               <AiOutlineCheck size={20} />
             </button>
@@ -305,6 +306,7 @@ function EditTaskUsers({
               type="button"
               onClick={closeEditUsers}
               className="transition-transform hover:scale-110 focus:scale-110"
+              aria-label="Cancel"
             >
               <AiOutlineClose size={20} />
             </button>

@@ -133,11 +133,12 @@ function List({
         </ColorDot>
         {!isEditingName ? (
           <>
-            <h2 className="text-xl">{name}</h2>
+            <h3 className="text-xl">{name}</h3>
             <button
               onClick={add}
               className={`group py-2 ${isEditingColor && "scale-0"} `}
               disabled={isEditingColor || isLoading}
+              aria-label="Add new task"
             >
               <PlusIcon />
             </button>

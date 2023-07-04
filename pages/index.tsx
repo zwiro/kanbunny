@@ -174,7 +174,7 @@ export default function Home() {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 [&>div]:cursor-default">
                   <ColorDot color={chosenBoard.color} />
-                  <h1 className="text-2xl font-bold">{chosenBoard.name}</h1>
+                  <h2 className="text-2xl font-bold">{chosenBoard.name}</h2>
                 </div>
                 <MenuWrapper>
                   <MenuItem handleClick={add}>add list</MenuItem>
@@ -290,7 +290,7 @@ export default function Home() {
             </div>
           </>
         ) : (
-          <p className="text-center font-bold text-neutral-500">
+          <p className="text-center font-bold text-neutral-300">
             open or create a new board
           </p>
         )}

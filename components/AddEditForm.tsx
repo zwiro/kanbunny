@@ -50,6 +50,7 @@ function AddEditForm({
       <button
         type="submit"
         className="transition-transform hover:scale-110 focus:scale-110"
+        aria-label="Submit"
       >
         <AiOutlineCheck size={20} />
       </button>
@@ -57,6 +58,7 @@ function AddEditForm({
         type="button"
         onClick={resetField}
         className="transition-transform hover:scale-110 focus:scale-110"
+        aria-label="Cancel"
       >
         <AiOutlineClose size={20} />
       </button>

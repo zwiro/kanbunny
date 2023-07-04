@@ -14,6 +14,7 @@ function ColorDot({ editColor, color, children }: ColorDotProps) {
         editColor?.()
       }}
       className={`peer relative h-4 w-4 cursor-pointer bg-${color}-500`}
+      aria-label="Edit color"
     >
       {children}
     </button>

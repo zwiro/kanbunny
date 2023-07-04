@@ -22,17 +22,18 @@ function Navbar() {
         <button
           onClick={toggleSideMenu}
           className="py-2 transition-transform hover:scale-110 focus:scale-110"
+          aria-label={`${isSideMenuOpen ? "Close" : "Open"} side menu`}
         >
           <BurgerMenu />
         </button>
         <div className="flex items-center">
           <GiRabbit className="h-8 w-8 xl:h-12 xl:w-12" />
-          <p className="font-bold">kanbunny</p>
+          <h1 className="font-bold">kanbunny</h1>
         </div>
         {status === "loading" ? (
           <LoadingDots />
         ) : (
-          <p className="ml-auto">{session?.user?.name}</p>
+          <h2 className="ml-auto">{session?.user?.name}</h2>
         )}
         <button
           onClick={() => signOut({ callbackUrl: "/auth/login" })}

@@ -24,9 +24,10 @@ function TextInput({ name, ...props }: TextInputProps) {
       {...register(name)}
       autoFocus
       {...props}
-      className={`h-10 w-44 border bg-zinc-900 p-1 text-xl placeholder:text-neutral-500 focus:border-slate-50 ${
+      className={`h-10 w-44 border bg-zinc-900 p-1 text-xl placeholder:text-neutral-300 focus:border-slate-50 ${
         errors[name] ? "border-red-800" : "border-transparent"
       } `}
+      aria-label={props.placeholder}
     />
   )
 }

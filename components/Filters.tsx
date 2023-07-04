@@ -61,7 +61,10 @@ function Filters({
   return (
     <div className="relative ml-auto">
       <div className="flex items-center justify-end gap-1">
-        <button onClick={toggleFilter}>
+        <button
+          onClick={toggleFilter}
+          aria-label={`${isFilterOpen ? "Close" : "Open"} filters`}
+        >
           {dateFilter || assignedFilter ? (
             <AiFillFilter size={32} />
           ) : (
@@ -72,7 +75,10 @@ function Filters({
           )}
         </button>
         <div className="flex">
-          <button onClick={isSearchOpen ? closeSearchAndReset : toggleSearch}>
+          <button
+            onClick={isSearchOpen ? closeSearchAndReset : toggleSearch}
+            aria-label={`${isSearchOpen ? "Close" : "Open"} searchbar`}
+          >
             <AnimatePresence mode="wait">
               <motion.div>
                 {isSearchOpen ? (
@@ -102,6 +108,7 @@ function Filters({
                   type="search"
                   placeholder="add dark mode..."
                   className="h-full w-full bg-zinc-900 px-1"
+                  aria-label="Search"
                 />
               </motion.div>
             )}
@@ -231,6 +238,14 @@ function FiltersMenu({
           calendarIcon={null}
           format="y-MM-dd h:mm a"
           className="border border-zinc-700"
+          amPmAriaLabel="Select AM/PM"
+          dayAriaLabel="Day"
+          hourAriaLabel="Hour"
+          minuteAriaLabel="Minute"
+          monthAriaLabel="Month"
+          yearAriaLabel="Year"
+          nativeInputAriaLabel="Due to"
+          clearAriaLabel="Clear value"
         />
       </fieldset>
       <button

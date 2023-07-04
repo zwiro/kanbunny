@@ -91,16 +91,23 @@ function AddTaskModal({ close, listId }: AddTaskModalProps) {
             </div>
           </FormFieldContainer>
           <FormFieldContainer>
-            <label htmlFor="datetime">due to</label>
+            <p>due to</p>
             <DateTimePicker
               onChange={onChange}
               value={date}
               disableClock
               minDate={new Date()}
-              clearIcon={null}
               calendarIcon={null}
               format="y-MM-dd h:mm a"
               className="w-fit"
+              amPmAriaLabel="Select AM/PM"
+              dayAriaLabel="Day"
+              hourAriaLabel="Hour"
+              minuteAriaLabel="Minute"
+              monthAriaLabel="Month"
+              yearAriaLabel="Year"
+              nativeInputAriaLabel="Due to"
+              clearAriaLabel="Clear value"
             />
           </FormFieldContainer>
           <AddButton disabled={createTask.isLoading}>

@@ -41,6 +41,7 @@ function MenuButton({ children, isLoading = false }: MenuButtonProps) {
         }}
         className="px-1 py-4"
         disabled={isLoading}
+        aria-label="Open menu"
       >
         <MenuDots isMenuOpened={isMenuOpened} />
       </button>

@@ -233,6 +233,7 @@ function Project({
                     <button
                       type="submit"
                       className="transition-transform hover:scale-110 disabled:hover:scale-100"
+                      aria-label="Submit users"
                     >
                       <AiOutlineCheck size={24} />
                     </button>
@@ -240,6 +241,7 @@ function Project({
                       type="button"
                       onClick={closeEditUsers}
                       className="transition-transform hover:scale-110"
+                      aria-label="Cancel"
                     >
                       <AiOutlineClose size={24} />
                     </button>
@@ -324,7 +326,7 @@ function Project({
           </DragDropContext>
         </AnimatePresence>
         {!boards.length && (
-          <p className="text-base font-bold text-neutral-500">no boards yet</p>
+          <p className="text-base font-bold text-neutral-300">no boards yet</p>
         )}
       </div>
     </section>
