@@ -233,7 +233,10 @@ function FiltersMenu({
           className="border border-zinc-700"
         />
       </fieldset>
-      <button onClick={clearFilters} className="mt-2 bg-zinc-700 px-2 py-1">
+      <button
+        onClick={clearFilters}
+        className="mt-2 bg-zinc-700 px-2 py-1 transition-colors hover:bg-zinc-800 focus:bg-zinc-800"
+      >
         clear filters
       </button>
     </motion.div>
@@ -270,7 +273,8 @@ function FilterButton({
         checked={filter === value}
         className={`hidden ${inputClassName}`}
       />
-      <label
+      <motion.label
+        whileTap={{ scale: 1.1 }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.currentTarget.click()
@@ -278,10 +282,10 @@ function FilterButton({
         }}
         tabIndex={0}
         htmlFor={value}
-        className={`cursor-pointer border border-zinc-700 px-1 ${labelClassName}`}
+        className={`cursor-pointer border border-zinc-700 px-1 transition-colors hover:bg-zinc-800 focus:bg-zinc-800 ${labelClassName}`}
       >
         {children}
-      </label>
+      </motion.label>
     </>
   )
 }
