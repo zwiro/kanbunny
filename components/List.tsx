@@ -168,15 +168,22 @@ function List({
             </div>
           </>
         ) : (
-          <FormProvider {...listMethods}>
-            <AddEditForm
-              name="name"
-              placeholder="list name"
-              close={closeEditName}
-              handleSubmit={listMethods.handleSubmit(onSubmit)}
-              className="[&>input]:h-9"
-            />
-          </FormProvider>
+          <div>
+            <FormProvider {...listMethods}>
+              <AddEditForm
+                name="name"
+                placeholder="list name"
+                close={closeEditName}
+                handleSubmit={listMethods.handleSubmit(onSubmit)}
+                className="[&>input]:h-9"
+              />
+            </FormProvider>
+            {listMethods.formState.errors && (
+              <p role="alert" className="text-base text-red-500">
+                {listMethods.formState.errors?.name?.message as string}
+              </p>
+            )}
+          </div>
         )}
       </div>
       <Droppable

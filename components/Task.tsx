@@ -29,6 +29,7 @@ import ColorPicker from "./ColorPicker"
 import useAssignUser from "@/hooks/useAssignUser"
 import LayoutContext from "@/context/LayoutContext"
 import useBooleanState from "@/hooks/useBooleanState"
+import { LoadingDots } from "./LoadingDots"
 
 type TaskSchema = z.infer<typeof editTaskSchema>
 
@@ -211,6 +212,11 @@ function Task({
                 className="[&>input]:h-9"
               />
             </FormProvider>
+            {taskMethods.formState.errors && (
+              <p role="alert" className="text-base text-red-500">
+                {taskMethods.formState.errors?.name?.message as string}
+              </p>
+            )}
           </div>
         )}
       </div>
@@ -279,27 +285,33 @@ function EditTaskUsers({
         ))}
       </div>
       <div className="flex items-center gap-1">
-        <button
-          onClick={() =>
-            updateUsers.mutate({
-              taskId,
-              name,
-              listId,
-              assigned_to: assignedUsers,
-            })
-          }
-          disabled={updateUsers.isLoading}
-          className="ml-auto transition-transform hover:scale-110 focus:scale-110"
-        >
-          <AiOutlineCheck size={20} />
-        </button>
-        <button
-          type="button"
-          onClick={closeEditUsers}
-          className="transition-transform hover:scale-110 focus:scale-110"
-        >
-          <AiOutlineClose size={20} />
-        </button>
+        {!updateUsers.isLoading ? (
+          <>
+            <button
+              onClick={() =>
+                updateUsers.mutate({
+                  taskId,
+                  name,
+                  listId,
+                  assigned_to: assignedUsers,
+                })
+              }
+              disabled={updateUsers.isLoading}
+              className="ml-auto transition-transform hover:scale-110 focus:scale-110"
+            >
+              <AiOutlineCheck size={20} />
+            </button>
+            <button
+              type="button"
+              onClick={closeEditUsers}
+              className="transition-transform hover:scale-110 focus:scale-110"
+            >
+              <AiOutlineClose size={20} />
+            </button>
+          </>
+        ) : (
+          <LoadingDots />
+        )}
       </div>
     </motion.form>
   )

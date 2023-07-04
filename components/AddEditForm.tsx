@@ -25,11 +25,16 @@ function AddEditForm({
 }: AddEditFormProps) {
   const { reset } = useFormContext()
 
-  useCloseOnEscape(close)
+  const resetField = () => {
+    reset({}, { keepDefaultValues: true })
+    close()
+  }
+
+  useCloseOnEscape(resetField)
 
   const formRef = useRef<HTMLFormElement>(null)
 
-  useClickOutside([formRef], close)
+  useClickOutside([formRef], resetField)
 
   return (
     <form
@@ -50,10 +55,7 @@ function AddEditForm({
       </button>
       <button
         type="button"
-        onClick={() => {
-          reset({}, { keepDefaultValues: true })
-          close()
-        }}
+        onClick={resetField}
         className="transition-transform hover:scale-110 focus:scale-110"
       >
         <AiOutlineClose size={20} />

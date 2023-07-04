@@ -34,7 +34,7 @@ export const editListSchema = z.object({
 })
 
 export const editTaskSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1, { message: "task name is required" }),
   id: z.string(),
   listId: z.string(),
   assigned_to: z.array(z.string()).optional(),

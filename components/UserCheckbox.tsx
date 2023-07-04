@@ -24,7 +24,6 @@ function UserCheckbox({ name, id, assignUser, isAssigned }: UserCheckboxProps) {
         name={name}
         onChange={() => check(id)}
         checked={isChecked}
-        defaultChecked={isAssigned}
         className="peer hidden"
       />
       <motion.label
