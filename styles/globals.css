@@ -9,6 +9,10 @@
   scrollbar-color: #000000 #737373;
 }
 
+body {
+  overflow: auto;
+}
+
 /* Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
   width: 8px;

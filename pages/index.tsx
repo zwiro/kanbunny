@@ -171,36 +171,42 @@ export default function Home() {
         onClick={() => {
           closeSideMenu()
         }}
-        className="flex flex-col"
+        className="flex flex-col overflow-x-scroll"
       >
         {chosenBoard ? (
           <>
             <div>
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1 [&>div]:cursor-default">
-                  <ColorDot color={chosenBoard.color} />
-                  <h2 className="text-2xl font-bold">{chosenBoard.name}</h2>
+                <div className="sticky left-0">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1 [&>button]:cursor-default">
+                      <ColorDot color={chosenBoard.color} />
+                      <h2 className="text-2xl font-bold">{chosenBoard.name}</h2>
+                    </div>
+                    <MenuWrapper>
+                      <MenuItem handleClick={add}>add list</MenuItem>
+                    </MenuWrapper>
+                  </div>
+                  <p className="text-slate-300">owner: {chosenBoard.owner}</p>
                 </div>
-                <MenuWrapper>
-                  <MenuItem handleClick={add}>add list</MenuItem>
-                </MenuWrapper>
-                <Filters
-                  searchQuery={searchQuery}
-                  search={search}
-                  resetQuery={resetQuery}
-                  assignedFilter={assignedFilter}
-                  dateFilter={dateFilter}
-                  handleDateFilterChange={handleDateFilterChange}
-                  handleAssignedFilterChange={handleAssignedFilterChange}
-                  clearFilters={clearFilters}
-                  setDateFilter={setDateFilter}
-                  hideEmptyLists={hideEmptyLists}
-                  toggleHideEmptyLists={toggleHideEmptyLists}
-                />
+                <div className="fixed right-4 lg:right-12 xl:right-24">
+                  <Filters
+                    searchQuery={searchQuery}
+                    search={search}
+                    resetQuery={resetQuery}
+                    assignedFilter={assignedFilter}
+                    dateFilter={dateFilter}
+                    handleDateFilterChange={handleDateFilterChange}
+                    handleAssignedFilterChange={handleAssignedFilterChange}
+                    clearFilters={clearFilters}
+                    setDateFilter={setDateFilter}
+                    hideEmptyLists={hideEmptyLists}
+                    toggleHideEmptyLists={toggleHideEmptyLists}
+                  />
+                </div>
               </div>
-              <p className="text-slate-300">owner: {chosenBoard.owner}</p>
             </div>
-            <div className={`flex overflow-y-hidden overflow-x-scroll pb-48`}>
+            <div className={`flex pb-48`}>
               {lists.isLoading && (
                 <div className="flex gap-4 lg:gap-8 xl:gap-16">
                   <ListSkeleton width={60} />

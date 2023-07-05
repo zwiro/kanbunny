@@ -49,7 +49,7 @@ function Layout({ children }: LayoutProps) {
         <meta name="theme-color" content="#ffffff" />
       </Head>
       <div
-        className={`${jura.className} min-h-screen bg-zinc-700 text-slate-100`}
+        className={`${jura.className} min-h-screen overflow-hidden bg-zinc-700 text-slate-100`}
       >
         <Navbar />
         <main className="p-4 xl:px-12 2xl:px-24">{children}</main>
