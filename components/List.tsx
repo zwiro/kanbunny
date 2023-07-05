@@ -105,7 +105,10 @@ function List({
   const isLoading = isUpdating || updateName.isLoading || updateColor.isLoading
 
   return (
-    <section
+    <motion.section
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      key={dateFilter?.toString() || assignedFilter}
       className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 ${
         colorVariants[color]
       } ${isUpdating && !id && "opacity-50"}       ${
@@ -235,7 +238,7 @@ function List({
       <AnimatePresence>
         {isAdding && <AddTaskModal close={closeAdd} listId={id} />}
       </AnimatePresence>
-    </section>
+    </motion.section>
   )
 }
 

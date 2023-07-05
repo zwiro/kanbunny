@@ -250,7 +250,7 @@ function FiltersMenu({
       </fieldset>
       <button
         onClick={clearFilters}
-        className="mt-2 bg-zinc-700 px-2 py-1 transition-colors hover:bg-zinc-800 focus:bg-zinc-800"
+        className="mt-2 bg-zinc-700 px-2 py-1 transition-colors hover:bg-zinc-800 focus-visible:bg-zinc-800"
       >
         clear filters
       </button>
