@@ -37,11 +37,14 @@ import PlusIcon from "@/components/PlusIcon"
 import List from "@/components/List"
 import SideMenu from "@/components/SideMenu"
 import LayoutContext from "@/context/LayoutContext"
+import getFilteredLists from "@/utils/getFilteredLists"
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("")
   const [dateFilter, setDateFilter] = useState<string | Date | null>(null)
   const [assignedFilter, setAssignedFilter] = useState<string | null>(null)
+
+  const [hideEmptyLists, , , toggleHideEmptyLists] = useBooleanState()
 
   const { isSideMenuOpen, closeSideMenu, chosenBoard } =
     useContext(LayoutContext)
@@ -189,6 +192,8 @@ export default function Home() {
                   handleAssignedFilterChange={handleAssignedFilterChange}
                   clearFilters={clearFilters}
                   setDateFilter={setDateFilter}
+                  hideEmptyLists={hideEmptyLists}
+                  toggleHideEmptyLists={toggleHideEmptyLists}
                 />
               </div>
               <p className="text-slate-300">owner: {chosenBoard.owner}</p>
@@ -214,7 +219,7 @@ export default function Home() {
                       className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16"
                     >
                       {!!lists.data?.length &&
-                        lists.data
+                        getFilteredLists(lists.data, hideEmptyLists)
                           ?.sort((a, b) => a.order - b.order)
                           .map((list, i) => (
                             <Draggable

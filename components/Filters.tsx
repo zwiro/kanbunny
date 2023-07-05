@@ -21,6 +21,8 @@ interface FiltersProps {
   handleDateFilterChange: (e: ChangeEvent<HTMLInputElement>) => void
   clearFilters: () => void
   setDateFilter: React.Dispatch<React.SetStateAction<Date | string | null>>
+  hideEmptyLists: boolean
+  toggleHideEmptyLists: () => void
 }
 
 function Filters({
@@ -33,6 +35,8 @@ function Filters({
   handleDateFilterChange,
   clearFilters,
   setDateFilter,
+  hideEmptyLists,
+  toggleHideEmptyLists,
 }: FiltersProps) {
   const [isSearchOpen, , , toggleSearch] = useBooleanState()
   const [isFilterOpen, , closeFilter, toggleFilter] = useBooleanState()
@@ -126,6 +130,8 @@ function Filters({
               handleDateFilterChange={handleDateFilterChange}
               setDateFilter={setDateFilter}
               closeFilter={closeFilter}
+              hideEmptyLists={hideEmptyLists}
+              toggleHideEmptyLists={toggleHideEmptyLists}
             />
           )}
         </AnimatePresence>
@@ -142,6 +148,8 @@ interface FiltersMenuProps {
   setDateFilter: React.Dispatch<React.SetStateAction<Date | string | null>>
   clearFilters: () => void
   closeFilter: () => void
+  hideEmptyLists: boolean
+  toggleHideEmptyLists: () => void
 }
 
 function FiltersMenu({
@@ -152,6 +160,8 @@ function FiltersMenu({
   setDateFilter,
   clearFilters,
   closeFilter,
+  hideEmptyLists,
+  toggleHideEmptyLists,
 }: FiltersMenuProps) {
   useCloseOnEscape(closeFilter)
 
@@ -248,9 +258,18 @@ function FiltersMenu({
           clearAriaLabel="Clear value"
         />
       </fieldset>
+      <div className="my-2 flex items-center gap-1 accent-zinc-700">
+        <input
+          type="checkbox"
+          id="hide-empty-lists"
+          checked={hideEmptyLists}
+          onChange={toggleHideEmptyLists}
+        />
+        <label htmlFor="hide-empty-lists">hide empty lists</label>
+      </div>
       <button
         onClick={clearFilters}
-        className="mt-2 bg-zinc-700 px-2 py-1 transition-colors hover:bg-zinc-800 focus-visible:bg-zinc-800"
+        className="bg-zinc-700 px-2 py-1 transition-colors hover:bg-zinc-800 focus-visible:bg-zinc-800"
       >
         clear filters
       </button>
