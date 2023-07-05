@@ -150,6 +150,7 @@ function Board({
           </AnimatePresence>
           <div
             {...dragHandleProps}
+            aria-label="Grab to drag"
             className={`ml-auto cursor-grab group-hover:visible group-focus:visible ${
               isDragging ? "visible" : "invisible"
             }`}

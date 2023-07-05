@@ -171,11 +171,13 @@ export default function Home() {
         onClick={() => {
           closeSideMenu()
         }}
-        className="flex flex-col overflow-x-scroll"
+        className={`flex flex-col ${
+          !!lists.data?.length && "overflow-x-scroll"
+        }`}
       >
         {chosenBoard ? (
           <>
-            <div className="sticky left-0 z-50 flex items-center justify-between">
+            <div className="sticky left-0 z-10 flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1 [&>button]:cursor-default">

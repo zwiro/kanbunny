@@ -170,6 +170,7 @@ function List({
             </AnimatePresence>
             <div
               {...dragHandleProps}
+              aria-label="Grab to drag"
               className={`cursor-grab ${isFiltered && "pointer-events-none"}`}
               onClick={(e) => e.stopPropagation()}
             >

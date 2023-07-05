@@ -189,7 +189,11 @@ function Project({
               />
             )}
           </AnimatePresence>
-          <div {...dragHandleProps} className="ml-auto cursor-grab">
+          <div
+            {...dragHandleProps}
+            className="ml-auto cursor-grab"
+            aria-label="Grab to drag"
+          >
             <GoGrabber />
           </div>
         </div>

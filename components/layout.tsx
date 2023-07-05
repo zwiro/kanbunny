@@ -52,7 +52,7 @@ function Layout({ children }: LayoutProps) {
         className={`${jura.className} h-screen overflow-y-scroll bg-zinc-700 text-slate-100`}
       >
         <Navbar />
-        <main className="p-4 xl:px-12 2xl:px-24">{children}</main>
+        <main className="mt-20 p-4 xl:px-12 2xl:px-24">{children}</main>
       </div>
     </LayoutProvider>
   )
