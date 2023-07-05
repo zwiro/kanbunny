@@ -63,7 +63,7 @@ function Filters({
   }
 
   return (
-    <div className="relative ml-auto">
+    <div className="relative z-50 ml-auto">
       <div className="flex items-center justify-end gap-1">
         <button
           onClick={toggleFilter}
@@ -174,7 +174,7 @@ function FiltersMenu({
   return (
     <motion.div
       {...filterAnimation}
-      className="absolute right-0 z-30 origin-top-right whitespace-nowrap bg-zinc-900/95 p-4 shadow-md shadow-black"
+      className="absolute right-0 z-50 origin-top-right whitespace-nowrap bg-zinc-900/95 p-4 shadow-md shadow-black"
     >
       <fieldset className="flex items-center gap-1">
         <legend>task state</legend>

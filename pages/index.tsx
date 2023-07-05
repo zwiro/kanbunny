@@ -175,7 +175,7 @@ export default function Home() {
       >
         {chosenBoard ? (
           <>
-            <div className="sticky left-0 flex items-center justify-between">
+            <div className="sticky left-0 z-50 flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1 [&>button]:cursor-default">
@@ -202,7 +202,7 @@ export default function Home() {
                 toggleHideEmptyLists={toggleHideEmptyLists}
               />
             </div>
-            <div className={`flex pb-48`}>
+            <div className="flex pb-48">
               {lists.isLoading && (
                 <div className="flex gap-4 lg:gap-8 xl:gap-16">
                   <ListSkeleton width={60} />

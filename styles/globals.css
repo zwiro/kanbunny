@@ -10,7 +10,7 @@
 }
 
 body {
-  overflow: auto;
+  overflow: hidden;
 }
 
 /* Chrome, Edge, and Safari */
