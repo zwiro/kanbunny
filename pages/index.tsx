@@ -44,7 +44,8 @@ export default function Home() {
   const [dateFilter, setDateFilter] = useState<string | Date | null>(null)
   const [assignedFilter, setAssignedFilter] = useState<string | null>(null)
 
-  const [hideEmptyLists, , , toggleHideEmptyLists] = useBooleanState()
+  const [hideEmptyLists, , disableHideEmptyLists, toggleHideEmptyLists] =
+    useBooleanState()
 
   const { isSideMenuOpen, closeSideMenu, chosenBoard } =
     useContext(LayoutContext)
@@ -64,6 +65,7 @@ export default function Home() {
   const clearFilters = () => {
     setDateFilter(null)
     setAssignedFilter(null)
+    disableHideEmptyLists()
   }
 
   const taskMutationCounter = useRef(0)
@@ -244,6 +246,7 @@ export default function Home() {
                                       searchQuery={searchQuery}
                                       dateFilter={dateFilter}
                                       assignedFilter={assignedFilter}
+                                      hideEmptyLists={hideEmptyLists}
                                       isUpdating={createList.isLoading}
                                       taskMutationCounter={taskMutationCounter}
                                       mutationCounter={listMutationCounter}

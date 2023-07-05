@@ -4,7 +4,7 @@ import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { AnimatePresence, motion } from "framer-motion"
 import { trpc } from "@/utils/trpc"
 import { GoGrabber } from "react-icons/go"
-import { z } from "zod"
+import { date, z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { List as ListType } from "@prisma/client"
 import { editListSchema } from "@/utils/schemas"
@@ -41,6 +41,7 @@ interface ListProps extends ListType {
   isUpdating: boolean
   taskMutationCounter: React.MutableRefObject<number>
   mutationCounter: React.MutableRefObject<number>
+  hideEmptyLists: boolean
 }
 
 function List({
@@ -56,6 +57,7 @@ function List({
   isUpdating,
   mutationCounter,
   taskMutationCounter,
+  hideEmptyLists,
 }: ListProps) {
   const { data: session } = useSession()
   const userId = session?.user?.id
@@ -104,11 +106,14 @@ function List({
 
   const isLoading = isUpdating || updateName.isLoading || updateColor.isLoading
 
+  const isFiltered =
+    Boolean(dateFilter) ||
+    Boolean(assignedFilter) ||
+    Boolean(searchQuery) ||
+    hideEmptyLists
+
   return (
-    <motion.section
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      key={dateFilter?.toString() || assignedFilter}
+    <section
       className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 ${
         colorVariants[color]
       } ${isUpdating && !id && "opacity-50"}       ${
@@ -165,7 +170,7 @@ function List({
             </AnimatePresence>
             <div
               {...dragHandleProps}
-              className={`cursor-grab`}
+              className={`cursor-grab ${isFiltered && "pointer-events-none"}`}
               onClick={(e) => e.stopPropagation()}
             >
               <GoGrabber size={24} />
@@ -224,6 +229,7 @@ function List({
                           isDragging={snapshot.isDragging}
                           length={tasks.length}
                           mutationCounter={taskMutationCounter}
+                          isFiltered={isFiltered}
                           {...task}
                         />
                       </motion.div>
@@ -238,7 +244,7 @@ function List({
       <AnimatePresence>
         {isAdding && <AddTaskModal close={closeAdd} listId={id} />}
       </AnimatePresence>
-    </motion.section>
+    </section>
   )
 }
 

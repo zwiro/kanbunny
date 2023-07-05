@@ -38,6 +38,7 @@ interface TaskProps extends TaskWithAssignedTo {
   isDragging: boolean
   length: number
   mutationCounter: React.MutableRefObject<number>
+  isFiltered: boolean
 }
 
 function Task({
@@ -50,6 +51,7 @@ function Task({
   isDragging,
   due_to,
   mutationCounter,
+  isFiltered,
 }: TaskProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
@@ -195,7 +197,7 @@ function Task({
               {...dragHandleProps}
               className={`cursor-grab group-hover:visible group-focus:visible ${
                 isDragging ? "visible" : "invisible"
-              }`}
+              } ${isFiltered && "pointer-events-none"} `}
               onClick={(e) => e.stopPropagation()}
             >
               <GoGrabber size={24} />
