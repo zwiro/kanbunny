@@ -37,7 +37,7 @@ function ModalForm({ children, close, handleSubmit }: ModalFormProps) {
       initial="hidden"
       animate="visible"
       exit="hidden"
-      className="fixed left-0 top-0 z-30 grid h-screen w-screen place-items-center bg-zinc-900/90"
+      className="fixed left-0 top-0 z-50 grid h-screen w-screen place-items-center bg-zinc-900/90"
     >
       <form
         onSubmit={handleSubmit}
