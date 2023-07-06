@@ -48,6 +48,7 @@ function AddEditForm({
         defaultValue={defaultValue}
       />
       <button
+        autoFocus
         type="submit"
         className="transition-transform hover:scale-110 focus:scale-110"
         aria-label="Submit"

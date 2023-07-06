@@ -15,8 +15,8 @@ body {
 
 /* Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 4px;
+  height: 4px;
 }
 
 *::-webkit-scrollbar-track {
@@ -24,8 +24,8 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-  @apply bg-slate-100;
-  border: 1px solid rgb(167, 167, 167);
+  @apply bg-zinc-400;
+  border: 1px solid rgb(161 161 170);
 }
 
 /* react datetimepicker styling */

@@ -171,9 +171,7 @@ export default function Home() {
         onClick={() => {
           closeSideMenu()
         }}
-        className={`flex flex-col ${
-          !!lists.data?.length && "overflow-x-scroll"
-        }`}
+        className="flex h-[calc(100vh-6rem)] flex-col overflow-scroll"
       >
         {chosenBoard ? (
           <>
