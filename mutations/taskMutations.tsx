@@ -110,6 +110,43 @@ export const updateTaskColor = (
     },
   })
 
+export const updateTaskDate = (
+  boardId: string,
+  listId: string,
+  utils: TRPCContextType,
+  closeEditDate: () => void,
+  counter: MutableRefObject<number>
+) =>
+  trpc.task.editDate.useMutation({
+    async onMutate(input) {
+      await utils.list.getByBoard.cancel()
+      counter.current += 1
+      const prevData = utils.list.getByBoard.getData()
+      utils.list.getByBoard.setData(boardId, (old) =>
+        old?.map((l) =>
+          l.id === listId
+            ? {
+                ...l,
+                tasks: l.tasks.map((t) =>
+                  t.id === input.id ? { ...t, due_to: input.due_to } : t
+                ),
+              }
+            : l
+        )
+      )
+      closeEditDate()
+      return { prevData }
+    },
+    onError(err, input, ctx) {
+      utils.list.getByBoard.setData(boardId, ctx?.prevData)
+    },
+    onSettled: () => {
+      closeEditDate()
+      counter.current -= 1
+      counter.current === 0 && utils.list.getByBoard.invalidate(boardId)
+    },
+  })
+
 export const reorderTasks = (
   boardId: string,
   utils: TRPCContextType,

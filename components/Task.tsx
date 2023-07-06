@@ -1,4 +1,4 @@
-import { FormEventHandler, useContext } from "react"
+import { FormEventHandler, useContext, useState } from "react"
 import {
   AiOutlineCheck,
   AiOutlineClockCircle,
@@ -16,11 +16,13 @@ import { trpc } from "@/utils/trpc"
 import {
   deleteOneTask,
   updateTaskColor,
+  updateTaskDate,
   updateTaskUsers,
   updatedTaskName,
 } from "@/mutations/taskMutations"
 import { editTaskSchema } from "@/utils/schemas"
 import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
+import DateTimePicker from "react-datetime-picker"
 import UserCheckbox from "./UserCheckbox"
 import AddEditForm from "./AddEditForm"
 import MenuWrapper from "./MenuWrapper"
@@ -31,6 +33,7 @@ import LayoutContext from "@/context/LayoutContext"
 import useBooleanState from "@/hooks/useBooleanState"
 import { LoadingDots } from "./LoadingDots"
 import formatRelativeTime from "@/utils/formatRelativeTime"
+import FormFieldContainer from "./FormFieldContainer"
 
 type TaskSchema = z.infer<typeof editTaskSchema>
 
@@ -56,6 +59,10 @@ function Task({
 }: TaskProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
+  const [isEditingColor, editColor, closeEditColor] = useBooleanState()
+  const [isEditingDate, editDate, closeEditDate] = useBooleanState()
+
+  const [date, onChange] = useState<Date | null>(due_to)
 
   const { chosenBoard } = useContext(LayoutContext)
 
@@ -100,6 +107,20 @@ function Task({
     utils,
     mutationCounter
   )
+  const updateColor = updateTaskColor(
+    chosenBoard?.id!,
+    listId,
+    utils,
+    closeEditColor,
+    mutationCounter
+  )
+  const updateDate = updateTaskDate(
+    chosenBoard?.id!,
+    listId,
+    utils,
+    closeEditDate,
+    mutationCounter
+  )
 
   const onSubmit: SubmitHandler<TaskSchema> = (data: any) => {
     updateName.mutate({ name: data.name, id, listId })
@@ -116,15 +137,9 @@ function Task({
     })
   }
 
-  const [isEditingColor, editColor, closeEditColor] = useBooleanState()
-
-  const updateColor = updateTaskColor(
-    chosenBoard?.id!,
-    listId,
-    utils,
-    closeEditColor,
-    mutationCounter
-  )
+  const onSubmitDate: SubmitHandler<TaskSchema> = (data: any) => {
+    updateDate.mutate({ id, due_to: date! })
+  }
 
   const colorVariants = {
     blue: "border-blue-500",
@@ -161,7 +176,7 @@ function Task({
               </AnimatePresence>
               <div className="flex items-center gap-2">
                 <h4
-                  className={`font-bold ${minutesLeft < 0 && "text-zinc-400"}`}
+                  className={`font-bold ${minutesLeft < 0 && "line-through"}`}
                 >
                   {name}
                 </h4>
@@ -198,25 +213,28 @@ function Task({
                 ))}
               </ul>
             </div>
-            <div className="z-20 ml-auto scale-0 transition-transform group-focus-within:scale-100 group-hover:scale-100">
-              <MenuWrapper isLoading={isLoading}>
-                <MenuItem handleClick={editName}>edit task name</MenuItem>
-                <MenuItem handleClick={editUsers}>assign user</MenuItem>
-                <MenuItem handleClick={editColor}>change color</MenuItem>
-                <MenuItem handleClick={() => deleteTask.mutate(id)}>
-                  delete task
-                </MenuItem>
-              </MenuWrapper>
-            </div>
-            <div
-              {...dragHandleProps}
-              aria-label="Grab to drag"
-              className={`cursor-grab group-hover:visible group-focus:visible ${
-                isDragging ? "visible" : "invisible"
-              } ${isFiltered && "pointer-events-none"} `}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <GoGrabber size={24} />
+            <div className="flex items-center self-start">
+              <div className="z-20 ml-auto scale-0 transition-transform group-focus-within:scale-100 group-hover:scale-100">
+                <MenuWrapper isLoading={isLoading}>
+                  <MenuItem handleClick={editName}>edit task name</MenuItem>
+                  <MenuItem handleClick={editUsers}>assign user</MenuItem>
+                  <MenuItem handleClick={editDate}>change due date</MenuItem>
+                  <MenuItem handleClick={editColor}>change color</MenuItem>
+                  <MenuItem handleClick={() => deleteTask.mutate(id)}>
+                    delete task
+                  </MenuItem>
+                </MenuWrapper>
+              </div>
+              <div
+                {...dragHandleProps}
+                aria-label="Grab to drag"
+                className={`cursor-grab group-hover:visible group-focus:visible ${
+                  isDragging ? "visible" : "invisible"
+                } ${isFiltered && "pointer-events-none"} `}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <GoGrabber size={24} />
+              </div>
             </div>
           </>
         ) : (
@@ -242,15 +260,21 @@ function Task({
         {isEditingUsers && (
           <EditTaskUsers
             assignUser={assignUser}
-            assignedUsers={assignedUsers}
             closeEditUsers={closeEditUsers}
             assignedToIds={assignedToIds}
-            listId={listId}
-            name={name}
             onSubmit={taskMethods.handleSubmit(onSubmitUsers)}
-            taskId={id}
             updateUsers={updateUsers}
             users={users}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isEditingDate && (
+          <EditTaskDate
+            closeEditDate={closeEditDate}
+            onSubmit={taskMethods.handleSubmit(onSubmitDate)}
+            date={date}
+            onChange={onChange}
           />
         )}
       </AnimatePresence>
@@ -264,11 +288,7 @@ interface EditTaskUsersProps {
   assignUser: (userId: string) => void
   assignedToIds: string[]
   updateUsers: any
-  assignedUsers: string[]
   closeEditUsers: () => void
-  taskId: string
-  listId: string
-  name: string
 }
 
 function EditTaskUsers({
@@ -277,11 +297,7 @@ function EditTaskUsers({
   assignUser,
   assignedToIds,
   updateUsers,
-  assignedUsers,
   closeEditUsers,
-  taskId,
-  listId,
-  name,
 }: EditTaskUsersProps) {
   const taskAnimation = {
     initial: { height: 0, opacity: 0, padding: 0 },
@@ -306,17 +322,9 @@ function EditTaskUsers({
         {!updateUsers.isLoading ? (
           <>
             <button
-              onClick={() =>
-                updateUsers.mutate({
-                  taskId,
-                  name,
-                  listId,
-                  assigned_to: assignedUsers,
-                })
-              }
               disabled={updateUsers.isLoading}
               className="ml-auto transition-transform hover:scale-110 focus:scale-110"
-              aria-label="Submit users"
+              aria-label="Submit date"
             >
               <AiOutlineCheck size={20} />
             </button>
@@ -332,6 +340,66 @@ function EditTaskUsers({
         ) : (
           <LoadingDots />
         )}
+      </div>
+    </motion.form>
+  )
+}
+
+interface EditTaskDateProps {
+  date: Date | null | undefined
+  onChange: (date: Date | null) => void
+  closeEditDate: () => void
+  onSubmit: FormEventHandler<HTMLFormElement>
+}
+
+function EditTaskDate({
+  date,
+  onChange,
+  closeEditDate,
+  onSubmit,
+}: EditTaskDateProps) {
+  const taskAnimation = {
+    initial: { height: 0, opacity: 0, padding: 0 },
+    animate: { height: "auto", opacity: 1 },
+    exit: { height: 0, opacity: 0, padding: 0 },
+  }
+
+  return (
+    <motion.form onSubmit={onSubmit} {...taskAnimation}>
+      <div className="pt-8">
+        <DateTimePicker
+          onChange={onChange}
+          value={date}
+          disableClock
+          minDate={new Date()}
+          calendarIcon={null}
+          format="y-MM-dd h:mm a"
+          className="w-fit"
+          amPmAriaLabel="Select AM/PM"
+          dayAriaLabel="Day"
+          hourAriaLabel="Hour"
+          minuteAriaLabel="Minute"
+          monthAriaLabel="Month"
+          yearAriaLabel="Year"
+          nativeInputAriaLabel="Due to"
+          clearAriaLabel="Clear value"
+        />
+      </div>
+      <div className="flex items-center gap-1">
+        <button
+          className="ml-auto transition-transform hover:scale-110 focus:scale-110"
+          aria-label="Submit users"
+        >
+          <AiOutlineCheck size={20} />
+        </button>
+        <button
+          type="button"
+          onClick={closeEditDate}
+          className="transition-transform hover:scale-110 focus:scale-110"
+          aria-label="Cancel"
+        >
+          <AiOutlineClose size={20} />
+        </button>
       </div>
     </motion.form>
   )

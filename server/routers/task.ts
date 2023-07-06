@@ -158,6 +158,40 @@ export const taskRouter = createTRPCRouter({
 
       return updatedTask
     }),
+  editDate: protectedProcedure
+    .input(z.object({ id: z.string(), due_to: z.date().or(z.null()) }))
+    .mutation(async ({ ctx, input }) => {
+      const task = await ctx.prisma.task.findUnique({
+        where: { id: input.id },
+        include: { list: { include: { board: true } } },
+      })
+
+      const project = await ctx.prisma.project.findUnique({
+        where: { id: task?.list.board.projectId },
+        include: { users: true },
+      })
+
+      if (!project || !task) {
+        throw new Error("Project or task does not exist")
+      }
+
+      if (
+        project.ownerId !== ctx.session.user.id &&
+        !project.users.map((u) => u.userId).includes(ctx.session.user.id)
+      ) {
+        throw new Error("You are not a member of this project")
+      }
+
+      const updatedTask = await ctx.prisma.task.update({
+        where: { id: input.id },
+        data: {
+          due_to: input.due_to,
+        },
+      })
+
+      return updatedTask
+    }),
+
   reorder: protectedProcedure
     .input(
       z.object({
