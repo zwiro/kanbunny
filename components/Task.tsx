@@ -30,6 +30,7 @@ import useAssignUser from "@/hooks/useAssignUser"
 import LayoutContext from "@/context/LayoutContext"
 import useBooleanState from "@/hooks/useBooleanState"
 import { LoadingDots } from "./LoadingDots"
+import formatRelativeTime from "@/utils/formatRelativeTime"
 
 type TaskSchema = z.infer<typeof editTaskSchema>
 
@@ -169,10 +170,16 @@ function Task({
               <p className="text-sm text-zinc-300">
                 {due_to && timeDiff > 0
                   ? daysLeft > 0
-                    ? relativeTimeFormat.format(daysLeft, "day")
+                    ? formatRelativeTime(
+                        relativeTimeFormat.format(daysLeft, "day")
+                      )
                     : hoursLeft > 0
-                    ? relativeTimeFormat.format(hoursLeft, "hour")
-                    : relativeTimeFormat.format(minutesLeft, "minute")
+                    ? formatRelativeTime(
+                        relativeTimeFormat.format(hoursLeft, "hour")
+                      )
+                    : formatRelativeTime(
+                        relativeTimeFormat.format(minutesLeft, "minute")
+                      )
                   : due_to &&
                     (daysLeft < -1
                       ? relativeTimeFormat.format(daysLeft, "day")
