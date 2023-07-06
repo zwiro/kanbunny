@@ -54,7 +54,7 @@ function UserSelect({ selectedUsers, setSelectedUsers }: UserSelectProps) {
         dropdownIndicator: (base) => ({ ...base, color: "rgb(241 245 249)" }),
         multiValue: (base) => ({ ...base, backgroundColor: "rgb(63 63 70)" }),
         multiValueLabel: (base) => ({ ...base, color: "rgb(241 245 249)" }),
-        placeholder: (base) => ({ ...base, color: "rgb(212 212 212)" }),
+        placeholder: (base) => ({ ...base, color: "rgb(163 163 163)" }),
         option: (base, state) => ({
           ...base,
           backgroundColor:

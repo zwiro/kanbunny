@@ -167,14 +167,22 @@ function Task({
                 {daysLeft <= 0 && minutesLeft > 0 && <AiOutlineClockCircle />}
               </div>
               <p className="text-sm text-zinc-300">
-                {due_to &&
-                  timeDiff > 0 &&
-                  (daysLeft > 0
+                {due_to && timeDiff > 0
+                  ? daysLeft > 0
                     ? relativeTimeFormat.format(daysLeft, "day")
                     : hoursLeft > 0
                     ? relativeTimeFormat.format(hoursLeft, "hour")
-                    : relativeTimeFormat.format(minutesLeft, "minute"))}
+                    : relativeTimeFormat.format(minutesLeft, "minute")
+                  : due_to &&
+                    (daysLeft < -1
+                      ? relativeTimeFormat.format(daysLeft, "day")
+                      : hoursLeft < -1
+                      ? relativeTimeFormat.format(hoursLeft, "hour")
+                      : relativeTimeFormat.format(minutesLeft, "minute"))}
               </p>
+              {!!assigned_to.length && (
+                <hr className="my-1 w-48 border-zinc-500" />
+              )}
               <ul className="flex flex-wrap gap-1">
                 {assigned_to.map((user) => (
                   <li key={user.id} className="text-sm text-neutral-300">
