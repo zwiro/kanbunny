@@ -47,7 +47,7 @@ export const updateListName = (
   trpc.list.editName.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
-      counter.current = +1
+      counter.current += 1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.map((l) => (l.id === input.id ? { ...l, name: input.name } : l))
@@ -73,7 +73,7 @@ export const updateListColor = (
   trpc.list.editColor.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
-      counter.current = +1
+      counter.current += 1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.map((l) => (l.id === input.id ? { ...l, color: input.color } : l))
@@ -134,7 +134,7 @@ export const deleteOneList = (
   trpc.list.delete.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
-      counter.current = +1
+      counter.current += 1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.filter((list) => list.id !== input)
