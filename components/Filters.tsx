@@ -69,7 +69,7 @@ function Filters({
           onClick={toggleFilter}
           aria-label={`${isFilterOpen ? "Close" : "Open"} filters`}
         >
-          {dateFilter || assignedFilter ? (
+          {dateFilter || assignedFilter || hideEmptyLists ? (
             <AiFillFilter size={32} />
           ) : (
             <AiOutlineFilter

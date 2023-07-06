@@ -98,7 +98,7 @@ export const reorderLists = (
   trpc.list.reorder.useMutation({
     async onMutate(input) {
       await utils.list.getByBoard.cancel()
-      counter.current = +1
+      counter.current += 1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) =>
         old?.map((l) =>

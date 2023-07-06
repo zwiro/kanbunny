@@ -7,7 +7,7 @@ import {
 } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { trpc } from "@/utils/trpc"
-import { z } from "zod"
+import { date, z } from "zod"
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { listSchema } from "@/utils/schemas"
@@ -19,8 +19,10 @@ import {
 } from "@hello-pangea/dnd"
 import { createNewList, reorderLists } from "@/mutations/listMutations"
 import { reorderTasks } from "@/mutations/taskMutations"
-import { getSession, GetSessionParams } from "next-auth/react"
+import { getSession, GetSessionParams, useSession } from "next-auth/react"
 import { createServerSideHelpers } from "@trpc/react-query/server"
+import { ScrollContainer } from "react-indiana-drag-scroll"
+import "react-indiana-drag-scroll/dist/style.css"
 import { prisma } from "@/server/db"
 import { appRouter } from "@/server/routers/_app"
 import ListSkeleton from "@/components/ListSkeleton"
@@ -40,6 +42,8 @@ import LayoutContext from "@/context/LayoutContext"
 import getFilteredLists from "@/utils/getFilteredLists"
 
 export default function Home() {
+  const { data: session } = useSession()
+
   const [searchQuery, setSearchQuery] = useState("")
   const [dateFilter, setDateFilter] = useState<string | Date | null>(null)
   const [assignedFilter, setAssignedFilter] = useState<string | null>(null)
@@ -166,158 +170,162 @@ export default function Home() {
   }, [chosenBoard?.id, listMethods, board.data])
 
   return (
-    <>
-      <div
-        onClick={() => {
-          closeSideMenu()
-        }}
-        className="flex h-[calc(100vh-6rem)] flex-col overflow-scroll"
-      >
-        {chosenBoard ? (
-          <>
-            <div className="sticky left-0 z-10 flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1 [&>button]:cursor-default">
-                    <ColorDot color={chosenBoard.color} />
-                    <h2 className="text-2xl font-bold">{chosenBoard.name}</h2>
-                  </div>
-                  <MenuWrapper>
-                    <MenuItem handleClick={add}>add list</MenuItem>
-                  </MenuWrapper>
+    <div
+      onClick={() => {
+        closeSideMenu()
+      }}
+      className="flex h-[calc(100vh-6rem)] flex-col overflow-y-scroll"
+    >
+      {chosenBoard ? (
+        <>
+          <div className="sticky left-0 z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1 [&>button]:cursor-default">
+                  <ColorDot color={chosenBoard.color} />
+                  <h2 className="text-2xl font-bold">{chosenBoard.name}</h2>
                 </div>
-                <p className="text-slate-300">owner: {chosenBoard.owner}</p>
+                <MenuWrapper>
+                  <MenuItem handleClick={add}>add list</MenuItem>
+                </MenuWrapper>
               </div>
-              <Filters
-                searchQuery={searchQuery}
-                search={search}
-                resetQuery={resetQuery}
-                assignedFilter={assignedFilter}
-                dateFilter={dateFilter}
-                handleDateFilterChange={handleDateFilterChange}
-                handleAssignedFilterChange={handleAssignedFilterChange}
-                clearFilters={clearFilters}
-                setDateFilter={setDateFilter}
-                hideEmptyLists={hideEmptyLists}
-                toggleHideEmptyLists={toggleHideEmptyLists}
-              />
+              <p className="text-slate-300">owner: {chosenBoard.owner}</p>
             </div>
-            <div className="flex pb-48">
-              {lists.isLoading && (
-                <div className="flex gap-4 lg:gap-8 xl:gap-16">
-                  <ListSkeleton width={60} />
-                  <ListSkeleton width={130} />
-                  <ListSkeleton width={100} />
-                </div>
-              )}
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable
-                  droppableId="board"
-                  direction="horizontal"
-                  type="boards"
-                >
-                  {(provided) => (
-                    <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16"
-                    >
-                      {!!lists.data?.length &&
-                        getFilteredLists(lists.data, hideEmptyLists)
-                          ?.sort((a, b) => a.order - b.order)
-                          .map((list, i) => (
-                            <Draggable
-                              key={`list-${i}-${list.id}`}
-                              draggableId={list.id || `placeholder-${i}`}
-                              index={list.order}
-                              isDragDisabled={createList.isLoading}
-                            >
-                              {(provided, snapshot) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
+            <Filters
+              searchQuery={searchQuery}
+              search={search}
+              resetQuery={resetQuery}
+              assignedFilter={assignedFilter}
+              dateFilter={dateFilter}
+              handleDateFilterChange={handleDateFilterChange}
+              handleAssignedFilterChange={handleAssignedFilterChange}
+              clearFilters={clearFilters}
+              setDateFilter={setDateFilter}
+              hideEmptyLists={hideEmptyLists}
+              toggleHideEmptyLists={toggleHideEmptyLists}
+            />
+          </div>
+          <div className="flex pb-4">
+            {lists.isLoading && (
+              <div className="flex gap-4 lg:gap-8 xl:gap-16">
+                <ListSkeleton width={60} />
+                <ListSkeleton width={130} />
+                <ListSkeleton width={100} />
+              </div>
+            )}
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable
+                droppableId="board"
+                direction="horizontal"
+                type="boards"
+              >
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16"
+                  >
+                    {!!lists.data?.length &&
+                      getFilteredLists(
+                        lists.data,
+                        hideEmptyLists,
+                        assignedFilter,
+                        dateFilter,
+                        session?.user.id
+                      )
+                        ?.sort((a, b) => a.order - b.order)
+                        .map((list, i) => (
+                          <Draggable
+                            key={`list-${i}-${list.id}`}
+                            draggableId={list.id || `placeholder-${i}`}
+                            index={list.order}
+                            isDragDisabled={createList.isLoading}
+                          >
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                              >
+                                <motion.div
+                                  animate={{
+                                    rotate: snapshot.isDragging ? -5 : 0,
+                                  }}
                                 >
-                                  <motion.div
-                                    animate={{
-                                      rotate: snapshot.isDragging ? -5 : 0,
-                                    }}
-                                  >
-                                    <List
-                                      key={list.id}
-                                      dragHandleProps={provided.dragHandleProps}
-                                      searchQuery={searchQuery}
-                                      dateFilter={dateFilter}
-                                      assignedFilter={assignedFilter}
-                                      hideEmptyLists={hideEmptyLists}
-                                      isUpdating={createList.isLoading}
-                                      taskMutationCounter={taskMutationCounter}
-                                      mutationCounter={listMutationCounter}
-                                      {...list}
-                                    />
-                                  </motion.div>
-                                </div>
-                              )}
-                            </Draggable>
-                          ))}
+                                  <List
+                                    key={list.id}
+                                    dragHandleProps={provided.dragHandleProps}
+                                    searchQuery={searchQuery}
+                                    dateFilter={dateFilter}
+                                    assignedFilter={assignedFilter}
+                                    hideEmptyLists={hideEmptyLists}
+                                    isUpdating={createList.isLoading}
+                                    taskMutationCounter={taskMutationCounter}
+                                    mutationCounter={listMutationCounter}
+                                    {...list}
+                                  />
+                                </motion.div>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
 
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
-
-              {isAdding ? (
-                <ListContainer length={lists.data?.length || 0}>
-                  <div className="flex flex-col">
-                    <FormProvider {...listMethods}>
-                      <AddEditForm
-                        name="name"
-                        placeholder="list name"
-                        close={closeAdd}
-                        handleSubmit={listMethods.handleSubmit(onSubmit)}
-                      />
-                    </FormProvider>
-                    {listMethods.formState.errors && (
-                      <p role="alert" className="text-base text-red-500">
-                        {listMethods.formState.errors?.name?.message as string}
-                      </p>
-                    )}
+                    {provided.placeholder}
                   </div>
-                </ListContainer>
-              ) : (
-                <div
-                  className={`${
-                    lists.data?.length || lists.isLoading
-                      ? "ml-4 lg:ml-8 xl:ml-16"
-                      : "ml-0"
-                  } `}
-                >
-                  <AddButton onClick={add}>
-                    new list <PlusIcon />
-                  </AddButton>
-                </div>
-              )}
-            </div>
-          </>
-        ) : (
-          <h2 className="text-center font-bold text-neutral-300">
-            open or create a new board
-          </h2>
-        )}
+                )}
+              </Droppable>
+            </DragDropContext>
 
-        <AnimatePresence>
-          {isSideMenuOpen && (
-            <>
-              <motion.div {...bgBlurAnimation} className="fixed inset-0" />
-              <SideMenu
-                data={userProjects.data}
-                isLoading={userProjects.isLoading}
-              />
-            </>
-          )}
-        </AnimatePresence>
-      </div>
-    </>
+            {isAdding ? (
+              <ListContainer length={lists.data?.length || 0}>
+                <div className="flex flex-col">
+                  <FormProvider {...listMethods}>
+                    <AddEditForm
+                      name="name"
+                      placeholder="list name"
+                      close={closeAdd}
+                      handleSubmit={listMethods.handleSubmit(onSubmit)}
+                    />
+                  </FormProvider>
+                  {listMethods.formState.errors && (
+                    <p role="alert" className="text-base text-red-500">
+                      {listMethods.formState.errors?.name?.message as string}
+                    </p>
+                  )}
+                </div>
+              </ListContainer>
+            ) : (
+              <div
+                className={`${
+                  lists.data?.length || lists.isLoading
+                    ? "ml-4 lg:ml-8 xl:ml-16"
+                    : "ml-0"
+                } `}
+              >
+                <AddButton onClick={add}>
+                  new list <PlusIcon />
+                </AddButton>
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        <h2 className="text-center font-bold text-neutral-300">
+          open or create a new board
+        </h2>
+      )}
+
+      <AnimatePresence>
+        {isSideMenuOpen && (
+          <>
+            <motion.div {...bgBlurAnimation} className="fixed inset-0" />
+            <SideMenu
+              data={userProjects.data}
+              isLoading={userProjects.isLoading}
+            />
+          </>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
 
