@@ -115,7 +115,7 @@ function List({
   return (
     <>
       <section
-        className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 ${
+        className={`mt-4 flex min-w-[18rem] max-w-sm flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 ${
           colorVariants[color]
         } ${isUpdating && !id && "opacity-50"}       ${
           ((isUpdating && !id) ||
