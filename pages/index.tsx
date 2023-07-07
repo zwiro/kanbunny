@@ -40,6 +40,8 @@ import LayoutContext from "@/context/LayoutContext"
 import getFilteredLists from "@/utils/getFilteredLists"
 
 export default function Home() {
+  const dragAreaRef = useRef<HTMLDivElement>(null)
+
   const { data: session } = useSession()
 
   const [searchQuery, setSearchQuery] = useState("")
@@ -168,6 +170,7 @@ export default function Home() {
 
   return (
     <div
+      ref={dragAreaRef}
       onClick={() => {
         closeSideMenu()
       }}
@@ -175,7 +178,7 @@ export default function Home() {
     >
       {chosenBoard ? (
         <>
-          <div className="sticky left-0 z-10 flex items-center justify-between">
+          <div className="sticky left-0 flex items-center justify-between">
             <div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 [&>button]:cursor-default">

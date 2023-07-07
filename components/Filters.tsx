@@ -63,7 +63,7 @@ function Filters({
   }
 
   return (
-    <div className="relative z-50 ml-auto">
+    <div className="relative ml-auto">
       <div className="flex items-center justify-end gap-1">
         <button
           onClick={toggleFilter}
