@@ -111,7 +111,6 @@ export default function Home() {
       boardId: chosenBoard?.id!,
     })
   }
-
   const reorder = reorderLists(chosenBoard?.id!, utils, listMutationCounter)
 
   const reorderDisplayedTasks = reorderTasks(

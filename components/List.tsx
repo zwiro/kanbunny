@@ -113,139 +113,142 @@ function List({
     hideEmptyLists
 
   return (
-    <section
-      className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 ${
-        colorVariants[color]
-      } ${isUpdating && !id && "opacity-50"}       ${
-        ((isUpdating && !id) ||
-          updateName.isLoading ||
-          updateColor.isLoading) &&
-        "opacity-50"
-      }`}
-    >
-      <div className="flex items-center gap-2">
-        <ColorDot
-          editColor={!isEditingName ? editColor : undefined}
-          color={color}
-        >
-          <AnimatePresence>
-            {isEditingColor && (
-              <ColorPicker
-                close={closeEditColor}
-                editColor={updateColor}
-                id={id}
-                currentColor={color}
-              />
-            )}
-          </AnimatePresence>
-        </ColorDot>
-        {!isEditingName ? (
-          <>
-            <h3 className="text-xl">{name}</h3>
-            <button
-              onClick={add}
-              className={`group py-2 ${isEditingColor && "scale-0"} `}
-              disabled={isEditingColor || isLoading}
-              aria-label="Add new task"
-            >
-              <PlusIcon />
-            </button>
-            <div className="ml-auto pr-2">
-              <MenuWrapper isLoading={isLoading}>
-                <MenuItem handleClick={add}>add task</MenuItem>
-                <MenuItem handleClick={editName}>edit list name</MenuItem>
-                <MenuItem handleClick={editColor}>change color</MenuItem>
-                <MenuItem handleClick={openPopup}>delete list</MenuItem>
-              </MenuWrapper>
-            </div>
+    <>
+      <section
+        className={`mt-4 flex min-w-[18rem] flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 ${
+          colorVariants[color]
+        } ${isUpdating && !id && "opacity-50"}       ${
+          ((isUpdating && !id) ||
+            updateName.isLoading ||
+            updateColor.isLoading) &&
+          "opacity-50"
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <ColorDot
+            editColor={!isEditingName ? editColor : undefined}
+            color={color}
+          >
             <AnimatePresence>
-              {isPopupOpened && (
-                <ConfirmPopup
-                  name={name}
-                  type="list"
-                  handleClick={() => deleteList.mutate(id)}
-                  close={() => closePopup()}
+              {isEditingColor && (
+                <ColorPicker
+                  close={closeEditColor}
+                  editColor={updateColor}
+                  id={id}
+                  currentColor={color}
                 />
               )}
             </AnimatePresence>
-            <div
-              {...dragHandleProps}
-              aria-label="Grab to drag"
-              className={`cursor-grab ${isFiltered && "pointer-events-none"}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <GoGrabber size={24} />
+          </ColorDot>
+          {!isEditingName ? (
+            <>
+              <h3 className="text-xl">{name}</h3>
+              <button
+                onClick={add}
+                className={`group py-2 ${isEditingColor && "scale-0"} `}
+                disabled={isEditingColor || isLoading}
+                aria-label="Add new task"
+              >
+                <PlusIcon />
+              </button>
+              <div className="ml-auto pr-2">
+                <MenuWrapper isLoading={isLoading}>
+                  <MenuItem handleClick={add}>add task</MenuItem>
+                  <MenuItem handleClick={editName}>edit list name</MenuItem>
+                  <MenuItem handleClick={editColor}>change color</MenuItem>
+                  <MenuItem handleClick={openPopup}>delete list</MenuItem>
+                </MenuWrapper>
+              </div>
+              <AnimatePresence>
+                {isPopupOpened && (
+                  <ConfirmPopup
+                    name={name}
+                    type="list"
+                    handleClick={() => deleteList.mutate(id)}
+                    close={() => closePopup()}
+                  />
+                )}
+              </AnimatePresence>
+              <div
+                {...dragHandleProps}
+                aria-label="Grab to drag"
+                className={`cursor-grab ${isFiltered && "pointer-events-none"}`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <GoGrabber size={24} />
+              </div>
+            </>
+          ) : (
+            <div>
+              <FormProvider {...listMethods}>
+                <AddEditForm
+                  name="name"
+                  placeholder="list name"
+                  close={closeEditName}
+                  handleSubmit={listMethods.handleSubmit(onSubmit)}
+                  className="[&>input]:h-9"
+                />
+              </FormProvider>
+              {listMethods.formState.errors && (
+                <p role="alert" className="text-base text-red-500">
+                  {listMethods.formState.errors?.name?.message as string}
+                </p>
+              )}
             </div>
-          </>
-        ) : (
-          <div>
-            <FormProvider {...listMethods}>
-              <AddEditForm
-                name="name"
-                placeholder="list name"
-                close={closeEditName}
-                handleSubmit={listMethods.handleSubmit(onSubmit)}
-                className="[&>input]:h-9"
-              />
-            </FormProvider>
-            {listMethods.formState.errors && (
-              <p role="alert" className="text-base text-red-500">
-                {listMethods.formState.errors?.name?.message as string}
-              </p>
-            )}
-          </div>
-        )}
-      </div>
-      <Droppable
-        droppableId={id || `placeholder-${Math.random()}`}
-        key="task"
-        direction="vertical"
-        ignoreContainerClipping={true}
-      >
-        {(provided) => (
-          <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            className="flex flex-col gap-4"
-          >
-            {getFilteredTasks(tasks, assignedFilter, dateFilter, userId)
-              .sort((a, b) => a.order - b.order)
-              .filter(
-                (task) =>
-                  task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  searchQuery === ""
-              )
-              .map((task, i) => (
-                <Draggable key={task.id} draggableId={task.id} index={i}>
-                  {(provided, snapshot) => (
-                    <div ref={provided.innerRef} {...provided.draggableProps}>
-                      <motion.div
-                        animate={{
-                          rotate: snapshot.isDragging ? -5 : 0,
-                        }}
-                      >
-                        <Task
-                          key={task.id}
-                          dragHandleProps={provided.dragHandleProps}
-                          isDragging={snapshot.isDragging}
-                          length={tasks.length}
-                          mutationCounter={taskMutationCounter}
-                          isFiltered={isFiltered}
-                          {...task}
-                        />
-                      </motion.div>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
+          )}
+        </div>
+        <Droppable
+          droppableId={id || `placeholder-${Math.random()}`}
+          key="task"
+          direction="vertical"
+          ignoreContainerClipping={true}
+        >
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="flex flex-col gap-4"
+            >
+              {getFilteredTasks(tasks, assignedFilter, dateFilter, userId)
+                .sort((a, b) => a.order - b.order)
+                .filter(
+                  (task) =>
+                    task.name
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase()) || searchQuery === ""
+                )
+                .map((task, i) => (
+                  <Draggable key={task.id} draggableId={task.id} index={i}>
+                    {(provided, snapshot) => (
+                      <div ref={provided.innerRef} {...provided.draggableProps}>
+                        <motion.div
+                          animate={{
+                            rotate: snapshot.isDragging ? -5 : 0,
+                          }}
+                        >
+                          <Task
+                            key={task.id}
+                            dragHandleProps={provided.dragHandleProps}
+                            isDragging={snapshot.isDragging}
+                            length={tasks.length}
+                            mutationCounter={taskMutationCounter}
+                            isFiltered={isFiltered}
+                            {...task}
+                          />
+                        </motion.div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </section>
       <AnimatePresence>
         {isAdding && <AddTaskModal close={closeAdd} listId={id} />}
       </AnimatePresence>
-    </section>
+    </>
   )
 }
 

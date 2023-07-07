@@ -136,7 +136,7 @@ function Project({
   return (
     <section className="my-4 border-b border-neutral-700">
       {!isEditingName ? (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 pb-4">
           <h2
             className={`relative after:absolute after:-bottom-1 after:left-0 after:h-1 after:w-0 after:bg-white after:transition-all ${
               boards.map((b) => b.id).includes(chosenBoard?.id!) &&
@@ -206,7 +206,7 @@ function Project({
               handleSubmit={projectMethods.handleSubmit(onSubmitName)}
               defaultValue={name}
               close={closeEditName}
-              className="pt-[3px]"
+              className="pb-4 pt-[5px]"
             />
           </FormProvider>
           {projectMethods.formState.errors && (
@@ -220,7 +220,7 @@ function Project({
         {isEditingUsers && (
           <motion.div
             {...projectUsersAnimation}
-            className="flex flex-col gap-2 pt-4 text-base"
+            className="flex flex-col gap-2 text-base"
           >
             <form onSubmit={handleSubmitUsers} className="flex flex-col gap-2">
               <p>
@@ -260,29 +260,29 @@ function Project({
           </motion.div>
         )}
       </AnimatePresence>
+      <AnimatePresence>
+        {isAdding && (
+          <motion.div {...projectUsersAnimation}>
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 bg-red-500" />
+              <FormProvider {...boardMethods}>
+                <AddEditForm
+                  name="name"
+                  placeholder="board name"
+                  handleSubmit={boardMethods.handleSubmit(onSubmit)}
+                  close={closeAdd}
+                />
+              </FormProvider>
+            </div>
+            {boardMethods.formState.errors && (
+              <p role="alert" className="pl-6 text-base text-red-500">
+                {boardMethods.formState.errors?.name?.message as string}
+              </p>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="flex flex-col gap-2 py-4 lg:gap-4">
-        <AnimatePresence>
-          {isAdding && (
-            <>
-              <div className="flex items-center gap-2">
-                <div className="h-4 w-4 bg-red-500" />
-                <FormProvider {...boardMethods}>
-                  <AddEditForm
-                    name="name"
-                    placeholder="board name"
-                    handleSubmit={boardMethods.handleSubmit(onSubmit)}
-                    close={closeAdd}
-                  />
-                </FormProvider>
-              </div>
-              {boardMethods.formState.errors && (
-                <p role="alert" className="pl-6 text-base text-red-500">
-                  {boardMethods.formState.errors?.name?.message as string}
-                </p>
-              )}
-            </>
-          )}
-        </AnimatePresence>
         <AnimatePresence>
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="projects">
