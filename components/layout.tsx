@@ -48,9 +48,13 @@ function Layout({ children }: LayoutProps) {
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-      <div className={`${jura.className} h-screen bg-zinc-700 text-slate-100`}>
+      <div
+        className={`${jura.className} h-screen overflow-hidden bg-zinc-700 text-slate-100`}
+      >
         <Navbar />
-        <main className="mt-20 p-4 xl:px-12 2xl:px-24">{children}</main>
+        <main className="h-full px-4 pb-4 pt-24 xl:px-12 2xl:px-24">
+          {children}
+        </main>
       </div>
     </LayoutProvider>
   )

@@ -13,33 +13,37 @@ function Navbar() {
 
   const { isSideMenuOpen, toggleSideMenu } = useContext(LayoutContext)
 
-  if (router.pathname === "/auth/login") return null
+  // if (router.pathname === "/auth/login") return null
 
   return (
     <FocusLock group="aside-nav" disabled={!isSideMenuOpen}>
       <nav className="fixed top-0 z-50 flex h-20 w-full items-center gap-4 border-b border-neutral-700 bg-zinc-800 p-4 text-lg sm:text-2xl xl:px-12 2xl:px-24">
-        <button
-          onClick={toggleSideMenu}
-          className="py-2 transition-transform hover:scale-110 focus:scale-110"
-          aria-label={`${isSideMenuOpen ? "Close" : "Open"} side menu`}
-        >
-          <BurgerMenu />
-        </button>
-        <div className="flex items-center">
-          <GiRabbit className="h-8 w-8 xl:h-12 xl:w-12" />
-          <h1 className="font-bold">kanbunny</h1>
-        </div>
-        {status === "loading" ? (
-          <LoadingDots />
-        ) : (
-          <h2 className="ml-auto">{session?.user?.name}</h2>
+        {router.pathname !== "/auth/login" && (
+          <>
+            <button
+              onClick={toggleSideMenu}
+              className="py-2 transition-transform hover:scale-110 focus:scale-110"
+              aria-label={`${isSideMenuOpen ? "Close" : "Open"} side menu`}
+            >
+              <BurgerMenu />
+            </button>
+            <div className="flex items-center">
+              <GiRabbit className="h-8 w-8 xl:h-12 xl:w-12" />
+              <h1 className="font-bold">kanbunny</h1>
+            </div>
+            {status === "loading" ? (
+              <LoadingDots />
+            ) : (
+              <h2 className="ml-auto">{session?.user?.name}</h2>
+            )}
+            <button
+              onClick={() => signOut({ callbackUrl: "/auth/login" })}
+              className="hover:underline focus:underline"
+            >
+              sign out
+            </button>
+          </>
         )}
-        <button
-          onClick={() => signOut({ callbackUrl: "/auth/login" })}
-          className="hover:underline focus:underline"
-        >
-          sign out
-        </button>
       </nav>
     </FocusLock>
   )

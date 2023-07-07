@@ -10,7 +10,7 @@ function AuthPage() {
   const router = useRouter()
 
   return (
-    <div className="relative mx-auto grid h-[calc(100vh-4rem)] max-w-4xl place-items-center">
+    <div className="relative mx-auto grid h-full max-w-4xl place-items-center">
       <div>
         <Image alt="" src={loginBgImage} className="h-52 object-cover" />
         <div className="flex flex-col gap-8 bg-zinc-800 px-8 py-12 text-center text-2xl">

@@ -172,7 +172,7 @@ export default function Home() {
       onClick={() => {
         closeSideMenu()
       }}
-      className="flex h-[calc(100vh-6rem)] flex-col overflow-y-scroll"
+      className="flex h-full flex-col overflow-y-scroll"
     >
       {chosenBoard ? (
         <>
