@@ -1,9 +1,11 @@
 import { LayoutProvider } from "@/context/LayoutContext"
 import { Jura } from "next/font/google"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/router"
+import dynamic from "next/dynamic"
 import Head from "next/head"
-import Navbar from "./Navbar"
+const Navbar = dynamic(() => import("./Navbar"), {
+  loading: () => <p>Loading...</p>,
+})
 
 const jura = Jura({ subsets: ["latin"], weight: ["400", "700"] })
 
@@ -13,8 +15,6 @@ interface LayoutProps {
 
 function Layout({ children }: LayoutProps) {
   const { data: session } = useSession()
-
-  const router = useRouter()
 
   const title = `kanbunny ${session ? `| ${session.user.name}` : ""}`
 
@@ -59,7 +59,7 @@ function Layout({ children }: LayoutProps) {
         <Navbar />
         <main
           className={`h-full px-4 pb-4 xl:px-12 2xl:px-24 ${
-            router.pathname !== "/auth/login" ? "pt-24" : "pt-4"
+            !session?.user ? "pt-24" : "pt-4"
           } `}
         >
           {children}

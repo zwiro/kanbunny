@@ -1,6 +1,5 @@
 import { useRef, useContext, useEffect, useState } from "react"
-import { AnimatePresence } from "framer-motion"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import useClickOutside from "@/hooks/useClickOutside"
 import MenuContext, { MenuProvider } from "@/context/MenuContext"
 import useCloseOnEscape from "@/hooks/useCloseOnEscape"
