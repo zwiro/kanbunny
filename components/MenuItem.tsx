@@ -20,7 +20,7 @@ function MenuItem({
     <li>
       <button
         id={id}
-        className="w-full px-8 text-left hover:cursor-pointer hover:bg-zinc-800 focus:bg-zinc-800"
+        className="w-full px-8 text-left text-sm hover:cursor-pointer hover:bg-zinc-800 focus:bg-zinc-800 md:text-lg"
         onClick={() => {
           handleClick && handleClick()
           closeOnClickInside && closeMenu()

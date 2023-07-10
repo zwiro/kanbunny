@@ -1,4 +1,8 @@
+import { useRef } from "react"
+import { createPortal } from "react-dom"
 import { motion } from "framer-motion"
+import useClickOutside from "@/hooks/useClickOutside"
+import useCloseOnEscape from "@/hooks/useCloseOnEscape"
 
 interface ConfirmPopupProps {
   name: string
@@ -15,19 +19,27 @@ function ConfirmPopup({
   handleClick,
   close,
 }: ConfirmPopupProps) {
+  const popupRef = useRef<HTMLDivElement>(null)
+  useClickOutside([popupRef], close)
+
+  useCloseOnEscape(close)
+
   const confirmPopupAnimation = {
     initial: { opacity: 0, y: 50 },
     animate: { opacity: 1, y: 0 },
     exit: { opacity: 0, y: 50 },
   }
 
-  return (
+  return createPortal(
     <motion.div
       {...confirmPopupAnimation}
       role="alert"
-      className="absolute inset-0 z-50 grid cursor-default place-content-center text-center text-lg"
+      className="fixed inset-0 z-50 mx-2 grid cursor-default place-items-center text-center"
     >
-      <div className="space-y-8 bg-zinc-900 p-8 shadow-md shadow-black">
+      <div
+        ref={popupRef}
+        className="inset-0 m-auto space-y-8 bg-zinc-900 p-8 text-center text-lg shadow-md shadow-black"
+      >
         <p>
           you are going to {action} <strong>{name}</strong> {type}
         </p>
@@ -47,7 +59,8 @@ function ConfirmPopup({
           </button>
         </div>
       </div>
-    </motion.div>
+    </motion.div>,
+    document.querySelector("#layout")!
   )
 }
 

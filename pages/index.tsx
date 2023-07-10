@@ -19,7 +19,7 @@ import {
 } from "@hello-pangea/dnd"
 import { createNewList, reorderLists } from "@/mutations/listMutations"
 import { reorderTasks } from "@/mutations/taskMutations"
-import { getSession, GetSessionParams, useSession } from "next-auth/react"
+import { getSession, type GetSessionParams, useSession } from "next-auth/react"
 import { createServerSideHelpers } from "@trpc/react-query/server"
 import { prisma } from "@/server/db"
 import { appRouter } from "@/server/routers/_app"
@@ -178,7 +178,7 @@ export default function Home() {
     >
       {chosenBoard ? (
         <>
-          <div className="sticky left-0 flex items-center justify-between">
+          <div className="sticky left-0 z-40 flex flex-col justify-between md:flex-row md:items-center">
             <div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 [&>button]:cursor-default">
@@ -317,7 +317,7 @@ export default function Home() {
       <AnimatePresence>
         {isSideMenuOpen && (
           <>
-            <motion.div {...bgBlurAnimation} className="fixed inset-0" />
+            <motion.div {...bgBlurAnimation} className="fixed inset-0 z-40" />
             <SideMenu
               data={userProjects.data}
               isLoading={userProjects.isLoading}

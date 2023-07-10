@@ -13,7 +13,7 @@ function Navbar() {
 
   const { isSideMenuOpen, toggleSideMenu } = useContext(LayoutContext)
 
-  // if (router.pathname === "/auth/login") return null
+  if (router.pathname === "/auth/login") return null
 
   return (
     <FocusLock group="aside-nav" disabled={!isSideMenuOpen}>

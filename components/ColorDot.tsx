@@ -13,7 +13,7 @@ function ColorDot({ editColor, color, children }: ColorDotProps) {
         e.stopPropagation()
         editColor?.()
       }}
-      className={`peer relative h-4 w-4 cursor-pointer bg-${color}-500`}
+      className={`peer relative h-4 w-4 flex-shrink-0 cursor-pointer bg-${color}-500`}
       aria-label="Edit color"
     >
       {children}

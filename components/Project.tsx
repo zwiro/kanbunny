@@ -1,4 +1,5 @@
 import { useContext, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { useSession } from "next-auth/react"
@@ -191,7 +192,7 @@ function Project({
           </AnimatePresence>
           <div
             {...dragHandleProps}
-            className="ml-auto cursor-grab"
+            className="ml-auto cursor-grab self-start"
             aria-label="Grab to drag"
           >
             <GoGrabber />

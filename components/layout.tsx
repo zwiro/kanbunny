@@ -1,8 +1,9 @@
 import { LayoutProvider } from "@/context/LayoutContext"
 import { Jura } from "next/font/google"
-import Navbar from "./Navbar"
-import Head from "next/head"
 import { useSession } from "next-auth/react"
+import { useRouter } from "next/router"
+import Head from "next/head"
+import Navbar from "./Navbar"
 
 const jura = Jura({ subsets: ["latin"], weight: ["400", "700"] })
 
@@ -12,6 +13,9 @@ interface LayoutProps {
 
 function Layout({ children }: LayoutProps) {
   const { data: session } = useSession()
+
+  const router = useRouter()
+
   const title = `kanbunny ${session ? `| ${session.user.name}` : ""}`
 
   return (
@@ -50,9 +54,14 @@ function Layout({ children }: LayoutProps) {
       </Head>
       <div
         className={`${jura.className} h-screen overflow-hidden bg-zinc-700 text-slate-100`}
+        id="layout"
       >
         <Navbar />
-        <main className="h-full px-4 pb-4 pt-24 xl:px-12 2xl:px-24">
+        <main
+          className={`h-full px-4 pb-4 xl:px-12 2xl:px-24 ${
+            router.pathname !== "/auth/login" ? "pt-24" : "pt-4"
+          } `}
+        >
           {children}
         </main>
       </div>
