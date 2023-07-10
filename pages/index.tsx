@@ -5,44 +5,49 @@ import {
   useRef,
   type ChangeEvent,
 } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import dynamic from "next/dynamic"
 import { trpc } from "@/utils/trpc"
 import { z } from "zod"
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { listSchema } from "@/utils/schemas"
-import {
-  DragDropContext,
-  Draggable,
-  type DropResult,
-  Droppable,
-} from "@hello-pangea/dnd"
+import { type DropResult } from "@hello-pangea/dnd"
+import { AnimatePresence } from "framer-motion"
 import { createNewList, reorderLists } from "@/mutations/listMutations"
 import { reorderTasks } from "@/mutations/taskMutations"
-import { getSession, type GetSessionParams, useSession } from "next-auth/react"
+import { getSession, type GetSessionParams } from "next-auth/react"
 import { createServerSideHelpers } from "@trpc/react-query/server"
 import { prisma } from "@/server/db"
 import { appRouter } from "@/server/routers/_app"
-import ListSkeleton from "@/components/ListSkeleton"
 import superjson from "superjson"
 import ColorDot from "@/components/ColorDot"
-import Filters from "@/components/Filters"
 import MenuItem from "@/components/MenuItem"
-import MenuWrapper from "@/components/MenuWrapper"
 import AddButton from "@/components/AddButton"
-import AddEditForm from "@/components/AddEditForm"
 import ListContainer from "@/components/ListContainer"
 import useBooleanState from "@/hooks/useBooleanState"
 import PlusIcon from "@/components/PlusIcon"
-import List from "@/components/List"
-import SideMenu from "@/components/SideMenu"
 import LayoutContext from "@/context/LayoutContext"
-import getFilteredLists from "@/utils/getFilteredLists"
+const Dashboard = dynamic(() => import("@/components/Dashboard"), {
+  loading: () => <p>Loading...</p>,
+})
+const ListSkeleton = dynamic(() => import("@/components/ListSkeleton"), {
+  loading: () => <p>Loading...</p>,
+})
+const MenuWrapper = dynamic(() => import("@/components/MenuWrapper"), {
+  loading: () => <p>Loading...</p>,
+})
+const AddEditForm = dynamic(() => import("@/components/AddEditForm"), {
+  loading: () => <p>Loading...</p>,
+})
+const SideMenu = dynamic(() => import("@/components/SideMenu"), {
+  loading: () => <p>Loading...</p>,
+})
+const Filters = dynamic(() => import("@/components/Filters"), {
+  loading: () => <p>Loading...</p>,
+})
 
 export default function Home() {
   const dragAreaRef = useRef<HTMLDivElement>(null)
-
-  const { data: session } = useSession()
 
   const [searchQuery, setSearchQuery] = useState("")
   const [dateFilter, setDateFilter] = useState<string | Date | null>(null)
@@ -158,12 +163,6 @@ export default function Home() {
     }
   }
 
-  const bgBlurAnimation = {
-    initial: { backdropFilter: "blur(0px)" },
-    animate: { backdropFilter: "blur(10px)" },
-    exit: { backdropFilter: "blur(0px)" },
-  }
-
   useEffect(() => {
     listMethods.reset({ boardId: chosenBoard?.id })
   }, [chosenBoard?.id, listMethods, board.data])
@@ -213,68 +212,17 @@ export default function Home() {
                 <ListSkeleton width={100} />
               </div>
             )}
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable
-                droppableId="board"
-                direction="horizontal"
-                type="boards"
-              >
-                {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16"
-                  >
-                    {!!lists.data?.length &&
-                      getFilteredLists(
-                        lists.data,
-                        hideEmptyLists,
-                        assignedFilter,
-                        dateFilter,
-                        session?.user.id
-                      )
-                        ?.sort((a, b) => a.order - b.order)
-                        .map((list, i) => (
-                          <Draggable
-                            key={`list-${i}-${list.id}`}
-                            draggableId={list.id || `placeholder-${i}`}
-                            index={list.order}
-                            isDragDisabled={createList.isLoading}
-                          >
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                              >
-                                <motion.div
-                                  animate={{
-                                    rotate: snapshot.isDragging ? -5 : 0,
-                                  }}
-                                >
-                                  <List
-                                    key={list.id}
-                                    dragHandleProps={provided.dragHandleProps}
-                                    searchQuery={searchQuery}
-                                    dateFilter={dateFilter}
-                                    assignedFilter={assignedFilter}
-                                    hideEmptyLists={hideEmptyLists}
-                                    isUpdating={createList.isLoading}
-                                    taskMutationCounter={taskMutationCounter}
-                                    mutationCounter={listMutationCounter}
-                                    {...list}
-                                  />
-                                </motion.div>
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-
+            <Dashboard
+              assignedFilter={assignedFilter}
+              createList={createList}
+              dateFilter={dateFilter}
+              hideEmptyLists={hideEmptyLists}
+              listMutationCounter={listMutationCounter}
+              lists={lists.data}
+              onDragEnd={onDragEnd}
+              searchQuery={searchQuery}
+              taskMutationCounter={taskMutationCounter}
+            />
             {isAdding ? (
               <ListContainer length={lists.data?.length || 0}>
                 <div className="flex flex-col">
@@ -313,11 +261,10 @@ export default function Home() {
           open or create a new board
         </h2>
       )}
-
       <AnimatePresence>
         {isSideMenuOpen && (
           <>
-            <motion.div {...bgBlurAnimation} className="fixed inset-0 z-40" />
+            <div className="fixed inset-0 z-40 backdrop-blur transition-colors" />
             <SideMenu
               data={userProjects.data}
               isLoading={userProjects.isLoading}

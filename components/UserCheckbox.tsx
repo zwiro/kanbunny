@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { motion } from "framer-motion"
 
 interface UserCheckboxProps {
   name: string
@@ -26,8 +25,7 @@ function UserCheckbox({ name, id, assignUser, isAssigned }: UserCheckboxProps) {
         checked={isChecked}
         className="peer hidden"
       />
-      <motion.label
-        whileTap={{ scale: 1.1 }}
+      <label
         htmlFor={name}
         tabIndex={0}
         onKeyDown={(e) => {
@@ -35,10 +33,10 @@ function UserCheckbox({ name, id, assignUser, isAssigned }: UserCheckboxProps) {
             e.currentTarget.click()
           }
         }}
-        className={`block cursor-pointer border border-zinc-900 p-2 transition-colors hover:bg-zinc-900 focus-visible:bg-zinc-900 peer-checked:bg-zinc-900`}
+        className={`block cursor-pointer border border-zinc-900 p-2 transition-all hover:bg-zinc-900 focus-visible:bg-zinc-900 active:scale-90 peer-checked:bg-zinc-950`}
       >
         {name}
-      </motion.label>
+      </label>
     </div>
   )
 }

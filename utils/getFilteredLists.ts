@@ -1,9 +1,5 @@
-import type { TaskWithAssignedTo } from "@/types/trpc"
-import type { List } from "@prisma/client"
+import type { ListWithTasks } from "@/types/trpc"
 import getFilteredTasks from "./getFilteredTasks"
-import { date } from "zod"
-
-type ListWithTasks = List & { tasks: TaskWithAssignedTo[] }
 
 export default function getFilteredLists(
   lists: ListWithTasks[],

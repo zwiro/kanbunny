@@ -1,5 +1,4 @@
 import { useContext, useRef, useState } from "react"
-import { createPortal } from "react-dom"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { useSession } from "next-auth/react"
@@ -338,4 +337,4 @@ function Project({
   )
 }
 
-export default Project
+export default Project as React.FC<ProjectProps>

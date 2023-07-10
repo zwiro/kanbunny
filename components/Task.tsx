@@ -4,14 +4,14 @@ import {
   AiOutlineClockCircle,
   AiOutlineClose,
 } from "react-icons/ai"
-import { UseTRPCQueryResult } from "@trpc/react-query/shared"
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
+import type { UseTRPCQueryResult } from "@trpc/react-query/shared"
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { User } from "@prisma/client"
 import { motion, AnimatePresence } from "framer-motion"
 import { GoGrabber } from "react-icons/go"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { TaskWithAssignedTo } from "@/types/trpc"
+import type { TaskWithAssignedTo } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
 import {
   deleteOneTask,
@@ -21,7 +21,7 @@ import {
   updatedTaskName,
 } from "@/mutations/taskMutations"
 import { editTaskSchema } from "@/utils/schemas"
-import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
+import type { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
 import DateTimePicker from "react-datetime-picker"
 import UserCheckbox from "./UserCheckbox"
 import AddEditForm from "./AddEditForm"

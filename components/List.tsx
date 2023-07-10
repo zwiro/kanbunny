@@ -220,7 +220,11 @@ function List({
                 .map((task, i) => (
                   <Draggable key={task.id} draggableId={task.id} index={i}>
                     {(provided, snapshot) => (
-                      <div ref={provided.innerRef} {...provided.draggableProps}>
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className="draggable"
+                      >
                         <motion.div
                           animate={{
                             rotate: snapshot.isDragging ? -5 : 0,

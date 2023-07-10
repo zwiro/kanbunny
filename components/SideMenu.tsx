@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import React, { useRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { trpc } from "@/utils/trpc"
 import {
@@ -7,7 +7,7 @@ import {
   Draggable,
   type DropResult,
 } from "@hello-pangea/dnd"
-import type { Board, User } from "@prisma/client"
+import { type Board, type User } from "@prisma/client"
 import { reorderProjects } from "@/mutations/projectMutations"
 import FocusLock from "react-focus-lock"
 import PlusIcon from "./PlusIcon"

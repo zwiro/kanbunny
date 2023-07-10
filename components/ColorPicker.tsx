@@ -1,7 +1,7 @@
 import { useRef } from "react"
 import { motion } from "framer-motion"
 import { z } from "zod"
-import { UseTRPCMutationResult } from "@trpc/react-query/shared"
+import type { UseTRPCMutationResult } from "@trpc/react-query/shared"
 import type { Board, List, Task } from "@prisma/client"
 import FocusLock from "react-focus-lock"
 import { colorSchema } from "@/utils/schemas"

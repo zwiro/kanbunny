@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom"
 import useClickOutside from "@/hooks/useClickOutside"
 import { motion } from "framer-motion"
 import { useRef } from "react"
@@ -30,7 +31,7 @@ function ModalForm({ children, close, handleSubmit }: ModalFormProps) {
   const modalRef = useRef<HTMLDivElement>(null)
   useClickOutside([modalRef], close)
 
-  return (
+  return createPortal(
     <motion.div
       onClick={(e) => e.stopPropagation()}
       variants={modalVariant}
@@ -51,7 +52,8 @@ function ModalForm({ children, close, handleSubmit }: ModalFormProps) {
           {children}
         </motion.div>
       </form>
-    </motion.div>
+    </motion.div>,
+    document.querySelector("#layout")!
   )
 }
 
