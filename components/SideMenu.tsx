@@ -55,7 +55,7 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
       <motion.aside
         onClick={(e) => e.stopPropagation()}
         {...sideMenuAnimation}
-        className="fixed bottom-0 left-0 top-0 w-11/12 overflow-y-scroll bg-zinc-800 px-4 py-8 pt-24 text-2xl lg:w-8/12 lg:px-24 lg:text-3xl xl:w-6/12 xl:px-36 [&>button]:my-0"
+        className="fixed bottom-0 left-0 top-0 z-10 w-11/12 overflow-y-scroll bg-zinc-800 px-4 py-8 pt-24 text-2xl lg:w-8/12 lg:px-24 lg:text-3xl xl:w-6/12 xl:px-36 [&>button]:my-0"
       >
         {!isLoading ? (
           <AddButton onClick={add}>
