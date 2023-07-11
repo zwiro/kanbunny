@@ -70,7 +70,7 @@ function Dashboard({ userProjects, isLoading }: DashboardProps) {
     >
       {chosenBoard ? (
         <>
-          <div className="sticky left-0 z-40 flex flex-col justify-between md:flex-row md:items-center">
+          <div className="sticky left-0 z-10 flex flex-col justify-between md:flex-row md:items-center">
             <div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 [&>button]:cursor-default">
@@ -119,7 +119,7 @@ function Dashboard({ userProjects, isLoading }: DashboardProps) {
       <AnimatePresence>
         {isSideMenuOpen && (
           <>
-            <div className="fixed inset-0 z-40 backdrop-blur transition-colors" />
+            <div className="fixed inset-0 backdrop-blur transition-colors" />
             <SideMenu data={userProjects} isLoading={isLoading} />
           </>
         )}

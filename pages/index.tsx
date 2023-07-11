@@ -19,12 +19,10 @@ export default function Home() {
   const userProjects = trpc.project.getByUser.useQuery()
 
   return (
-    <>
-      <Dashboard
-        userProjects={userProjects.data}
-        isLoading={userProjects.isLoading}
-      />
-    </>
+    <Dashboard
+      userProjects={userProjects.data}
+      isLoading={userProjects.isLoading}
+    />
   )
 }
 

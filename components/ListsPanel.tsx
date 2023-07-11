@@ -171,7 +171,7 @@ function ListsPanel({
                         >
                           <motion.div
                             animate={{
-                              rotate: snapshot.isDragging ? "-5deg" : "0deg",
+                              rotate: snapshot.isDragging ? -5 : 0,
                             }}
                           >
                             <List

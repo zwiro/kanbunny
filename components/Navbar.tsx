@@ -17,7 +17,7 @@ function Navbar() {
 
   return (
     <FocusLock group="aside-nav" disabled={!isSideMenuOpen}>
-      <nav className="fixed top-0 z-50 flex h-20 w-full items-center gap-4 border-b border-neutral-700 bg-zinc-800 p-4 text-lg sm:text-2xl xl:px-12 2xl:px-24">
+      <nav className="fixed top-0 z-10 flex h-20 w-full items-center gap-4 border-b border-neutral-700 bg-zinc-800 p-4 text-lg sm:text-2xl xl:px-12 2xl:px-24">
         {router.pathname !== "/auth/login" && (
           <>
             <button

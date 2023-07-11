@@ -1,12 +1,8 @@
 import { LayoutProvider } from "@/context/LayoutContext"
 import { Jura } from "next/font/google"
 import { useSession } from "next-auth/react"
-// import dynamic from "next/dynamic"
 import Head from "next/head"
 import Navbar from "./Navbar"
-// const Navbar = dynamic(() => import("./Navbar"), {
-//   loading: () => <p>Loading...</p>,
-// })
 
 const jura = Jura({ subsets: ["latin"], weight: ["400", "700"] })
 

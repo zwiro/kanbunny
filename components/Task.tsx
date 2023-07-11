@@ -213,7 +213,7 @@ function Task({
               </ul>
             </div>
             <div className="flex items-center self-start">
-              <div className="z-20 ml-auto scale-0 transition-transform group-focus-within:scale-100 group-hover:scale-100">
+              <div className="ml-auto scale-0 transition-transform group-focus-within:scale-100 group-hover:scale-100">
                 <MenuWrapper isLoading={isLoading}>
                   <MenuItem handleClick={editName}>edit task name</MenuItem>
                   <MenuItem handleClick={editUsers}>assign user</MenuItem>

@@ -92,7 +92,7 @@ function Menu({ children }: MenuProps) {
       id="menu"
       ref={menuRef}
       {...menuAnimation}
-      className={`absolute top-5 z-50 w-max bg-zinc-900/95 py-4 text-lg shadow-md shadow-black ${getDirection()}`}
+      className={`absolute top-5 z-20 w-max bg-zinc-900/95 py-4 text-lg shadow-md shadow-black ${getDirection()}`}
     >
       <ul className="flex flex-col gap-2">{children}</ul>
     </motion.div>
