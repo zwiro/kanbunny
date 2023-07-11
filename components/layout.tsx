@@ -56,7 +56,7 @@ function Layout({ children }: LayoutProps) {
         <Navbar />
         <main
           className={`h-full px-4 pb-4 xl:px-12 2xl:px-24 ${
-            !session?.user ? "pt-24" : "pt-4"
+            session?.user ? "pt-24" : "pt-4"
           } `}
         >
           {children}

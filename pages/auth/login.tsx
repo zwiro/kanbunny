@@ -7,7 +7,11 @@ function AuthPage() {
   return (
     <div className="relative mx-auto grid h-full max-w-4xl place-items-center">
       <div>
-        <Image alt="" src={loginBgImage} className="h-52 object-cover" />
+        <Image
+          alt=""
+          src={loginBgImage}
+          className="h-32 object-cover sm:h-52"
+        />
         <div className="flex flex-col gap-8 bg-zinc-800 px-8 py-12 text-center lg:text-2xl">
           <p>
             join <span className="font-bold">kanbunny</span> and start creating

@@ -115,7 +115,7 @@ function List({
   return (
     <>
       <section
-        className={`mt-4 flex min-w-[18rem] max-w-sm flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 ${
+        className={`mt-4 flex min-w-[18rem] max-w-xs flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 sm:max-w-sm ${
           colorVariants[color]
         } ${isUpdating && !id && "opacity-50"}       ${
           ((isUpdating && !id) ||
@@ -142,7 +142,9 @@ function List({
           </ColorDot>
           {!isEditingName ? (
             <>
-              <h3 className="max-w-[15rem] break-words text-xl">{name}</h3>
+              <h3 className="max-w-[60%] break-words text-base sm:text-xl">
+                {name}
+              </h3>
               <button
                 onClick={add}
                 className={`group py-2 ${isEditingColor && "scale-0"} `}

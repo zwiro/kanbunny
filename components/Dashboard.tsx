@@ -66,7 +66,7 @@ function Dashboard({ userProjects, isLoading }: DashboardProps) {
       onClick={() => {
         closeSideMenu()
       }}
-      className="flex h-full flex-col overflow-y-scroll pt-20"
+      className="flex h-full flex-col overflow-y-scroll"
     >
       {chosenBoard ? (
         <>
@@ -75,7 +75,9 @@ function Dashboard({ userProjects, isLoading }: DashboardProps) {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 [&>button]:cursor-default">
                   <ColorDot color={chosenBoard.color} />
-                  <h2 className="text-2xl font-bold">{chosenBoard.name}</h2>
+                  <h2 className="max-w-xs break-words text-base font-bold sm:max-w-lg sm:text-2xl md:max-w-xl xl:max-w-4xl 2xl:max-w-6xl">
+                    {chosenBoard.name}
+                  </h2>
                 </div>
                 <MenuWrapper>
                   <MenuItem handleClick={add}>add list</MenuItem>
