@@ -124,7 +124,7 @@ function Board({
       </ColorDot>
       {!isEditingName ? (
         <>
-          <h3>{name}</h3>
+          <h3 className="max-w-xl break-words">{name}</h3>
           <div
             className={`invisible z-10 scale-0 transition-transform ${
               isEditingColor

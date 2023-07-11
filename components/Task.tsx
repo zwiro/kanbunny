@@ -173,9 +173,11 @@ function Task({
                   />
                 )}
               </AnimatePresence>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 ">
                 <h4
-                  className={`font-bold ${minutesLeft < 0 && "line-through"}`}
+                  className={`max-w-xs break-words font-bold ${
+                    minutesLeft < 0 && "line-through"
+                  }`}
                 >
                   {name}
                 </h4>

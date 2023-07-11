@@ -142,7 +142,7 @@ function List({
           </ColorDot>
           {!isEditingName ? (
             <>
-              <h3 className="text-xl">{name}</h3>
+              <h3 className="max-w-[15rem] break-words text-xl">{name}</h3>
               <button
                 onClick={add}
                 className={`group py-2 ${isEditingColor && "scale-0"} `}
