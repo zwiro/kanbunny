@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import { useRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { trpc } from "@/utils/trpc"
 import {
@@ -7,7 +7,6 @@ import {
   Draggable,
   type DropResult,
 } from "@hello-pangea/dnd"
-import { type Board, type User } from "@prisma/client"
 import { reorderProjects } from "@/mutations/projectMutations"
 import FocusLock from "react-focus-lock"
 import PlusIcon from "./PlusIcon"
@@ -16,23 +15,10 @@ import useBooleanState from "@/hooks/useBooleanState"
 import AddProjectModal from "./AddProjectModal"
 import Project from "./Project"
 import ProjectSkeleton from "./ProjectSkeleton"
+import { ProjectWithUsers } from "@/types/trpc"
 
 interface SideMenuProps {
-  data:
-    | {
-        order: number
-        id: string
-        name: string
-        ownerId: string
-        created_at: Date
-        updated_at: Date
-        owner: User
-        boards: Board[]
-        users: {
-          order: number
-        }[]
-      }[]
-    | undefined
+  data: ProjectWithUsers[] | undefined
   isLoading: boolean
 }
 

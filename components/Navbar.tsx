@@ -32,7 +32,7 @@ function Navbar() {
               <h1 className="font-bold">kanbunny</h1>
             </div>
             {status === "loading" ? (
-              <LoadingDots />
+              <LoadingDots className="ml-auto" />
             ) : (
               <h2 className="ml-auto">{session?.user?.name}</h2>
             )}

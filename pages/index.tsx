@@ -1,143 +1,30 @@
-import { useContext, useState, useRef, type ChangeEvent } from "react"
 import dynamic from "next/dynamic"
 import { trpc } from "@/utils/trpc"
-import { AnimatePresence } from "framer-motion"
 import { getSession, type GetSessionParams } from "next-auth/react"
 import { createServerSideHelpers } from "@trpc/react-query/server"
 import { prisma } from "@/server/db"
 import { appRouter } from "@/server/routers/_app"
 import superjson from "superjson"
-import ColorDot from "@/components/ColorDot"
-import MenuItem from "@/components/MenuItem"
-import useBooleanState from "@/hooks/useBooleanState"
-import LayoutContext from "@/context/LayoutContext"
+import { LoadingDots } from "@/components/LoadingDots"
 const Dashboard = dynamic(() => import("@/components/Dashboard"), {
-  loading: () => <p>Loading...</p>,
-})
-const MenuWrapper = dynamic(() => import("@/components/MenuWrapper"), {
-  loading: () => <p>Loading...</p>,
-})
-const SideMenu = dynamic(() => import("@/components/SideMenu"), {
-  loading: () => <p>Loading...</p>,
-})
-const Filters = dynamic(() => import("@/components/Filters"), {
-  loading: () => <p>Loading...</p>,
+  loading: () => (
+    <LoadingDots
+      className="absolute inset-0 m-auto h-full items-center"
+      dotClassName="w-12 h-12"
+    />
+  ),
 })
 
 export default function Home() {
-  const dragAreaRef = useRef<HTMLDivElement>(null)
-
-  const [searchQuery, setSearchQuery] = useState("")
-  const [dateFilter, setDateFilter] = useState<string | Date | null>(null)
-  const [assignedFilter, setAssignedFilter] = useState<string | null>(null)
-
-  const [hideEmptyLists, , disableHideEmptyLists, toggleHideEmptyLists] =
-    useBooleanState()
-
-  const { isSideMenuOpen, closeSideMenu, chosenBoard } =
-    useContext(LayoutContext)
-
-  const [isAdding, add, closeAdd] = useBooleanState()
-
-  const handleDateFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setDateFilter(e.target.value)
-  }
-
-  const handleAssignedFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setAssignedFilter(e.target.value)
-  }
-
-  const clearFilters = () => {
-    setDateFilter(null)
-    setAssignedFilter(null)
-    disableHideEmptyLists()
-  }
-
-  const taskMutationCounter = useRef(0)
-  const listMutationCounter = useRef(0)
-
-  const lists = trpc.list.getByBoard.useQuery(chosenBoard?.id!, {
-    enabled: !!chosenBoard?.id,
-  })
-
   const userProjects = trpc.project.getByUser.useQuery()
 
-  const search = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
-  }
-
-  const resetQuery = () => {
-    setSearchQuery("")
-  }
-
   return (
-    <div
-      ref={dragAreaRef}
-      onClick={() => {
-        closeSideMenu()
-      }}
-      className="flex h-full flex-col overflow-y-scroll"
-    >
-      {chosenBoard ? (
-        <div className="pt-20">
-          <div className="sticky left-0 z-40 flex flex-col justify-between md:flex-row md:items-center">
-            <div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1 [&>button]:cursor-default">
-                  <ColorDot color={chosenBoard.color} />
-                  <h2 className="text-2xl font-bold">{chosenBoard.name}</h2>
-                </div>
-                <MenuWrapper>
-                  <MenuItem handleClick={add}>add list</MenuItem>
-                </MenuWrapper>
-              </div>
-              <p className="text-slate-300">owner: {chosenBoard.owner}</p>
-            </div>
-            <Filters
-              searchQuery={searchQuery}
-              search={search}
-              resetQuery={resetQuery}
-              assignedFilter={assignedFilter}
-              dateFilter={dateFilter}
-              handleDateFilterChange={handleDateFilterChange}
-              handleAssignedFilterChange={handleAssignedFilterChange}
-              clearFilters={clearFilters}
-              setDateFilter={setDateFilter}
-              hideEmptyLists={hideEmptyLists}
-              toggleHideEmptyLists={toggleHideEmptyLists}
-            />
-          </div>
-          <Dashboard
-            assignedFilter={assignedFilter}
-            dateFilter={dateFilter}
-            hideEmptyLists={hideEmptyLists}
-            listMutationCounter={listMutationCounter}
-            lists={lists.data}
-            searchQuery={searchQuery}
-            taskMutationCounter={taskMutationCounter}
-            isLoading={lists.isLoading}
-            isAdding={isAdding}
-            closeAdd={closeAdd}
-            add={add}
-          />
-        </div>
-      ) : (
-        <h2 className="text-center font-bold text-neutral-300">
-          open or create a new board
-        </h2>
-      )}
-      <AnimatePresence>
-        {isSideMenuOpen && (
-          <>
-            <div className="fixed inset-0 z-40 backdrop-blur transition-colors" />
-            <SideMenu
-              data={userProjects.data}
-              isLoading={userProjects.isLoading}
-            />
-          </>
-        )}
-      </AnimatePresence>
-    </div>
+    <>
+      <Dashboard
+        userProjects={userProjects.data}
+        isLoading={userProjects.isLoading}
+      />
+    </>
   )
 }
 

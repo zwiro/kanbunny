@@ -337,7 +337,7 @@ function EditTaskUsers({
             </button>
           </>
         ) : (
-          <LoadingDots />
+          <LoadingDots className="ml-auto" />
         )}
       </div>
     </motion.form>

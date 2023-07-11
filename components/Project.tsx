@@ -252,7 +252,7 @@ function Project({
                   </>
                 ) : (
                   <div className="mr-auto h-6">
-                    <LoadingDots />
+                    <LoadingDots className="ml-auto" />
                   </div>
                 )}
               </div>

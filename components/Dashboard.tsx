@@ -1,233 +1,129 @@
-import { useSession } from "next-auth/react"
-import { useContext, useEffect } from "react"
-import LayoutContext from "@/context/LayoutContext"
+import { type ChangeEvent, useContext, useRef, useState } from "react"
 import { trpc } from "@/utils/trpc"
-import {
-  DragDropContext,
-  Draggable,
-  type DropResult,
-  Droppable,
-} from "@hello-pangea/dnd"
-import { motion } from "framer-motion"
-import getFilteredLists from "@/utils/getFilteredLists"
-import { type List as ListType } from "@prisma/client"
-import { type UseTRPCMutationResult } from "@trpc/react-query/shared"
-import { type ListWithTasks } from "@/types/trpc"
-import { createNewList, reorderLists } from "@/mutations/listMutations"
-import { reorderTasks } from "@/mutations/taskMutations"
-import List from "./List"
-import { z } from "zod"
-import { listSchema } from "@/utils/schemas"
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import ListSkeleton from "./ListSkeleton"
-import AddButton from "./AddButton"
-import PlusIcon from "./PlusIcon"
-import ListContainer from "./ListContainer"
-import AddEditForm from "./AddEditForm"
+import { AnimatePresence } from "framer-motion"
+import { ProjectWithUsers } from "@/types/trpc"
+import LayoutContext from "@/context/LayoutContext"
+import useBooleanState from "@/hooks/useBooleanState"
+import ColorDot from "./ColorDot"
+import MenuWrapper from "./MenuWrapper"
+import MenuItem from "./MenuItem"
+import Filters from "./Filters"
+import ListsPanel from "./ListsPanel"
+import SideMenu from "./SideMenu"
 
 interface DashboardProps {
-  lists: ListWithTasks[] | undefined
-  hideEmptyLists: boolean
-  assignedFilter: string | null
-  dateFilter: string | Date | null
-  searchQuery: string
-  taskMutationCounter: React.MutableRefObject<number>
-  listMutationCounter: React.MutableRefObject<number>
+  userProjects: ProjectWithUsers[] | undefined
   isLoading: boolean
-  isAdding: boolean
-  closeAdd: () => void
-  add: () => void
 }
 
-function Dashboard({
-  lists,
-  hideEmptyLists,
-  assignedFilter,
-  dateFilter,
-  searchQuery,
-  taskMutationCounter,
-  listMutationCounter,
-  isLoading,
-  isAdding,
-  closeAdd,
-  add,
-}: DashboardProps) {
-  const { data: session } = useSession()
+function Dashboard({ userProjects, isLoading }: DashboardProps) {
+  const dragAreaRef = useRef<HTMLDivElement>(null)
 
-  const { chosenBoard } = useContext(LayoutContext)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [dateFilter, setDateFilter] = useState<string | Date | null>(null)
+  const [assignedFilter, setAssignedFilter] = useState<string | null>(null)
 
-  const board = trpc.board.getById.useQuery(chosenBoard?.id!, {
+  const [hideEmptyLists, , disableHideEmptyLists, toggleHideEmptyLists] =
+    useBooleanState()
+
+  const { isSideMenuOpen, closeSideMenu, chosenBoard } =
+    useContext(LayoutContext)
+
+  const [isAdding, add, closeAdd] = useBooleanState()
+
+  const handleDateFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setDateFilter(e.target.value)
+  }
+
+  const handleAssignedFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setAssignedFilter(e.target.value)
+  }
+
+  const clearFilters = () => {
+    setDateFilter(null)
+    setAssignedFilter(null)
+    disableHideEmptyLists()
+  }
+
+  const taskMutationCounter = useRef(0)
+  const listMutationCounter = useRef(0)
+
+  const lists = trpc.list.getByBoard.useQuery(chosenBoard?.id!, {
     enabled: !!chosenBoard?.id,
   })
 
-  const utils = trpc.useContext()
-
-  type ListSchema = z.infer<typeof listSchema>
-
-  const listMethods = useForm<ListSchema>({
-    defaultValues: { boardId: chosenBoard?.id },
-    resolver: zodResolver(listSchema),
-  })
-
-  const createList = createNewList(
-    chosenBoard?.id!,
-    utils,
-    closeAdd,
-    listMethods
-  )
-
-  const onSubmit: SubmitHandler<ListSchema> = (data: any) => {
-    createList.mutate({
-      name: data.name,
-      boardId: chosenBoard?.id!,
-    })
+  const search = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
   }
 
-  useEffect(() => {
-    listMethods.reset({ boardId: chosenBoard?.id })
-  }, [chosenBoard?.id, listMethods, board.data])
-
-  const reorder = reorderLists(chosenBoard?.id!, utils, listMutationCounter)
-
-  const reorderDisplayedTasks = reorderTasks(
-    chosenBoard?.id!,
-    utils,
-    taskMutationCounter
-  )
-
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination, draggableId } = result
-    const itemOne = lists
-      ?.filter((l) => l.id === source.droppableId)[0]
-      ?.tasks.filter(
-        (task) =>
-          task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          searchQuery === ""
-      )[source.index]
-    const itemTwo = lists
-      ?.filter((l) => l.id === destination?.droppableId)[0]
-      ?.tasks.filter(
-        (task) =>
-          task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          searchQuery === ""
-      )[destination!.index]
-
-    if (!destination) return
-    if (source.droppableId === "board" || destination.droppableId === "board") {
-      reorder.mutate({
-        itemOneIndex: source.index,
-        itemTwoIndex: destination.index,
-        draggableId,
-      })
-    } else {
-      if (!itemOne) return
-      reorderDisplayedTasks.mutate({
-        itemOneId: itemOne.id,
-        itemTwoId: itemTwo?.id || undefined,
-        itemOneOrder: itemOne.order,
-        itemTwoOrder: destination.index,
-        listId: destination.droppableId,
-        prevListId: source.droppableId,
-      })
-    }
+  const resetQuery = () => {
+    setSearchQuery("")
   }
 
   return (
-    <div className="flex pb-4">
-      {isLoading && (
-        <div className="flex gap-4 lg:gap-8 xl:gap-16">
-          <ListSkeleton width={60} />
-          <ListSkeleton width={130} />
-          <ListSkeleton width={100} />
-        </div>
-      )}
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="board" direction="horizontal" type="boards">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16"
-            >
-              {!!lists?.length &&
-                getFilteredLists(
-                  lists,
-                  hideEmptyLists,
-                  assignedFilter,
-                  dateFilter,
-                  session?.user.id
-                )
-                  ?.sort((a, b) => a.order - b.order)
-                  .map((list, i) => (
-                    <Draggable
-                      key={`list-${i}-${list.id}`}
-                      draggableId={list.id || `placeholder-${i}`}
-                      index={list.order}
-                      isDragDisabled={createList.isLoading}
-                    >
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                        >
-                          <motion.div
-                            animate={{
-                              rotate: snapshot.isDragging ? "-5deg" : "0deg",
-                            }}
-                          >
-                            <List
-                              key={list.id}
-                              dragHandleProps={provided.dragHandleProps}
-                              searchQuery={searchQuery}
-                              dateFilter={dateFilter}
-                              assignedFilter={assignedFilter}
-                              hideEmptyLists={hideEmptyLists}
-                              isUpdating={createList.isLoading}
-                              taskMutationCounter={taskMutationCounter}
-                              mutationCounter={listMutationCounter}
-                              {...list}
-                            />
-                          </motion.div>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-
-              {provided.placeholder}
+    <div
+      ref={dragAreaRef}
+      onClick={() => {
+        closeSideMenu()
+      }}
+      className="mt-20 flex h-full flex-col overflow-y-scroll"
+    >
+      {chosenBoard ? (
+        <>
+          <div className="sticky left-0 z-40 flex flex-col justify-between md:flex-row md:items-center">
+            <div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1 [&>button]:cursor-default">
+                  <ColorDot color={chosenBoard.color} />
+                  <h2 className="text-2xl font-bold">{chosenBoard.name}</h2>
+                </div>
+                <MenuWrapper>
+                  <MenuItem handleClick={add}>add list</MenuItem>
+                </MenuWrapper>
+              </div>
+              <p className="text-slate-300">owner: {chosenBoard.owner}</p>
             </div>
-          )}
-        </Droppable>
-      </DragDropContext>
-      {isAdding ? (
-        <ListContainer length={lists?.length || 0}>
-          <div className="flex flex-col">
-            <FormProvider {...listMethods}>
-              <AddEditForm
-                name="name"
-                placeholder="list name"
-                close={closeAdd}
-                handleSubmit={listMethods.handleSubmit(onSubmit)}
-              />
-            </FormProvider>
-            {listMethods.formState.errors && (
-              <p role="alert" className="text-base text-red-500">
-                {listMethods.formState.errors?.name?.message as string}
-              </p>
-            )}
+            <Filters
+              searchQuery={searchQuery}
+              search={search}
+              resetQuery={resetQuery}
+              assignedFilter={assignedFilter}
+              dateFilter={dateFilter}
+              handleDateFilterChange={handleDateFilterChange}
+              handleAssignedFilterChange={handleAssignedFilterChange}
+              clearFilters={clearFilters}
+              setDateFilter={setDateFilter}
+              hideEmptyLists={hideEmptyLists}
+              toggleHideEmptyLists={toggleHideEmptyLists}
+            />
           </div>
-        </ListContainer>
+          <ListsPanel
+            assignedFilter={assignedFilter}
+            dateFilter={dateFilter}
+            hideEmptyLists={hideEmptyLists}
+            listMutationCounter={listMutationCounter}
+            lists={lists.data}
+            searchQuery={searchQuery}
+            taskMutationCounter={taskMutationCounter}
+            isLoading={lists.isLoading}
+            isAdding={isAdding}
+            closeAdd={closeAdd}
+            add={add}
+          />
+        </>
       ) : (
-        <div
-          className={`${
-            lists?.length || isLoading ? "ml-4 lg:ml-8 xl:ml-16" : "ml-0"
-          } `}
-        >
-          <AddButton onClick={add}>
-            new list <PlusIcon />
-          </AddButton>
-        </div>
+        <h2 className="text-center font-bold text-neutral-300">
+          open or create a new board
+        </h2>
       )}
+      <AnimatePresence>
+        {isSideMenuOpen && (
+          <>
+            <div className="fixed inset-0 z-40 backdrop-blur transition-colors" />
+            <SideMenu data={userProjects} isLoading={isLoading} />
+          </>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
