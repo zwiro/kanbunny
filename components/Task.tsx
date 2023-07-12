@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { GoGrabber } from "react-icons/go"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { isMobile } from "react-device-detect"
 import type { TaskWithAssignedTo } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
 import {
@@ -215,7 +216,13 @@ function Task({
               </ul>
             </div>
             <div className="flex items-center self-start">
-              <div className="z-10 ml-auto scale-0 transition-transform group-focus-within:scale-100 group-hover:scale-100">
+              <div
+                className={`z-10 ml-auto ${
+                  isMobile
+                    ? "scale-100"
+                    : "scale-0 transition-transform group-focus-within:scale-100 group-hover:scale-100"
+                }`}
+              >
                 <MenuWrapper isLoading={isLoading}>
                   <MenuItem handleClick={editName}>edit task name</MenuItem>
                   <MenuItem handleClick={editUsers}>assign user</MenuItem>
@@ -229,9 +236,10 @@ function Task({
               <div
                 {...dragHandleProps}
                 aria-label="Grab to drag"
-                className={`cursor-grab group-hover:visible group-focus:visible ${
-                  isDragging ? "visible" : "invisible"
-                } ${isFiltered && "pointer-events-none"} `}
+                className={`cursor-grab group-hover:visible group-focus:visible 
+                ${isDragging ? "visible" : !isMobile && "invisible"} ${
+                  isFiltered && "pointer-events-none"
+                } `}
                 onClick={(e) => e.stopPropagation()}
               >
                 <GoGrabber size={24} />

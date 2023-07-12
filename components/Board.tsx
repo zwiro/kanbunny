@@ -5,6 +5,7 @@ import { GoGrabber } from "react-icons/go"
 import { z } from "zod"
 import type { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
 import { AnimatePresence } from "framer-motion"
+import { isMobile } from "react-device-detect"
 import { trpc } from "@/utils/trpc"
 import type { Board, Color } from "@prisma/client"
 import { boardSchema } from "@/utils/schemas"
@@ -127,7 +128,9 @@ function Board({
           <h3 className="max-w-[75%] break-words">{name}</h3>
           <div className="ml-auto flex items-center self-start">
             <div
-              className={`invisible z-10 scale-0 transition-transform ${
+              className={`z-10 transition-transform
+              ${isMobile ? "visible scale-100" : "invisible scale-0"}
+              ${
                 isEditingColor
                   ? "group-hover:scale-0 group-focus:scale-0"
                   : "group-focus-within:visible group-focus-within:scale-100 group-hover:visible group-hover:scale-100 group-focus:visible group-focus:scale-100 peer-focus:visible peer-focus:scale-100"
@@ -153,7 +156,7 @@ function Board({
               {...dragHandleProps}
               aria-label="Grab to drag"
               className={`ml-auto cursor-grab group-hover:visible group-focus:visible ${
-                isDragging ? "visible" : "invisible"
+                isDragging ? "visible" : !isMobile && "invisible"
               }`}
               onClick={(e) => e.stopPropagation()}
             >
