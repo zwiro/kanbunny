@@ -1,6 +1,6 @@
 import { type ChangeEvent, useContext, useRef, useState } from "react"
 import { trpc } from "@/utils/trpc"
-import { AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { ProjectWithUsers } from "@/types/trpc"
 import LayoutContext from "@/context/LayoutContext"
 import useBooleanState from "@/hooks/useBooleanState"
@@ -60,13 +60,22 @@ function Dashboard({ userProjects, isLoading }: DashboardProps) {
     setSearchQuery("")
   }
 
+  const backdropBlurAnimation = {
+    initial: { backdropFilter: "blur(0px)", backgroundColor: "rgba(0,0,0,0)" },
+    animate: {
+      backdropFilter: "blur(10px)",
+      backgroundColor: "rgba(0,0,0,0.2)",
+    },
+    exit: { backdropFilter: "blur(0px)", backgroundColor: "rgba(0,0,0,0)" },
+  }
+
   return (
     <div
       ref={dragAreaRef}
       onClick={() => {
         closeSideMenu()
       }}
-      className="flex h-full flex-col overflow-y-scroll"
+      className="flex flex-col overflow-auto"
     >
       {chosenBoard ? (
         <>
@@ -121,7 +130,10 @@ function Dashboard({ userProjects, isLoading }: DashboardProps) {
       <AnimatePresence>
         {isSideMenuOpen && (
           <>
-            <div className="fixed inset-0 backdrop-blur transition-colors" />
+            <motion.div
+              {...backdropBlurAnimation}
+              className="fixed inset-0 z-10 backdrop-blur transition-colors"
+            />
             <SideMenu data={userProjects} isLoading={isLoading} />
           </>
         )}

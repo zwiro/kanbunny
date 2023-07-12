@@ -132,7 +132,7 @@ function ListsPanel({
   }
 
   return (
-    <div className="flex pb-4">
+    <div className="flex pb-12">
       {isLoading && (
         <div className="flex gap-4 lg:gap-8 xl:gap-16">
           <ListSkeleton width={60} />

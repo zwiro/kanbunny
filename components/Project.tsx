@@ -136,9 +136,9 @@ function Project({
   return (
     <section className="my-4 border-b border-neutral-700">
       {!isEditingName ? (
-        <div className="flex items-center gap-4 pb-4">
+        <div className="flex gap-4 pb-4">
           <h2
-            className={`relative max-w-[80%] break-words text-lg after:absolute after:-bottom-1 after:left-0 after:h-1 after:w-0 after:bg-white after:transition-all ${
+            className={`relative max-w-[80%] break-words text-lg after:absolute after:-bottom-1 after:left-0 after:h-1 after:w-0 after:bg-white after:transition-all lg:text-2xl ${
               boards.map((b) => b.id).includes(chosenBoard?.id!) &&
               chosenBoard &&
               "after:w-[100%]"
@@ -146,55 +146,57 @@ function Project({
           >
             {name}
           </h2>
-          <MenuWrapper isLoading={isLoading}>
-            <MenuItem handleClick={add}>add board</MenuItem>
-            {!isOwner && (
-              <MenuItem
-                handleClick={() => {
-                  setIsLeaving(true)
-                  openPopup()
-                }}
-              >
-                leave project
-              </MenuItem>
-            )}
-            {isOwner && (
-              <>
-                <MenuItem handleClick={editUsers}>edit users</MenuItem>
-                <MenuItem handleClick={editName}>edit project name</MenuItem>
-                <MenuItem handleClick={openPopup}>delete project</MenuItem>
-              </>
-            )}
-          </MenuWrapper>
-          <AnimatePresence>
-            {!isLeaving ? (
-              isPopupOpened && (
+          <div className="ml-auto flex items-center self-start">
+            <MenuWrapper isLoading={isLoading}>
+              <MenuItem handleClick={add}>add board</MenuItem>
+              {!isOwner && (
+                <MenuItem
+                  handleClick={() => {
+                    setIsLeaving(true)
+                    openPopup()
+                  }}
+                >
+                  leave project
+                </MenuItem>
+              )}
+              {isOwner && (
+                <>
+                  <MenuItem handleClick={editUsers}>edit users</MenuItem>
+                  <MenuItem handleClick={editName}>edit project name</MenuItem>
+                  <MenuItem handleClick={openPopup}>delete project</MenuItem>
+                </>
+              )}
+            </MenuWrapper>
+            <AnimatePresence>
+              {!isLeaving ? (
+                isPopupOpened && (
+                  <ConfirmPopup
+                    name={name}
+                    type="project"
+                    handleClick={() => deleteProject.mutate(id)}
+                    close={() => closePopup()}
+                  />
+                )
+              ) : (
                 <ConfirmPopup
                   name={name}
                   type="project"
-                  handleClick={() => deleteProject.mutate(id)}
-                  close={() => closePopup()}
+                  action="leave"
+                  handleClick={() => leaveProject.mutate(id)}
+                  close={() => {
+                    setIsLeaving(false)
+                    closePopup()
+                  }}
                 />
-              )
-            ) : (
-              <ConfirmPopup
-                name={name}
-                type="project"
-                action="leave"
-                handleClick={() => leaveProject.mutate(id)}
-                close={() => {
-                  setIsLeaving(false)
-                  closePopup()
-                }}
-              />
-            )}
-          </AnimatePresence>
-          <div
-            {...dragHandleProps}
-            className="ml-auto cursor-grab self-start"
-            aria-label="Grab to drag"
-          >
-            <GoGrabber />
+              )}
+            </AnimatePresence>
+            <div
+              {...dragHandleProps}
+              className="ml-auto cursor-grab"
+              aria-label="Grab to drag"
+            >
+              <GoGrabber />
+            </div>
           </div>
         </div>
       ) : (

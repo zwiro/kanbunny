@@ -125,38 +125,40 @@ function Board({
       {!isEditingName ? (
         <>
           <h3 className="max-w-[75%] break-words">{name}</h3>
-          <div
-            className={`invisible z-10 scale-0 transition-transform ${
-              isEditingColor
-                ? "group-hover:scale-0 group-focus:scale-0"
-                : "group-focus-within:visible group-focus-within:scale-100 group-hover:visible group-hover:scale-100 group-focus:visible group-focus:scale-100 peer-focus:visible peer-focus:scale-100"
-            }`}
-          >
-            <MenuWrapper isLoading={isLoading}>
-              <MenuItem handleClick={editName}>edit board name</MenuItem>
-              <MenuItem handleClick={editColor}>change color</MenuItem>
-              <MenuItem handleClick={openPopup}>delete board</MenuItem>
-            </MenuWrapper>
-          </div>
-          <AnimatePresence>
-            {isPopupOpened && (
-              <ConfirmPopup
-                name={name}
-                type="board"
-                handleClick={() => deleteBoard.mutate(id)}
-                close={() => closePopup()}
-              />
-            )}
-          </AnimatePresence>
-          <div
-            {...dragHandleProps}
-            aria-label="Grab to drag"
-            className={`ml-auto cursor-grab group-hover:visible group-focus:visible ${
-              isDragging ? "visible" : "invisible"
-            }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <GoGrabber />
+          <div className="ml-auto flex items-center self-start">
+            <div
+              className={`invisible z-10 scale-0 transition-transform ${
+                isEditingColor
+                  ? "group-hover:scale-0 group-focus:scale-0"
+                  : "group-focus-within:visible group-focus-within:scale-100 group-hover:visible group-hover:scale-100 group-focus:visible group-focus:scale-100 peer-focus:visible peer-focus:scale-100"
+              }`}
+            >
+              <MenuWrapper isLoading={isLoading}>
+                <MenuItem handleClick={editName}>edit board name</MenuItem>
+                <MenuItem handleClick={editColor}>change color</MenuItem>
+                <MenuItem handleClick={openPopup}>delete board</MenuItem>
+              </MenuWrapper>
+            </div>
+            <AnimatePresence>
+              {isPopupOpened && (
+                <ConfirmPopup
+                  name={name}
+                  type="board"
+                  handleClick={() => deleteBoard.mutate(id)}
+                  close={() => closePopup()}
+                />
+              )}
+            </AnimatePresence>
+            <div
+              {...dragHandleProps}
+              aria-label="Grab to drag"
+              className={`ml-auto cursor-grab group-hover:visible group-focus:visible ${
+                isDragging ? "visible" : "invisible"
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <GoGrabber />
+            </div>
           </div>
         </>
       ) : (

@@ -34,7 +34,7 @@ function ConfirmPopup({
     <motion.div
       {...confirmPopupAnimation}
       role="alert"
-      className="fixed inset-0 mx-2 grid cursor-default place-items-center text-center"
+      className="fixed inset-0 z-10 mx-2 grid cursor-default place-items-center text-center"
     >
       <div
         ref={popupRef}

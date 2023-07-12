@@ -175,7 +175,7 @@ function Task({
               </AnimatePresence>
               <div className="flex items-center gap-2 ">
                 <h4
-                  className={`max-w-[14rem] break-words text-sm font-bold sm:max-w-xs sm:text-base ${
+                  className={`max-w-[14rem] break-words text-sm font-bold sm:max-w-[18rem] sm:text-base ${
                     minutesLeft < 0 && "line-through"
                   }`}
                 >
@@ -215,7 +215,7 @@ function Task({
               </ul>
             </div>
             <div className="flex items-center self-start">
-              <div className="ml-auto scale-0 transition-transform group-focus-within:scale-100 group-hover:scale-100">
+              <div className="z-10 ml-auto scale-0 transition-transform group-focus-within:scale-100 group-hover:scale-100">
                 <MenuWrapper isLoading={isLoading}>
                   <MenuItem handleClick={editName}>edit task name</MenuItem>
                   <MenuItem handleClick={editUsers}>assign user</MenuItem>

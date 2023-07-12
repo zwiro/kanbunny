@@ -50,15 +50,11 @@ function Layout({ children }: LayoutProps) {
         <meta name="theme-color" content="#ffffff" />
       </Head>
       <div
-        className={`${jura.className} h-screen overflow-hidden bg-zinc-700 text-slate-100`}
+        className={`${jura.className} h-screen bg-zinc-700 text-slate-100`}
         id="layout"
       >
         <Navbar />
-        <main
-          className={`h-full px-4 pb-4 xl:px-12 2xl:px-24 ${
-            session?.user ? "pt-24" : "pt-4"
-          } `}
-        >
+        <main className="h-[calc(100vh-80px)] overflow-y-scroll p-4 xl:px-12 2xl:px-24">
           {children}
         </main>
       </div>

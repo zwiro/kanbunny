@@ -174,7 +174,7 @@ function FiltersMenu({
   return (
     <motion.div
       {...filterAnimation}
-      className="absolute right-0 origin-top-right whitespace-nowrap bg-zinc-900/95 p-4 shadow-md shadow-black"
+      className="absolute right-0 origin-top-right whitespace-nowrap bg-zinc-900/95 p-4 text-sm shadow-md shadow-black sm:text-base"
     >
       <fieldset className="flex items-center gap-1">
         <legend>task state</legend>

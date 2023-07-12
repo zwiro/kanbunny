@@ -153,31 +153,35 @@ function List({
               >
                 <PlusIcon />
               </button>
-              <div className="ml-auto pr-2">
-                <MenuWrapper isLoading={isLoading}>
-                  <MenuItem handleClick={add}>add task</MenuItem>
-                  <MenuItem handleClick={editName}>edit list name</MenuItem>
-                  <MenuItem handleClick={editColor}>change color</MenuItem>
-                  <MenuItem handleClick={openPopup}>delete list</MenuItem>
-                </MenuWrapper>
-              </div>
-              <AnimatePresence>
-                {isPopupOpened && (
-                  <ConfirmPopup
-                    name={name}
-                    type="list"
-                    handleClick={() => deleteList.mutate(id)}
-                    close={() => closePopup()}
-                  />
-                )}
-              </AnimatePresence>
-              <div
-                {...dragHandleProps}
-                aria-label="Grab to drag"
-                className={`cursor-grab ${isFiltered && "pointer-events-none"}`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <GoGrabber size={24} />
+              <div className="ml-auto flex items-center self-start">
+                <div className="ml-auto pr-2">
+                  <MenuWrapper isLoading={isLoading}>
+                    <MenuItem handleClick={add}>add task</MenuItem>
+                    <MenuItem handleClick={editName}>edit list name</MenuItem>
+                    <MenuItem handleClick={editColor}>change color</MenuItem>
+                    <MenuItem handleClick={openPopup}>delete list</MenuItem>
+                  </MenuWrapper>
+                </div>
+                <AnimatePresence>
+                  {isPopupOpened && (
+                    <ConfirmPopup
+                      name={name}
+                      type="list"
+                      handleClick={() => deleteList.mutate(id)}
+                      close={() => closePopup()}
+                    />
+                  )}
+                </AnimatePresence>
+                <div
+                  {...dragHandleProps}
+                  aria-label="Grab to drag"
+                  className={`cursor-grab ${
+                    isFiltered && "pointer-events-none"
+                  }`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <GoGrabber size={24} />
+                </div>
               </div>
             </>
           ) : (
