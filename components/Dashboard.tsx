@@ -61,12 +61,11 @@ function Dashboard({ userProjects, isLoading }: DashboardProps) {
   }
 
   const backdropBlurAnimation = {
-    initial: { backdropFilter: "blur(0px)", backgroundColor: "rgba(0,0,0,0)" },
+    initial: { backdropFilter: "blur(0px)" },
     animate: {
       backdropFilter: "blur(10px)",
-      backgroundColor: "rgba(0,0,0,0.2)",
     },
-    exit: { backdropFilter: "blur(0px)", backgroundColor: "rgba(0,0,0,0)" },
+    exit: { backdropFilter: "blur(0px)" },
   }
 
   return (
