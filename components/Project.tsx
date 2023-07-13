@@ -34,6 +34,23 @@ import ConfirmPopup from "./ConfirmPopup"
 import UserSelect from "./UserSelect"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 
 interface ProjectProps {
   boards: Board[]
@@ -113,16 +130,16 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     exit: { height: 0, opacity: 0 },
   }
 
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination, draggableId } = result
-    if (!destination || source.index === destination.index) {
-      return
+  const onDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!active || !over) return
+    if (active.id !== over.id) {
+      return reorder.mutate({
+        itemOneIndex: active.data.current!.sortable.index,
+        itemTwoIndex: over.data.current!.sortable.index,
+        draggableId: active.id as string,
+      })
     }
-    reorder.mutate({
-      itemOneIndex: source.index,
-      itemTwoIndex: destination.index,
-      draggableId,
-    })
   }
 
   const isLoading = createBoard.isLoading || updateName.isLoading
@@ -142,6 +159,13 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     transform: CSS.Translate.toString(transform),
     transition,
   }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   return (
     <section
@@ -303,50 +327,29 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
       </AnimatePresence>
       <div className="flex flex-col gap-2 py-4 lg:gap-4">
         <AnimatePresence>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="projects">
-              {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {!!boards.length &&
-                    boards
-                      ?.sort((a, b) => a.order - b.order)
-                      .map((board, i) => (
-                        <Draggable
-                          key={`board-${i}-${board.id}`}
-                          draggableId={board.id || `placeholder-${i}`}
-                          index={board.order}
-                          isDragDisabled={createBoard.isLoading}
-                        >
-                          {(provided, snapshot) => (
-                            <div
-                              className="draggable"
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                            >
-                              <motion.div
-                                animate={{
-                                  rotate: snapshot.isDragging ? -5 : 0,
-                                }}
-                              >
-                                <Board
-                                  key={board.id}
-                                  isDragging={snapshot.isDragging}
-                                  dragHandleProps={provided.dragHandleProps}
-                                  isUpdating={createBoard.isLoading}
-                                  owner={owner.name!}
-                                  mutationCounter={boardMutationCounter}
-                                  {...board}
-                                />
-                              </motion.div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={onDragEnd}
+            modifiers={[restrictToVerticalAxis]}
+            key="boards"
+          >
+            <SortableContext
+              items={boards}
+              strategy={verticalListSortingStrategy}
+              disabled={createBoard.isLoading}
+            >
+              {boards?.map((board, i) => (
+                <Board
+                  key={board.id}
+                  isUpdating={createBoard.isLoading}
+                  owner={owner.name!}
+                  mutationCounter={boardMutationCounter}
+                  {...board}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
         </AnimatePresence>
         {!boards.length && (
           <p className="text-base font-bold text-neutral-300">no boards yet</p>

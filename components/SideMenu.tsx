@@ -98,6 +98,7 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
           collisionDetection={closestCenter}
           onDragEnd={onDragEnd}
           modifiers={[restrictToVerticalAxis]}
+          key="projects"
         >
           <SortableContext items={data!} strategy={verticalListSortingStrategy}>
             {data?.map((project) => (

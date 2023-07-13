@@ -128,19 +128,21 @@ export const reorderBoards = (
           p.id === projectId
             ? {
                 ...p,
-                boards: p.boards.map((b) =>
-                  b.id === input.draggableId
-                    ? { ...b, order: input.itemTwoIndex }
-                    : input.itemOneIndex > input.itemTwoIndex &&
-                      b.order >= input.itemTwoIndex &&
-                      b.order <= input.itemOneIndex
-                    ? { ...b, order: b.order + 1 }
-                    : input.itemOneIndex < input.itemTwoIndex &&
-                      b.order <= input.itemTwoIndex &&
-                      b.order >= input.itemOneIndex
-                    ? { ...b, order: b.order - 1 }
-                    : b
-                ),
+                boards: p.boards
+                  .map((b) =>
+                    b.id === input.draggableId
+                      ? { ...b, order: input.itemTwoIndex }
+                      : input.itemOneIndex > input.itemTwoIndex &&
+                        b.order >= input.itemTwoIndex &&
+                        b.order <= input.itemOneIndex
+                      ? { ...b, order: b.order + 1 }
+                      : input.itemOneIndex < input.itemTwoIndex &&
+                        b.order <= input.itemTwoIndex &&
+                        b.order >= input.itemOneIndex
+                      ? { ...b, order: b.order - 1 }
+                      : b
+                  )
+                  .sort((a, b) => a.order - b.order),
               }
             : p
         )

@@ -9,7 +9,7 @@ export const projectRouter = createTRPCRouter({
       select: {
         project: {
           include: {
-            boards: true,
+            boards: { orderBy: { order: "asc" } },
             owner: true,
             users: {
               where: { userId: ctx.session.user.id },

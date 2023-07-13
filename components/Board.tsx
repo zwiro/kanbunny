@@ -22,6 +22,8 @@ import AddEditForm from "./AddEditForm"
 import ColorPicker from "./ColorPicker"
 import ColorDot from "./ColorDot"
 import ConfirmPopup from "./ConfirmPopup"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 
 interface BoardProps {
   name: string
@@ -29,8 +31,6 @@ interface BoardProps {
   id: string
   owner: string
   projectId: string
-  dragHandleProps: DraggableProvidedDragHandleProps | null
-  isDragging: boolean
   isUpdating: boolean
   mutationCounter: React.MutableRefObject<number>
 }
@@ -41,8 +41,6 @@ function Board({
   id,
   owner,
   projectId,
-  dragHandleProps,
-  isDragging,
   isUpdating,
   mutationCounter,
 }: BoardProps) {
@@ -92,8 +90,28 @@ function Board({
 
   const isLoading = isUpdating || updateName.isLoading || updateColor.isLoading
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id,
+  })
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+  }
+
   return (
     <div
+      ref={setNodeRef}
+      {...attributes}
+      style={style}
       tabIndex={0}
       onClick={() => chooseOpenedBoard({ id, color, name, owner })}
       onKeyDown={(e) =>
@@ -153,7 +171,8 @@ function Board({
               )}
             </AnimatePresence>
             <div
-              {...dragHandleProps}
+              {...listeners}
+              ref={setActivatorNodeRef}
               aria-label="Grab to drag"
               tabIndex={0}
               className={`ml-auto cursor-grab group-hover:visible group-focus:visible ${
