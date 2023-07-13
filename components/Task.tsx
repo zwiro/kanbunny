@@ -236,6 +236,7 @@ function Task({
               <div
                 {...dragHandleProps}
                 aria-label="Grab to drag"
+                tabIndex={0}
                 className={`cursor-grab group-hover:visible group-focus:visible 
                 ${isDragging ? "visible" : !isMobile && "invisible"} ${
                   isFiltered && "pointer-events-none"

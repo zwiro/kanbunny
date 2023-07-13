@@ -18,6 +18,7 @@ export const projectRouter = createTRPCRouter({
           },
         },
       },
+      orderBy: { order: "asc" },
     })
 
     const modifiedProjects = projects.map((project) => ({

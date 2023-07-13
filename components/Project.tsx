@@ -32,26 +32,20 @@ import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import ConfirmPopup from "./ConfirmPopup"
 import UserSelect from "./UserSelect"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 
 interface ProjectProps {
   boards: Board[]
   id: string
   name: string
   owner: User
-  dragHandleProps: DraggableProvidedDragHandleProps | null
   mutationCounter: React.MutableRefObject<number>
 }
 
 type BoardAndProjectSchema = z.infer<typeof boardAndProjectSchema>
 
-function Project({
-  id,
-  name,
-  boards,
-  owner,
-  dragHandleProps,
-  mutationCounter,
-}: ProjectProps) {
+function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
   trpc.project.getUsers.useQuery(id, {
     onSuccess(data) {
       setSelectedUsers(data?.map((user) => user.name!))
@@ -133,8 +127,29 @@ function Project({
 
   const isLoading = createBoard.isLoading || updateName.isLoading
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+  } = useSortable({
+    id,
+  })
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+  }
+
   return (
-    <section className="my-4 border-b border-neutral-700">
+    <section
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className="my-4 cursor-default border-b border-neutral-700"
+    >
       {!isEditingName ? (
         <div className="flex gap-4 pb-4">
           <h2
@@ -191,9 +206,11 @@ function Project({
               )}
             </AnimatePresence>
             <div
-              {...dragHandleProps}
+              {...listeners}
+              ref={setActivatorNodeRef}
               className="ml-auto cursor-grab"
               aria-label="Grab to drag"
+              tabIndex={0}
             >
               <GoGrabber />
             </div>

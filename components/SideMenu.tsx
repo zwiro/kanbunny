@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { trpc } from "@/utils/trpc"
 import {
@@ -16,6 +16,23 @@ import AddProjectModal from "./AddProjectModal"
 import Project from "./Project"
 import ProjectSkeleton from "./ProjectSkeleton"
 import { ProjectWithUsers } from "@/types/trpc"
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 
 interface SideMenuProps {
   data: ProjectWithUsers[] | undefined
@@ -38,17 +55,24 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
 
   const reorder = reorderProjects(utils, projectMutationCounter)
 
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination, draggableId } = result
-    if (!destination || source.index === destination.index) {
-      return
+  const onDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!active || !over) return
+    if (active.id !== over.id) {
+      return reorder.mutate({
+        itemOneIndex: active.data.current!.sortable.index,
+        itemTwoIndex: over.data.current!.sortable.index,
+        draggableId: active.id as string,
+      })
     }
-    reorder.mutate({
-      itemOneIndex: source.index,
-      itemTwoIndex: destination.index,
-      draggableId,
-    })
   }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   return (
     <FocusLock group="aside-nav">
@@ -69,47 +93,23 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
             <ProjectSkeleton width={180} />
           </>
         )}
-        <DragDropContext onDragEnd={onDragEnd}>
-          {!!data?.length && (
-            <Droppable droppableId="projects">
-              {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {data
-                    ?.sort((a, b) => a.order - b.order)
-                    .map((project) => (
-                      <Draggable
-                        key={project.id}
-                        draggableId={project.id}
-                        index={project.order}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            className="draggable"
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                          >
-                            <motion.div
-                              animate={{
-                                rotate: snapshot.isDragging ? -5 : 0,
-                              }}
-                            >
-                              <Project
-                                key={project.id}
-                                dragHandleProps={provided.dragHandleProps}
-                                mutationCounter={projectMutationCounter}
-                                {...project}
-                              />
-                            </motion.div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          )}
-        </DragDropContext>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={onDragEnd}
+          modifiers={[restrictToVerticalAxis]}
+        >
+          <SortableContext items={data!} strategy={verticalListSortingStrategy}>
+            {data?.map((project) => (
+              <Project
+                key={project.id}
+                mutationCounter={projectMutationCounter}
+                {...project}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
+
         {!data?.length && !isLoading && (
           <p className="pt-12 text-center text-neutral-300">no projects yet</p>
         )}

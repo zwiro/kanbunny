@@ -175,6 +175,7 @@ function List({
                 <div
                   {...dragHandleProps}
                   aria-label="Grab to drag"
+                  tabIndex={0}
                   className={`cursor-grab ${
                     isFiltered && "pointer-events-none"
                   }`}

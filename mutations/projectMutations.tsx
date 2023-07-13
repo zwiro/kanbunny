@@ -53,19 +53,21 @@ export const reorderProjects = (
       counter.current += 1
       const prevData = utils.project.getByUser.getData()
       utils.project.getByUser.setData(undefined, (old) =>
-        old?.map((p) =>
-          p.id === input.draggableId
-            ? { ...p, order: input.itemTwoIndex }
-            : input.itemOneIndex > input.itemTwoIndex &&
-              p.order >= input.itemTwoIndex &&
-              p.order <= input.itemOneIndex
-            ? { ...p, order: p.order + 1 }
-            : input.itemOneIndex < input.itemTwoIndex &&
-              p.order <= input.itemTwoIndex &&
-              p.order >= input.itemOneIndex
-            ? { ...p, order: p.order - 1 }
-            : p
-        )
+        old
+          ?.map((p) =>
+            p.id === input.draggableId
+              ? { ...p, order: input.itemTwoIndex }
+              : input.itemOneIndex > input.itemTwoIndex &&
+                p.order >= input.itemTwoIndex &&
+                p.order <= input.itemOneIndex
+              ? { ...p, order: p.order + 1 }
+              : input.itemOneIndex < input.itemTwoIndex &&
+                p.order <= input.itemTwoIndex &&
+                p.order >= input.itemOneIndex
+              ? { ...p, order: p.order - 1 }
+              : p
+          )
+          .sort((a, b) => a.order - b.order)
       )
       return { prevData }
     },
