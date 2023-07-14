@@ -6,6 +6,7 @@ import { prisma } from "@/server/db"
 import { appRouter } from "@/server/routers/_app"
 import superjson from "superjson"
 import { LoadingDots } from "@/components/LoadingDots"
+
 const Dashboard = dynamic(() => import("@/components/Dashboard"), {
   loading: () => (
     <LoadingDots

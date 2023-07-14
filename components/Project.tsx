@@ -325,14 +325,13 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="flex flex-col gap-2 py-4 lg:gap-4">
+      <div className="flex flex-col py-4">
         <AnimatePresence>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={onDragEnd}
             modifiers={[restrictToVerticalAxis]}
-            key="boards"
           >
             <SortableContext
               items={boards}

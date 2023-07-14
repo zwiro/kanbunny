@@ -101,19 +101,21 @@ export const reorderLists = (
       counter.current += 1
       const prevData = utils.list.getByBoard.getData()
       utils.list.getByBoard.setData(boardId, (old) =>
-        old?.map((l) =>
-          l.id === input.draggableId
-            ? { ...l, order: input.itemTwoIndex }
-            : input.itemOneIndex > input.itemTwoIndex &&
-              l.order >= input.itemTwoIndex &&
-              l.order <= input.itemOneIndex
-            ? { ...l, order: l.order + 1 }
-            : input.itemOneIndex < input.itemTwoIndex &&
-              l.order <= input.itemTwoIndex &&
-              l.order >= input.itemOneIndex
-            ? { ...l, order: l.order - 1 }
-            : l
-        )
+        old
+          ?.map((l) =>
+            l.id === input.draggableId
+              ? { ...l, order: input.itemTwoIndex }
+              : input.itemOneIndex > input.itemTwoIndex &&
+                l.order >= input.itemTwoIndex &&
+                l.order <= input.itemOneIndex
+              ? { ...l, order: l.order + 1 }
+              : input.itemOneIndex < input.itemTwoIndex &&
+                l.order <= input.itemTwoIndex &&
+                l.order >= input.itemOneIndex
+              ? { ...l, order: l.order - 1 }
+              : l
+          )
+          .sort((a, b) => a.order - b.order)
       )
       return { prevData }
     },

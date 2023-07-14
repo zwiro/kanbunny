@@ -23,6 +23,24 @@ import AddButton from "./AddButton"
 import PlusIcon from "./PlusIcon"
 import ListContainer from "./ListContainer"
 import AddEditForm from "./AddEditForm"
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+import { restrictToHorizontalAxis } from "@dnd-kit/modifiers"
 
 interface ListsPanelProps {
   lists: ListWithTasks[] | undefined
@@ -94,42 +112,50 @@ function ListsPanel({
     taskMutationCounter
   )
 
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination, draggableId } = result
+  const onDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!active || !over) return
     const itemOne = lists
-      ?.filter((l) => l.id === source.droppableId)[0]
+      ?.filter((l) => l.id === active.id)[0]
       ?.tasks.filter(
         (task) =>
           task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           searchQuery === ""
-      )[source.index]
+      )[active.data.current!.sortable.index]
     const itemTwo = lists
-      ?.filter((l) => l.id === destination?.droppableId)[0]
+      ?.filter((l) => l.id === over.id)[0]
       ?.tasks.filter(
         (task) =>
           task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           searchQuery === ""
-      )[destination!.index]
+      )[over.data.current!.sortable.index]
 
-    if (!destination) return
-    if (source.droppableId === "board" || destination.droppableId === "board") {
+    if (active.data.current!.sortable.containerId === "lists") {
       reorder.mutate({
-        itemOneIndex: source.index,
-        itemTwoIndex: destination.index,
-        draggableId,
+        itemOneIndex: active.data.current!.sortable.index,
+        itemTwoIndex: over.data.current!.sortable.index,
+        draggableId: active.id as string,
       })
-    } else {
-      if (!itemOne) return
-      reorderDisplayedTasks.mutate({
-        itemOneId: itemOne.id,
-        itemTwoId: itemTwo?.id || undefined,
-        itemOneOrder: itemOne.order,
-        itemTwoOrder: destination.index,
-        listId: destination.droppableId,
-        prevListId: source.droppableId,
-      })
+      // } else {
+      //   if (!itemOne) return
+      //   reorderDisplayedTasks.mutate({
+      //     itemOneId: itemOne.id,
+      //     itemTwoId: itemTwo?.id || undefined,
+      //     itemOneOrder: itemOne.order,
+      //     itemTwoOrder: destination.index,
+      //     listId: destination.droppableId,
+      //     prevListId: source.droppableId,
+      //   })
+      // }
     }
   }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   return (
     <div className="flex pb-12">
@@ -140,63 +166,50 @@ function ListsPanel({
           <ListSkeleton width={100} />
         </div>
       )}
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="board" direction="horizontal" type="boards">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16"
-            >
-              {!!lists?.length &&
-                getFilteredLists(
-                  lists,
-                  hideEmptyLists,
-                  assignedFilter,
-                  dateFilter,
-                  session?.user.id
-                )
-                  ?.sort((a, b) => a.order - b.order)
-                  .map((list, i) => (
-                    <Draggable
-                      key={`list-${i}-${list.id}`}
-                      draggableId={list.id || `placeholder-${i}`}
-                      index={list.order}
-                      isDragDisabled={createList.isLoading}
-                    >
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                        >
-                          <motion.div
-                            animate={{
-                              rotate: snapshot.isDragging ? -5 : 0,
-                            }}
-                          >
-                            <List
-                              key={list.id}
-                              dragHandleProps={provided.dragHandleProps}
-                              searchQuery={searchQuery}
-                              dateFilter={dateFilter}
-                              assignedFilter={assignedFilter}
-                              hideEmptyLists={hideEmptyLists}
-                              isUpdating={createList.isLoading}
-                              taskMutationCounter={taskMutationCounter}
-                              mutationCounter={listMutationCounter}
-                              {...list}
-                            />
-                          </motion.div>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <div className="flex min-h-[16rem] gap-4 lg:gap-8 xl:gap-16">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={onDragEnd}
+          modifiers={[restrictToHorizontalAxis]}
+          key="lists"
+        >
+          <SortableContext
+            items={getFilteredLists(
+              lists!,
+              hideEmptyLists,
+              assignedFilter,
+              dateFilter,
+              session?.user.id
+            )}
+            strategy={horizontalListSortingStrategy}
+            disabled={createList.isLoading}
+            id="lists"
+          >
+            {getFilteredLists(
+              lists!,
+              hideEmptyLists,
+              assignedFilter,
+              dateFilter,
+              session?.user.id
+            )
+              ?.sort((a, b) => a.order - b.order)
+              .map((list) => (
+                <List
+                  key={list.id}
+                  searchQuery={searchQuery}
+                  dateFilter={dateFilter}
+                  assignedFilter={assignedFilter}
+                  hideEmptyLists={hideEmptyLists}
+                  isUpdating={createList.isLoading}
+                  taskMutationCounter={taskMutationCounter}
+                  mutationCounter={listMutationCounter}
+                  {...list}
+                />
+              ))}
+          </SortableContext>
+        </DndContext>
+      </div>
       {isAdding ? (
         <ListContainer length={lists?.length || 0}>
           <div className="flex flex-col">

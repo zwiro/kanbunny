@@ -31,10 +31,11 @@ import LayoutContext from "@/context/LayoutContext"
 import getFilteredTasks from "@/utils/getFilteredTasks"
 import ConfirmPopup from "./ConfirmPopup"
 import Task from "./Task"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 
 interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]
-  dragHandleProps: DraggableProvidedDragHandleProps | null
   searchQuery: string
   dateFilter: string | Date | null
   assignedFilter: string | null
@@ -50,7 +51,6 @@ function List({
   tasks,
   id,
   boardId,
-  dragHandleProps,
   searchQuery,
   dateFilter,
   assignedFilter,
@@ -112,10 +112,30 @@ function List({
     Boolean(searchQuery) ||
     hideEmptyLists
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id,
+  })
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+  }
+
   return (
     <>
       <section
-        className={`mt-4 flex min-w-[18rem] max-w-xs flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 sm:max-w-sm ${
+        ref={setNodeRef}
+        {...attributes}
+        style={style}
+        className={`mt-4 flex h-min min-w-[18rem] max-w-xs flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 sm:max-w-sm ${
           colorVariants[color]
         } ${isUpdating && !id && "opacity-50"}       ${
           ((isUpdating && !id) ||
@@ -173,7 +193,8 @@ function List({
                   )}
                 </AnimatePresence>
                 <div
-                  {...dragHandleProps}
+                  ref={setActivatorNodeRef}
+                  {...listeners}
                   aria-label="Grab to drag"
                   tabIndex={0}
                   className={`cursor-grab ${
@@ -204,57 +225,23 @@ function List({
             </div>
           )}
         </div>
-        <Droppable
-          droppableId={id || `placeholder-${Math.random()}`}
-          key="task"
-          direction="vertical"
-          ignoreContainerClipping={true}
-        >
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="flex flex-col gap-4"
-            >
-              {getFilteredTasks(tasks, assignedFilter, dateFilter, userId)
-                .sort((a, b) => a.order - b.order)
-                .filter(
-                  (task) =>
-                    task.name
-                      .toLowerCase()
-                      .includes(searchQuery.toLowerCase()) || searchQuery === ""
-                )
-                .map((task, i) => (
-                  <Draggable key={task.id} draggableId={task.id} index={i}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        className="draggable"
-                      >
-                        <motion.div
-                          animate={{
-                            rotate: snapshot.isDragging ? -5 : 0,
-                          }}
-                        >
-                          <Task
-                            key={task.id}
-                            dragHandleProps={provided.dragHandleProps}
-                            isDragging={snapshot.isDragging}
-                            length={tasks.length}
-                            mutationCounter={taskMutationCounter}
-                            isFiltered={isFiltered}
-                            {...task}
-                          />
-                        </motion.div>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
+
+        {getFilteredTasks(tasks, assignedFilter, dateFilter, userId)
+          .sort((a, b) => a.order - b.order)
+          .filter(
+            (task) =>
+              task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              searchQuery === ""
+          )
+          .map((task, i) => (
+            <Task
+              key={task.id}
+              length={tasks.length}
+              mutationCounter={taskMutationCounter}
+              isFiltered={isFiltered}
+              {...task}
+            />
+          ))}
       </section>
       <AnimatePresence>
         {isAdding && <AddTaskModal close={closeAdd} listId={id} />}

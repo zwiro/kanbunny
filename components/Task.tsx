@@ -38,8 +38,6 @@ import formatRelativeTime from "@/utils/formatRelativeTime"
 type TaskSchema = z.infer<typeof editTaskSchema>
 
 interface TaskProps extends TaskWithAssignedTo {
-  dragHandleProps: DraggableProvidedDragHandleProps | null
-  isDragging: boolean
   length: number
   mutationCounter: React.MutableRefObject<number>
   isFiltered: boolean
@@ -51,8 +49,6 @@ function Task({
   listId,
   assigned_to,
   color,
-  dragHandleProps,
-  isDragging,
   due_to,
   mutationCounter,
   isFiltered,
@@ -234,13 +230,11 @@ function Task({
                 </MenuWrapper>
               </div>
               <div
-                {...dragHandleProps}
                 aria-label="Grab to drag"
                 tabIndex={0}
                 className={`cursor-grab group-hover:visible group-focus:visible 
-                ${isDragging ? "visible" : !isMobile && "invisible"} ${
-                  isFiltered && "pointer-events-none"
-                } `}
+                ${false ? "visible" : !isMobile && "invisible"} 
+                ${isFiltered && "pointer-events-none"} `}
                 onClick={(e) => e.stopPropagation()}
               >
                 <GoGrabber size={24} />
