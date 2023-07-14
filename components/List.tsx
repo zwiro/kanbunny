@@ -33,6 +33,26 @@ import ConfirmPopup from "./ConfirmPopup"
 import Task from "./Task"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+import { createNewTask } from "@/mutations/taskMutations"
+import { useDroppable } from "@dnd-kit/core"
 
 interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]
@@ -129,20 +149,29 @@ function List({
     transition,
   }
 
+  const displayedTasks = getFilteredTasks(
+    tasks,
+    assignedFilter,
+    dateFilter,
+    userId
+  )
+
   return (
     <>
       <section
         ref={setNodeRef}
         {...attributes}
         style={style}
-        className={`mt-4 flex h-min min-w-[18rem] max-w-xs flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 sm:max-w-sm ${
+        className={`mx-2 mt-4 flex min-w-[18rem] max-w-xs cursor-default flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 first-of-type:ml-0 sm:max-w-sm lg:mx-4 xl:mx-8 ${
           colorVariants[color]
         } ${isUpdating && !id && "opacity-50"}       ${
           ((isUpdating && !id) ||
             updateName.isLoading ||
             updateColor.isLoading) &&
           "opacity-50"
-        }`}
+        }
+        ${isDragging ? "z-10" : ""}
+        `}
       >
         <div className="flex items-center gap-2">
           <ColorDot
@@ -225,23 +254,56 @@ function List({
             </div>
           )}
         </div>
-
-        {getFilteredTasks(tasks, assignedFilter, dateFilter, userId)
-          .sort((a, b) => a.order - b.order)
-          .filter(
-            (task) =>
-              task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              searchQuery === ""
-          )
-          .map((task, i) => (
-            <Task
-              key={task.id}
-              length={tasks.length}
-              mutationCounter={taskMutationCounter}
-              isFiltered={isFiltered}
-              {...task}
-            />
-          ))}
+        <Droppable
+          droppableId={id || `placeholder-${Math.random()}`}
+          key="task"
+          direction="vertical"
+          ignoreContainerClipping={true}
+        >
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="flex flex-col gap-4"
+            >
+              {displayedTasks
+                .filter(
+                  (task) =>
+                    task.name
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase()) || searchQuery === ""
+                )
+                .map((task, i) => (
+                  <Draggable key={task.id} draggableId={task.id} index={i}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className="draggable"
+                      >
+                        <motion.div
+                          animate={{
+                            rotate: snapshot.isDragging ? -5 : 0,
+                          }}
+                        >
+                          <Task
+                            key={task.id}
+                            dragHandleProps={provided.dragHandleProps}
+                            isDragging={snapshot.isDragging}
+                            length={tasks.length}
+                            mutationCounter={taskMutationCounter}
+                            isFiltered={isFiltered}
+                            {...task}
+                          />
+                        </motion.div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
       </section>
       <AnimatePresence>
         {isAdding && <AddTaskModal close={closeAdd} listId={id} />}

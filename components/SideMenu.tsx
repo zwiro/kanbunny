@@ -99,7 +99,10 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
           onDragEnd={onDragEnd}
           modifiers={[restrictToVerticalAxis]}
         >
-          <SortableContext items={data!} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={data!.map((p) => p.id)}
+            strategy={verticalListSortingStrategy}
+          >
             {data?.map((project) => (
               <Project
                 key={project.id}

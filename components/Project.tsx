@@ -334,7 +334,7 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
             modifiers={[restrictToVerticalAxis]}
           >
             <SortableContext
-              items={boards}
+              items={boards.map((b) => b.id)}
               strategy={verticalListSortingStrategy}
               disabled={createBoard.isLoading}
             >

@@ -193,19 +193,21 @@ export const reorderTasks = (
             return l.id === input.listId
               ? {
                   ...l,
-                  tasks: l.tasks.map((t) =>
-                    t.id === input.itemOneId
-                      ? { ...t, order: input.itemTwoOrder! }
-                      : input.itemOneOrder > input.itemTwoOrder! &&
-                        t.order >= input.itemTwoOrder! &&
-                        t.order <= input.itemOneOrder
-                      ? { ...t, order: t.order + 1 }
-                      : input.itemOneOrder < input.itemTwoOrder! &&
-                        t.order <= input.itemTwoOrder! &&
-                        t.order >= input.itemOneOrder
-                      ? { ...t, order: t.order - 1 }
-                      : t
-                  ),
+                  tasks: l.tasks
+                    .map((t) =>
+                      t.id === input.itemOneId
+                        ? { ...t, order: input.itemTwoOrder! }
+                        : input.itemOneOrder > input.itemTwoOrder! &&
+                          t.order >= input.itemTwoOrder! &&
+                          t.order <= input.itemOneOrder
+                        ? { ...t, order: t.order + 1 }
+                        : input.itemOneOrder < input.itemTwoOrder! &&
+                          t.order <= input.itemTwoOrder! &&
+                          t.order >= input.itemOneOrder
+                        ? { ...t, order: t.order - 1 }
+                        : t
+                    )
+                    .sort((a, b) => a!.order - b!.order),
                 }
               : l
           } else return l

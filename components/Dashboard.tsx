@@ -70,11 +70,10 @@ function Dashboard({ userProjects, isLoading }: DashboardProps) {
 
   return (
     <div
-      ref={dragAreaRef}
       onClick={() => {
         closeSideMenu()
       }}
-      className="flex flex-col overflow-auto"
+      className="flex flex-col overflow-x-scroll"
     >
       {chosenBoard ? (
         <>

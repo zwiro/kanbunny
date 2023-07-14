@@ -34,10 +34,14 @@ import LayoutContext from "@/context/LayoutContext"
 import useBooleanState from "@/hooks/useBooleanState"
 import { LoadingDots } from "./LoadingDots"
 import formatRelativeTime from "@/utils/formatRelativeTime"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 
 type TaskSchema = z.infer<typeof editTaskSchema>
 
 interface TaskProps extends TaskWithAssignedTo {
+  dragHandleProps: DraggableProvidedDragHandleProps | null
+  isDragging: boolean
   length: number
   mutationCounter: React.MutableRefObject<number>
   isFiltered: boolean
@@ -49,6 +53,8 @@ function Task({
   listId,
   assigned_to,
   color,
+  dragHandleProps,
+  isDragging,
   due_to,
   mutationCounter,
   isFiltered,
@@ -230,10 +236,11 @@ function Task({
                 </MenuWrapper>
               </div>
               <div
+                {...dragHandleProps}
                 aria-label="Grab to drag"
                 tabIndex={0}
                 className={`cursor-grab group-hover:visible group-focus:visible 
-                ${false ? "visible" : !isMobile && "invisible"} 
+                ${isDragging ? "visible" : !isMobile && "invisible"} 
                 ${isFiltered && "pointer-events-none"} `}
                 onClick={(e) => e.stopPropagation()}
               >

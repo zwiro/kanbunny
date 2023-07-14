@@ -11,7 +11,9 @@ export const listRouter = createTRPCRouter({
       const lists = await ctx.prisma.list.findMany({
         where: { boardId: input },
         orderBy: { order: "asc" },
-        include: { tasks: { include: { assigned_to: true } } },
+        include: {
+          tasks: { include: { assigned_to: true }, orderBy: { order: "asc" } },
+        },
       })
 
       return lists
