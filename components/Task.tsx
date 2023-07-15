@@ -36,6 +36,7 @@ import { LoadingDots } from "./LoadingDots"
 import formatRelativeTime from "@/utils/formatRelativeTime"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { useDraggable } from "@dnd-kit/core"
 
 type TaskSchema = z.infer<typeof editTaskSchema>
 
@@ -53,11 +54,11 @@ function Task({
   listId,
   assigned_to,
   color,
-  dragHandleProps,
-  isDragging,
   due_to,
   mutationCounter,
   isFiltered,
+  dragHandleProps,
+  isDragging,
 }: TaskProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
@@ -239,7 +240,7 @@ function Task({
                 {...dragHandleProps}
                 aria-label="Grab to drag"
                 tabIndex={0}
-                className={`cursor-grab group-hover:visible group-focus:visible 
+                className={`cursor-grab group-focus-within:visible group-hover:visible 
                 ${isDragging ? "visible" : !isMobile && "invisible"} 
                 ${isFiltered && "pointer-events-none"} `}
                 onClick={(e) => e.stopPropagation()}

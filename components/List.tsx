@@ -31,7 +31,7 @@ import LayoutContext from "@/context/LayoutContext"
 import getFilteredTasks from "@/utils/getFilteredTasks"
 import ConfirmPopup from "./ConfirmPopup"
 import Task from "./Task"
-import { useSortable } from "@dnd-kit/sortable"
+import { defaultAnimateLayoutChanges, useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import {
   DndContext,
@@ -42,6 +42,7 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  useDraggable,
 } from "@dnd-kit/core"
 import {
   arrayMove,
@@ -154,6 +155,13 @@ function List({
     assignedFilter,
     dateFilter,
     userId
+  )
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
   )
 
   return (
@@ -281,21 +289,15 @@ function List({
                         {...provided.draggableProps}
                         className="draggable"
                       >
-                        <motion.div
-                          animate={{
-                            rotate: snapshot.isDragging ? -5 : 0,
-                          }}
-                        >
-                          <Task
-                            key={task.id}
-                            dragHandleProps={provided.dragHandleProps}
-                            isDragging={snapshot.isDragging}
-                            length={tasks.length}
-                            mutationCounter={taskMutationCounter}
-                            isFiltered={isFiltered}
-                            {...task}
-                          />
-                        </motion.div>
+                        <Task
+                          key={task.id}
+                          dragHandleProps={provided.dragHandleProps}
+                          isDragging={snapshot.isDragging}
+                          length={tasks.length}
+                          mutationCounter={taskMutationCounter}
+                          isFiltered={isFiltered}
+                          {...task}
+                        />
                       </div>
                     )}
                   </Draggable>

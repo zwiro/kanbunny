@@ -54,7 +54,7 @@ function Layout({ children }: LayoutProps) {
         id="layout"
       >
         <Navbar />
-        <main className="h-[calc(100vh-80px)] overflow-y-scroll p-4 xl:px-12 2xl:px-24">
+        <main className="h-[calc(100vh-80px)] p-4 xl:px-12 2xl:px-24">
           {children}
         </main>
       </div>

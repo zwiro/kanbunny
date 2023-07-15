@@ -73,7 +73,7 @@ function Dashboard({ userProjects, isLoading }: DashboardProps) {
       onClick={() => {
         closeSideMenu()
       }}
-      className="flex flex-col overflow-x-scroll"
+      className="flex h-full flex-col overflow-scroll"
     >
       {chosenBoard ? (
         <>

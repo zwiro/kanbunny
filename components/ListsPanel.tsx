@@ -1,16 +1,11 @@
 import { useSession } from "next-auth/react"
-import { useContext, useEffect, useId } from "react"
+import { useContext, useEffect, useId, useState } from "react"
 import LayoutContext from "@/context/LayoutContext"
 import { trpc } from "@/utils/trpc"
-import {
-  DragDropContext,
-  Draggable,
-  type DropResult,
-  Droppable,
-} from "@hello-pangea/dnd"
+
 import { motion } from "framer-motion"
 import { z } from "zod"
-import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
+import { FormProvider, type SubmitHandler, useForm, set } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import getFilteredLists from "@/utils/getFilteredLists"
 import { type ListWithTasks } from "@/types/trpc"
@@ -34,6 +29,8 @@ import {
   useSensors,
   DragEndEvent,
   useDroppable,
+  MeasuringStrategy,
+  MeasuringFrequency,
 } from "@dnd-kit/core"
 import {
   arrayMove,
@@ -45,6 +42,7 @@ import {
 } from "@dnd-kit/sortable"
 import { restrictToHorizontalAxis } from "@dnd-kit/modifiers"
 import Task from "./Task"
+import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 
 interface ListsPanelProps {
   lists: ListWithTasks[] | undefined
@@ -126,7 +124,7 @@ function ListsPanel({
     })
   }
 
-  const onDragEndTask = (result: DropResult) => {
+  const onTaskDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
     const itemOne = lists
       ?.filter((l) => l.id === source.droppableId)[0]
@@ -142,24 +140,15 @@ function ListsPanel({
           task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           searchQuery === ""
       )[destination!.index]
-    if (!destination) return
-    if (source.droppableId === "board" || destination.droppableId === "board") {
-      reorder.mutate({
-        itemOneIndex: source.index,
-        itemTwoIndex: destination.index,
-        draggableId,
-      })
-    } else {
-      if (!itemOne) return
-      reorderDisplayedTasks.mutate({
-        itemOneId: itemOne.id,
-        itemTwoId: itemTwo?.id || undefined,
-        itemOneOrder: itemOne.order,
-        itemTwoOrder: destination.index,
-        listId: destination.droppableId,
-        prevListId: source.droppableId,
-      })
-    }
+    if (!destination || !itemOne) return
+    reorderDisplayedTasks.mutate({
+      itemOneId: itemOne.id,
+      itemTwoId: itemTwo?.id || undefined,
+      itemOneOrder: itemOne.order,
+      itemTwoOrder: destination.index,
+      listId: destination.droppableId,
+      prevListId: source.droppableId,
+    })
   }
 
   const sensors = useSensors(
@@ -187,18 +176,17 @@ function ListsPanel({
           <ListSkeleton width={100} />
         </div>
       )}
-      <DragDropContext onDragEnd={onDragEndTask}>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={onDragEnd}
-          modifiers={[restrictToHorizontalAxis]}
+      <DndContext
+        sensors={sensors}
+        modifiers={[restrictToHorizontalAxis]}
+        onDragEnd={onDragEnd}
+      >
+        <SortableContext
+          items={displayedLists.map((list) => list.id)}
+          strategy={horizontalListSortingStrategy}
+          disabled={createList.isLoading}
         >
-          <SortableContext
-            items={displayedLists.map((list) => list.id)}
-            strategy={horizontalListSortingStrategy}
-            disabled={createList.isLoading}
-          >
+          <DragDropContext onDragEnd={onTaskDragEnd}>
             <div className="flex min-h-[16rem] items-start">
               {!!lists?.length &&
                 displayedLists.map((list) => (
@@ -215,9 +203,9 @@ function ListsPanel({
                   />
                 ))}
             </div>
-          </SortableContext>
-        </DndContext>
-      </DragDropContext>
+          </DragDropContext>
+        </SortableContext>
+      </DndContext>
       {isAdding ? (
         <ListContainer length={lists?.length || 0}>
           <div className="flex flex-col">
