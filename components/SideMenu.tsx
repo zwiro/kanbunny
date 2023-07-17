@@ -23,9 +23,9 @@ import dynamic from "next/dynamic"
 import PlusIcon from "./PlusIcon"
 import AddButton from "./AddButton"
 import useBooleanState from "@/hooks/useBooleanState"
-import AddProjectModal from "./AddProjectModal"
 import ProjectSkeleton from "./ProjectSkeleton"
 import { ProjectWithUsers } from "@/types/trpc"
+import AddProjectModal from "./AddProjectModal"
 const Project = dynamic(() => import("@/components/Project"), {
   ssr: false,
   loading: () => <ProjectSkeleton width={200} />,

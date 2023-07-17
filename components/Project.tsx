@@ -336,7 +336,7 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
               strategy={verticalListSortingStrategy}
               disabled={createBoard.isLoading}
             >
-              {boards?.map((board, i) => (
+              {boards?.map((board) => (
                 <Board
                   key={board.id}
                   isUpdating={createBoard.isLoading}

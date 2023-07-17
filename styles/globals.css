@@ -49,8 +49,8 @@ select option {
   @apply bg-zinc-900;
 }
 
-/* to fix offset while dragging inside non-static position parent */
-/* .draggable {
-  left: auto !important;
-  top: auto !important;
-} */
+.main {
+  height: calc(100svh - 80px);
+  /* fallback  */
+  height: calc(100vh - 80px);
+}

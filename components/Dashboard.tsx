@@ -7,9 +7,9 @@ import useBooleanState from "@/hooks/useBooleanState"
 import ColorDot from "./ColorDot"
 import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
-import Filters from "./Filters"
 import ListsPanel from "./ListsPanel"
 import SideMenu from "./SideMenu"
+import Filters from "./Filters"
 
 interface DashboardProps {
   userProjects: ProjectWithUsers[] | undefined

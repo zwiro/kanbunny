@@ -13,6 +13,8 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { isMobile } from "react-device-detect"
 import type { TaskWithAssignedTo } from "@/types/trpc"
+import DateTimePicker from "react-datetime-picker"
+import type { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
 import { trpc } from "@/utils/trpc"
 import {
   deleteOneTask,
@@ -22,8 +24,7 @@ import {
   updatedTaskName,
 } from "@/mutations/taskMutations"
 import { editTaskSchema } from "@/utils/schemas"
-import type { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
-import DateTimePicker from "react-datetime-picker"
+import formatRelativeTime from "@/utils/formatRelativeTime"
 import UserCheckbox from "./UserCheckbox"
 import AddEditForm from "./AddEditForm"
 import MenuWrapper from "./MenuWrapper"
@@ -33,7 +34,6 @@ import useAssignUser from "@/hooks/useAssignUser"
 import LayoutContext from "@/context/LayoutContext"
 import useBooleanState from "@/hooks/useBooleanState"
 import { LoadingDots } from "./LoadingDots"
-import formatRelativeTime from "@/utils/formatRelativeTime"
 
 type TaskSchema = z.infer<typeof editTaskSchema>
 

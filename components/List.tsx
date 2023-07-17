@@ -21,7 +21,6 @@ import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
 import AddEditForm from "./AddEditForm"
-import AddTaskModal from "./AddTaskModal"
 import useBooleanState from "@/hooks/useBooleanState"
 import ColorPicker from "./ColorPicker"
 import ColorDot from "./ColorDot"
@@ -29,6 +28,7 @@ import LayoutContext from "@/context/LayoutContext"
 import getFilteredTasks from "@/utils/getFilteredTasks"
 import ConfirmPopup from "./ConfirmPopup"
 import Task from "./Task"
+import AddTaskModal from "./AddTaskModal"
 
 interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]

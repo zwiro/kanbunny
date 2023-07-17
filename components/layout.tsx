@@ -1,7 +1,6 @@
 import { LayoutProvider } from "@/context/LayoutContext"
 import { Jura } from "next/font/google"
 import { useSession } from "next-auth/react"
-import { isMobile } from "react-device-detect"
 import Head from "next/head"
 import Navbar from "./Navbar"
 
@@ -55,13 +54,7 @@ function Layout({ children }: LayoutProps) {
         id="layout"
       >
         <Navbar />
-        <main
-          className={`${
-            isMobile ? "h-[calc(100svh-80px)]" : "h-[calc(100vh-80px)]"
-          } p-4 xl:px-12 2xl:px-24`}
-        >
-          {children}
-        </main>
+        <main className="main p-4 xl:px-12 2xl:px-24">{children}</main>
       </div>
     </LayoutProvider>
   )
