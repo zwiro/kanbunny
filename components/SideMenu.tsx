@@ -13,7 +13,7 @@ import PlusIcon from "./PlusIcon"
 import AddButton from "./AddButton"
 import useBooleanState from "@/hooks/useBooleanState"
 import AddProjectModal from "./AddProjectModal"
-import Project from "./Project"
+// import Project from "./Project"
 import ProjectSkeleton from "./ProjectSkeleton"
 import { ProjectWithUsers } from "@/types/trpc"
 import {
@@ -22,6 +22,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -33,6 +34,12 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
+import dynamic from "next/dynamic"
+import { LoadingDots } from "./LoadingDots"
+const Project = dynamic(() => import("@/components/Project"), {
+  ssr: false,
+  loading: () => <ProjectSkeleton width={200} />,
+})
 
 interface SideMenuProps {
   data: ProjectWithUsers[] | undefined
@@ -71,6 +78,12 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
     })
   )
 

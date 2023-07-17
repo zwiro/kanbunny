@@ -175,7 +175,7 @@ function Board({
               ref={setActivatorNodeRef}
               aria-label="Grab to drag"
               tabIndex={0}
-              className={`ml-auto cursor-grab group-hover:visible group-focus:visible ${
+              className={`ml-auto cursor-grab group-focus-within:visible group-hover:visible ${
                 isDragging ? "visible" : !isMobile && "invisible"
               }`}
               onClick={(e) => e.stopPropagation()}
