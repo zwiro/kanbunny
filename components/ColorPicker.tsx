@@ -49,7 +49,7 @@ function ColorPicker({ close, id, editColor, currentColor }: ColorPickerProps) {
   }
 
   return (
-    <FocusLock>
+    <FocusLock autoFocus={false}>
       <motion.div
         {...pickerAnimation}
         ref={pickerRef}

@@ -16,7 +16,7 @@ function Navbar() {
   if (router.pathname === "/auth/login") return null
 
   return (
-    <FocusLock group="aside-nav" disabled={!isSideMenuOpen}>
+    <FocusLock group="aside-nav" disabled={!isSideMenuOpen} autoFocus={false}>
       <nav className="sticky top-0 z-20 flex h-20 w-full items-center gap-4 border-b border-neutral-700 bg-zinc-800 p-4 text-lg sm:text-2xl xl:px-12 2xl:px-24">
         {router.pathname !== "/auth/login" && (
           <>

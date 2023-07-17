@@ -88,7 +88,7 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
   )
 
   return (
-    <FocusLock group="aside-nav">
+    <FocusLock group="aside-nav" autoFocus={false}>
       <motion.aside
         onClick={(e) => e.stopPropagation()}
         {...sideMenuAnimation}

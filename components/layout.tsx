@@ -3,6 +3,7 @@ import { Jura } from "next/font/google"
 import { useSession } from "next-auth/react"
 import Head from "next/head"
 import Navbar from "./Navbar"
+import { isMobile } from "react-device-detect"
 
 const jura = Jura({ subsets: ["latin"], weight: ["400", "700"] })
 
@@ -54,7 +55,11 @@ function Layout({ children }: LayoutProps) {
         id="layout"
       >
         <Navbar />
-        <main className="h-[calc(100vh-80px)] p-4 xl:px-12 2xl:px-24">
+        <main
+          className={`${
+            isMobile ? "h-[calc(100svh-80px)]" : "h-[calc(100vh-80px)]"
+          } p-4 xl:px-12 2xl:px-24`}
+        >
           {children}
         </main>
       </div>

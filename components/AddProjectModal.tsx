@@ -41,7 +41,7 @@ function AddProjectModal({ close }: AddProjectModalProps) {
   }
 
   return (
-    <FocusLock>
+    <FocusLock autoFocus={false}>
       <FormProvider {...methods}>
         <ModalForm close={close} handleSubmit={methods.handleSubmit(onSubmit)}>
           <h2 className="pb-4 text-center font-bold">add a new project</h2>
