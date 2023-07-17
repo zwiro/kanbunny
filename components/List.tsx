@@ -197,18 +197,16 @@ function List({
                     />
                   )}
                 </AnimatePresence>
-                <div
+                <button
                   ref={setActivatorNodeRef}
                   {...listeners}
                   aria-label="Grab to drag"
                   tabIndex={0}
-                  className={`cursor-grab ${
-                    isFiltered && "pointer-events-none"
-                  }`}
+                  className={`${isFiltered && "pointer-events-none"}`}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <GoGrabber size={24} />
-                </div>
+                </button>
               </div>
             </>
           ) : (

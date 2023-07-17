@@ -233,17 +233,17 @@ function Task({
                   </MenuItem>
                 </MenuWrapper>
               </div>
-              <div
+              <button
                 {...dragHandleProps}
                 aria-label="Grab to drag"
                 tabIndex={0}
-                className={`cursor-grab group-focus-within:visible group-hover:visible 
+                className={`group-focus-within:visible group-hover:visible 
                 ${isDragging ? "visible" : !isMobile && "invisible"} 
                 ${isFiltered && "pointer-events-none"} `}
                 onClick={(e) => e.stopPropagation()}
               >
                 <GoGrabber size={24} />
-              </div>
+              </button>
             </div>
           </>
         ) : (

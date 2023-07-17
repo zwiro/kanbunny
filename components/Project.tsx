@@ -227,15 +227,15 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
                 />
               )}
             </AnimatePresence>
-            <div
+            <button
               {...listeners}
               ref={setActivatorNodeRef}
-              className="ml-auto cursor-grab"
+              className="ml-auto"
               aria-label="Grab to drag"
               tabIndex={0}
             >
               <GoGrabber />
-            </div>
+            </button>
           </div>
         </div>
       ) : (

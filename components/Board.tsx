@@ -169,18 +169,18 @@ function Board({
                 />
               )}
             </AnimatePresence>
-            <div
+            <button
               {...listeners}
               ref={setActivatorNodeRef}
               aria-label="Grab to drag"
               tabIndex={0}
-              className={`ml-auto cursor-grab group-focus-within:visible group-hover:visible ${
+              className={`ml-auto group-focus-within:visible group-hover:visible ${
                 isDragging ? "visible" : !isMobile && "invisible"
               }`}
               onClick={(e) => e.stopPropagation()}
             >
               <GoGrabber />
-            </div>
+            </button>
           </div>
         </>
       ) : (
