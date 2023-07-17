@@ -82,7 +82,14 @@ export const projectRouter = createTRPCRouter({
       })
 
       await ctx.prisma.projectUser.updateMany({
-        where: { NOT: { projectId: project.id } },
+        where: {
+          AND: [
+            { NOT: { projectId: project.id } },
+            {
+              userId: { in: [...users.map((u) => u.id), ctx.session.user.id] },
+            },
+          ],
+        },
         data: { order: { increment: 1 } },
       })
 
@@ -249,10 +256,26 @@ export const projectRouter = createTRPCRouter({
         throw new Error("Project does not exist")
       }
 
+      const projectUser = await ctx.prisma.projectUser.findFirst({
+        where: { projectId: project.id },
+        include: { project: true },
+      })
+
       if (!project.users.map((u) => u.userId).includes(ctx.session.user.id))
         throw new Error("You are not a member of this project")
       await ctx.prisma.projectUser.deleteMany({
         where: { projectId: input, userId: ctx.session.user.id },
+      })
+
+      await ctx.prisma.projectUser.updateMany({
+        where: {
+          AND: [
+            { NOT: { id: input } },
+            { order: { gt: projectUser!.order } },
+            { userId: ctx.session.user.id },
+          ],
+        },
+        data: { order: { decrement: 1 } },
       })
 
       return { success: true }
@@ -271,9 +294,11 @@ export const projectRouter = createTRPCRouter({
 
       const users = await ctx.prisma.user.findMany({
         where: {
-          projects_in: { some: { id: input } },
+          projects_in: { some: { projectId: input } },
         },
       })
+
+      console.log(users)
 
       users.map(async (user) => {
         await ctx.prisma.user.update({
@@ -294,7 +319,13 @@ export const projectRouter = createTRPCRouter({
 
       await ctx.prisma.projectUser.updateMany({
         where: {
-          AND: [{ NOT: { id: input } }, { order: { gt: projectUser.order } }],
+          AND: [
+            { NOT: { id: input } },
+            { order: { gt: projectUser.order } },
+            {
+              userId: { in: [...users.map((u) => u.id), ctx.session.user.id] },
+            },
+          ],
         },
         data: { order: { decrement: 1 } },
       })
