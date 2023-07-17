@@ -1,4 +1,4 @@
-import { FormEventHandler, useContext, useState } from "react"
+import { type FormEventHandler, useContext, useState } from "react"
 import {
   AiOutlineCheck,
   AiOutlineClockCircle,
@@ -34,9 +34,6 @@ import LayoutContext from "@/context/LayoutContext"
 import useBooleanState from "@/hooks/useBooleanState"
 import { LoadingDots } from "./LoadingDots"
 import formatRelativeTime from "@/utils/formatRelativeTime"
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { useDraggable } from "@dnd-kit/core"
 
 type TaskSchema = z.infer<typeof editTaskSchema>
 

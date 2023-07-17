@@ -1,9 +1,9 @@
 import { LayoutProvider } from "@/context/LayoutContext"
 import { Jura } from "next/font/google"
 import { useSession } from "next-auth/react"
+import { isMobile } from "react-device-detect"
 import Head from "next/head"
 import Navbar from "./Navbar"
-import { isMobile } from "react-device-detect"
 
 const jura = Jura({ subsets: ["latin"], weight: ["400", "700"] })
 

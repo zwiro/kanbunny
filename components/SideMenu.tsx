@@ -1,24 +1,10 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { trpc } from "@/utils/trpc"
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  type DropResult,
-} from "@hello-pangea/dnd"
 import { reorderProjects } from "@/mutations/projectMutations"
 import FocusLock from "react-focus-lock"
-import PlusIcon from "./PlusIcon"
-import AddButton from "./AddButton"
-import useBooleanState from "@/hooks/useBooleanState"
-import AddProjectModal from "./AddProjectModal"
-// import Project from "./Project"
-import ProjectSkeleton from "./ProjectSkeleton"
-import { ProjectWithUsers } from "@/types/trpc"
 import {
   DndContext,
-  DragOverlay,
   closestCenter,
   KeyboardSensor,
   PointerSensor,
@@ -28,14 +14,18 @@ import {
   DragEndEvent,
 } from "@dnd-kit/core"
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import dynamic from "next/dynamic"
-import { LoadingDots } from "./LoadingDots"
+import PlusIcon from "./PlusIcon"
+import AddButton from "./AddButton"
+import useBooleanState from "@/hooks/useBooleanState"
+import AddProjectModal from "./AddProjectModal"
+import ProjectSkeleton from "./ProjectSkeleton"
+import { ProjectWithUsers } from "@/types/trpc"
 const Project = dynamic(() => import("@/components/Project"), {
   ssr: false,
   loading: () => <ProjectSkeleton width={200} />,

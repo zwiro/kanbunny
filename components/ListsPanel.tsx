@@ -1,12 +1,26 @@
 import { useSession } from "next-auth/react"
-import { useContext, useEffect, useId, useState } from "react"
+import { useContext, useEffect } from "react"
 import LayoutContext from "@/context/LayoutContext"
 import { trpc } from "@/utils/trpc"
-
-import { motion } from "framer-motion"
 import { z } from "zod"
-import { FormProvider, type SubmitHandler, useForm, set } from "react-hook-form"
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  horizontalListSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable"
+import { restrictToHorizontalAxis } from "@dnd-kit/modifiers"
+import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 import getFilteredLists from "@/utils/getFilteredLists"
 import { type ListWithTasks } from "@/types/trpc"
 import { createNewList, reorderLists } from "@/mutations/listMutations"
@@ -18,32 +32,6 @@ import AddButton from "./AddButton"
 import PlusIcon from "./PlusIcon"
 import ListContainer from "./ListContainer"
 import AddEditForm from "./AddEditForm"
-import {
-  DndContext,
-  DragOverlay,
-  closestCenter,
-  pointerWithin,
-  KeyboardSensor,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-  useDroppable,
-  MeasuringStrategy,
-  MeasuringFrequency,
-} from "@dnd-kit/core"
-import {
-  arrayMove,
-  horizontalListSortingStrategy,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  rectSortingStrategy,
-} from "@dnd-kit/sortable"
-import { restrictToHorizontalAxis } from "@dnd-kit/modifiers"
-import Task from "./Task"
-import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 
 interface ListsPanelProps {
   lists: ListWithTasks[] | undefined

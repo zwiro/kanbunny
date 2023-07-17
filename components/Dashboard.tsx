@@ -17,8 +17,6 @@ interface DashboardProps {
 }
 
 function Dashboard({ userProjects, isLoading }: DashboardProps) {
-  const dragAreaRef = useRef<HTMLDivElement>(null)
-
   const [searchQuery, setSearchQuery] = useState("")
   const [dateFilter, setDateFilter] = useState<string | Date | null>(null)
   const [assignedFilter, setAssignedFilter] = useState<string | null>(null)

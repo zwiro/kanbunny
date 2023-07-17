@@ -6,17 +6,28 @@ import { AnimatePresence, motion } from "framer-motion"
 import type { Project, User } from "@prisma/client"
 import { trpc } from "@/utils/trpc"
 import { z } from "zod"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { LoadingDots } from "./LoadingDots"
 import { boardAndProjectSchema } from "@/utils/schemas"
 import { GoGrabber } from "react-icons/go"
-import {
-  DragDropContext,
-  Draggable,
-  type DraggableProvidedDragHandleProps,
-  type DropResult,
-  Droppable,
-} from "@hello-pangea/dnd"
 import {
   deleteOneProject,
   leaveOneProject,
@@ -32,26 +43,6 @@ import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import ConfirmPopup from "./ConfirmPopup"
 import UserSelect from "./UserSelect"
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import {
-  DndContext,
-  DragOverlay,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core"
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 
 interface ProjectProps {
   boards: Board[]

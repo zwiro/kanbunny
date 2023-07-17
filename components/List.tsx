@@ -1,18 +1,16 @@
 import { useContext } from "react"
 import { useSession } from "next-auth/react"
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence } from "framer-motion"
 import { trpc } from "@/utils/trpc"
 import { GoGrabber } from "react-icons/go"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { List as ListType } from "@prisma/client"
 import { editListSchema } from "@/utils/schemas"
-import {
-  Draggable,
-  type DraggableProvidedDragHandleProps,
-  Droppable,
-} from "@hello-pangea/dnd"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import { Draggable, Droppable } from "@hello-pangea/dnd"
 import {
   deleteOneList,
   updateListColor,
@@ -31,30 +29,6 @@ import LayoutContext from "@/context/LayoutContext"
 import getFilteredTasks from "@/utils/getFilteredTasks"
 import ConfirmPopup from "./ConfirmPopup"
 import Task from "./Task"
-import { defaultAnimateLayoutChanges, useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import {
-  DndContext,
-  DragOverlay,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-  useDraggable,
-} from "@dnd-kit/core"
-import {
-  arrayMove,
-  horizontalListSortingStrategy,
-  rectSortingStrategy,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { createNewTask } from "@/mutations/taskMutations"
-import { useDroppable } from "@dnd-kit/core"
 
 interface ListProps extends ListType {
   tasks: TaskWithAssignedTo[]
@@ -156,19 +130,6 @@ function List({
     assignedFilter,
     dateFilter,
     userId
-  )
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250,
-        tolerance: 5,
-      },
-    })
   )
 
   return (

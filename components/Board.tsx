@@ -1,11 +1,12 @@
 import { useContext } from "react"
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form"
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { GoGrabber } from "react-icons/go"
 import { z } from "zod"
-import type { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
 import { AnimatePresence } from "framer-motion"
 import { isMobile } from "react-device-detect"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 import { trpc } from "@/utils/trpc"
 import type { Board, Color } from "@prisma/client"
 import { boardSchema } from "@/utils/schemas"
@@ -22,8 +23,6 @@ import AddEditForm from "./AddEditForm"
 import ColorPicker from "./ColorPicker"
 import ColorDot from "./ColorDot"
 import ConfirmPopup from "./ConfirmPopup"
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
 
 interface BoardProps {
   name: string

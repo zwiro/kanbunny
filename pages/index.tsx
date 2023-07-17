@@ -2,9 +2,9 @@ import dynamic from "next/dynamic"
 import { trpc } from "@/utils/trpc"
 import { getSession, type GetSessionParams } from "next-auth/react"
 import { createServerSideHelpers } from "@trpc/react-query/server"
+import superjson from "superjson"
 import { prisma } from "@/server/db"
 import { appRouter } from "@/server/routers/_app"
-import superjson from "superjson"
 import { LoadingDots } from "@/components/LoadingDots"
 
 const Dashboard = dynamic(() => import("@/components/Dashboard"), {
