@@ -23,7 +23,7 @@ import PlusIcon from "./PlusIcon"
 import AddEditForm from "./AddEditForm"
 import useBooleanState from "@/hooks/useBooleanState"
 import ColorPicker from "./ColorPicker"
-import ColorDot from "./ColorDot"
+import ColorDot, { ColorDotButton } from "./ColorDot"
 import LayoutContext from "@/context/LayoutContext"
 import getFilteredTasks from "@/utils/getFilteredTasks"
 import ConfirmPopup from "./ConfirmPopup"
@@ -149,17 +149,19 @@ function List({
         `}
       >
         <div className="flex items-center gap-2">
-          <ColorDot
-            editColor={!isEditingName ? editColor : undefined}
-            color={color}
-          >
+          <ColorDot>
             <AnimatePresence>
-              {isEditingColor && (
+              {isEditingColor ? (
                 <ColorPicker
                   close={closeEditColor}
                   editColor={updateColor}
                   id={id}
                   currentColor={color}
+                />
+              ) : (
+                <ColorDotButton
+                  editColor={!isEditingName ? editColor : undefined}
+                  color={color}
                 />
               )}
             </AnimatePresence>

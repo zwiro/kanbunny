@@ -21,7 +21,7 @@ import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import ColorPicker from "./ColorPicker"
-import ColorDot from "./ColorDot"
+import ColorDot, { ColorDotButton } from "./ColorDot"
 import ConfirmPopup from "./ConfirmPopup"
 
 interface BoardProps {
@@ -128,15 +128,17 @@ function Board({
       }
       `}
     >
-      <ColorDot editColor={editColor} color={color}>
+      <ColorDot>
         <AnimatePresence>
-          {isEditingColor && (
+          {isEditingColor ? (
             <ColorPicker
               id={id}
               close={closeEditColor}
               editColor={updateColor}
               currentColor={color}
             />
+          ) : (
+            <ColorDotButton editColor={editColor} color={color} />
           )}
         </AnimatePresence>
       </ColorDot>
