@@ -159,7 +159,7 @@ function Task({
 
   return (
     <>
-      <motion.div
+      <div
         {...taskAnimation}
         tabIndex={0}
         className={`group flex items-center justify-between border-b border-l-8 border-r border-t border-b-neutral-800 border-r-neutral-800 border-t-neutral-800 ${
@@ -271,7 +271,7 @@ function Task({
             )}
           </div>
         )}
-      </motion.div>
+      </div>
       <AnimatePresence>
         {isEditingUsers && (
           <EditTaskUsers

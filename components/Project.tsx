@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { useSession } from "next-auth/react"
@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from "framer-motion"
 import type { Project, User } from "@prisma/client"
 import { trpc } from "@/utils/trpc"
 import { z } from "zod"
-import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import {
   DndContext,
@@ -19,6 +18,8 @@ import {
   DragEndEvent,
 } from "@dnd-kit/core"
 import {
+  arrayMove,
+  useSortable,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
@@ -116,17 +117,17 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     closeEditUsers()
   }
 
-  const onDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (!active || !over) return
-    if (active.id !== over.id) {
-      return reorder.mutate({
-        itemOneIndex: active.data.current!.sortable.index,
-        itemTwoIndex: over.data.current!.sortable.index,
-        draggableId: active.id as string,
-      })
-    }
-  }
+  // const onDragEnd = (event: DragEndEvent) => {
+  //   const { active, over } = event
+  //   if (!active || !over) return
+  //   if (active.id !== over.id) {
+  //     return reorder.mutate({
+  //       itemOneIndex: active.data.current!.sortable.index,
+  //       itemTwoIndex: over.data.current!.sortable.index,
+  //       draggableId: active.id as string,
+  //     })
+  //   }
+  // }
 
   const isLoading = createBoard.isLoading || updateName.isLoading
 
@@ -170,6 +171,30 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     animate: { height: "auto", opacity: 1 },
     exit: { height: 0, opacity: 0 },
   }
+
+  const [displayedBoards, setDisplayedBoards] = useState(boards)
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!active || !over) return
+    if (active.id !== over.id) {
+      setDisplayedBoards((boards) => {
+        if (!boards) return boards
+        const oldIndex = boards.map((b) => b.id).indexOf(active.id as string)
+        const newIndex = boards.map((b) => b.id).indexOf(over.id as string)
+        return arrayMove(boards, oldIndex, newIndex)
+      })
+      return reorder.mutate({
+        itemOneIndex: active.data.current!.sortable.index,
+        itemTwoIndex: over.data.current!.sortable.index,
+        draggableId: active.id as string,
+      })
+    }
+  }
+
+  useEffect(() => {
+    setDisplayedBoards(boards)
+  }, [boards])
 
   return (
     <motion.section
@@ -334,15 +359,15 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          onDragEnd={onDragEnd}
+          onDragEnd={handleDragEnd}
           modifiers={[restrictToVerticalAxis]}
         >
           <SortableContext
-            items={boards.map((b) => b.id)}
+            items={displayedBoards.map((b) => b.id)}
             strategy={verticalListSortingStrategy}
             disabled={createBoard.isLoading}
           >
-            {boards?.map((board) => (
+            {displayedBoards?.map((board) => (
               <Board
                 key={board.id}
                 isUpdating={createBoard.isLoading}
@@ -353,7 +378,7 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
             ))}
           </SortableContext>
         </DndContext>
-        {!boards.length && (
+        {!displayedBoards.length && (
           <p className="text-base font-bold text-neutral-300">no boards yet</p>
         )}
       </div>

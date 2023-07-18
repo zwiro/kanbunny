@@ -1,5 +1,5 @@
 import { useSession } from "next-auth/react"
-import { useContext, useEffect } from "react"
+import { useContext, useEffect, useState } from "react"
 import LayoutContext from "@/context/LayoutContext"
 import { trpc } from "@/utils/trpc"
 import { z } from "zod"
@@ -15,6 +15,7 @@ import {
   DragEndEvent,
 } from "@dnd-kit/core"
 import {
+  arrayMove,
   horizontalListSortingStrategy,
   SortableContext,
   sortableKeyboardCoordinates,
@@ -103,18 +104,18 @@ function ListsPanel({
     taskMutationCounter
   )
 
-  const onDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (!active || !over) return
-    reorder.mutate({
-      itemOneIndex: active.data.current!.sortable.index,
-      itemTwoIndex: over.data.current!.sortable.index,
-      draggableId: active.id as string,
-    })
-  }
+  // const onDragEnd = (event: DragEndEvent) => {
+  //   const { active, over } = event
+  //   if (!active || !over) return
+  //   reorder.mutate({
+  //     itemOneIndex: active.data.current!.sortable.index,
+  //     itemTwoIndex: over.data.current!.sortable.index,
+  //     draggableId: active.id as string,
+  //   })
+  // }
 
   const onTaskDragEnd = (result: DropResult) => {
-    const { source, destination, draggableId } = result
+    const { source, destination } = result
     const itemOne = lists
       ?.filter((l) => l.id === source.droppableId)[0]
       ?.tasks.filter(
@@ -153,9 +154,33 @@ function ListsPanel({
     })
   )
 
-  const displayedLists =
+  const [displayedLists, setDisplayedLists] = useState(lists)
+
+  useEffect(() => {
+    setDisplayedLists(lists)
+  }, [lists])
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!active || !over) return
+    if (active.id !== over.id) {
+      setDisplayedLists((lists) => {
+        if (!lists) return lists
+        const oldIndex = lists.map((l) => l.id).indexOf(active.id as string)
+        const newIndex = lists.map((l) => l.id).indexOf(over.id as string)
+        return arrayMove(lists, oldIndex, newIndex)
+      })
+      return reorder.mutate({
+        itemOneIndex: active.data.current!.sortable.index,
+        itemTwoIndex: over.data.current!.sortable.index,
+        draggableId: active.id as string,
+      })
+    }
+  }
+
+  const filteredLists =
     getFilteredLists(
-      lists!,
+      displayedLists!,
       hideEmptyLists,
       assignedFilter,
       dateFilter,
@@ -174,17 +199,17 @@ function ListsPanel({
       <DndContext
         sensors={sensors}
         modifiers={[restrictToHorizontalAxis]}
-        onDragEnd={onDragEnd}
+        onDragEnd={handleDragEnd}
       >
         <SortableContext
-          items={displayedLists.map((list) => list.id)}
+          items={filteredLists.map((list) => list.id)}
           strategy={horizontalListSortingStrategy}
           disabled={createList.isLoading}
         >
           <DragDropContext onDragEnd={onTaskDragEnd}>
             <div className="flex min-h-[16rem] items-start">
               {!!lists?.length &&
-                displayedLists.map((list) => (
+                filteredLists.map((list) => (
                   <List
                     key={list.id}
                     searchQuery={searchQuery}

@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { trpc } from "@/utils/trpc"
 import { reorderProjects } from "@/mutations/projectMutations"
@@ -14,6 +14,7 @@ import {
   DragEndEvent,
 } from "@dnd-kit/core"
 import {
+  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
@@ -45,17 +46,17 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
 
   const reorder = reorderProjects(utils, projectMutationCounter)
 
-  const onDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (!active || !over) return
-    if (active.id !== over.id) {
-      return reorder.mutate({
-        itemOneIndex: active.data.current!.sortable.index,
-        itemTwoIndex: over.data.current!.sortable.index,
-        draggableId: active.id as string,
-      })
-    }
-  }
+  // const onDragEnd = (event: DragEndEvent) => {
+  //   const { active, over } = event
+  //   if (!active || !over) return
+  //   if (active.id !== over.id) {
+  //     return reorder.mutate({
+  //       itemOneIndex: active.data.current!.sortable.index,
+  //       itemTwoIndex: over.data.current!.sortable.index,
+  //       draggableId: active.id as string,
+  //     })
+  //   }
+  // }
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -76,6 +77,30 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
     exit: { x: "-100vw" },
     transition: { type: "tween" },
   }
+
+  const [displayedProjects, setDisplayedProjects] = useState(data)
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!active || !over) return
+    if (active.id !== over.id) {
+      setDisplayedProjects((projects) => {
+        if (!projects) return projects
+        const oldIndex = projects.map((p) => p.id).indexOf(active.id as string)
+        const newIndex = projects.map((p) => p.id).indexOf(over.id as string)
+        return arrayMove(projects, oldIndex, newIndex)
+      })
+      return reorder.mutate({
+        itemOneIndex: active.data.current!.sortable.index,
+        itemTwoIndex: over.data.current!.sortable.index,
+        draggableId: active.id as string,
+      })
+    }
+  }
+
+  useEffect(() => {
+    setDisplayedProjects(data)
+  }, [data])
 
   return (
     <FocusLock group="aside-nav" autoFocus={false}>
@@ -99,15 +124,15 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          onDragEnd={onDragEnd}
+          onDragEnd={handleDragEnd}
           modifiers={[restrictToVerticalAxis]}
         >
           <SortableContext
-            items={data!.map((p) => p.id)}
+            items={displayedProjects!.map((p) => p.id)}
             strategy={verticalListSortingStrategy}
           >
             <AnimatePresence>
-              {data?.map((project) => (
+              {displayedProjects?.map((project) => (
                 <Project
                   key={project.id}
                   mutationCounter={projectMutationCounter}
@@ -117,7 +142,7 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
             </AnimatePresence>
           </SortableContext>
         </DndContext>
-        {!data?.length && !isLoading && (
+        {!displayedProjects?.length && !isLoading && (
           <p className="pt-12 text-center text-neutral-300">no projects yet</p>
         )}
       </motion.aside>

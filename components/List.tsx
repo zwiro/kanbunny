@@ -1,4 +1,4 @@
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { AnimatePresence } from "framer-motion"
@@ -124,8 +124,7 @@ function List({
     transform: CSS.Translate.toString(transform),
     transition,
   }
-
-  const displayedTasks = getFilteredTasks(
+  const filteredTasks = getFilteredTasks(
     tasks,
     assignedFilter,
     dateFilter,
@@ -198,6 +197,7 @@ function List({
                   )}
                 </AnimatePresence>
                 <button
+                  disabled={isLoading}
                   ref={setActivatorNodeRef}
                   {...listeners}
                   aria-label="Grab to drag"
@@ -241,7 +241,7 @@ function List({
               className="flex flex-col gap-4"
             >
               <AnimatePresence>
-                {displayedTasks
+                {filteredTasks
                   .filter(
                     (task) =>
                       task.name
