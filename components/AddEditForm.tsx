@@ -49,6 +49,7 @@ function AddEditForm({
       />
       <button
         type="submit"
+        onClick={(e) => e.stopPropagation()}
         className="transition-transform hover:scale-110 focus:scale-110"
         aria-label="Submit"
       >
@@ -56,7 +57,10 @@ function AddEditForm({
       </button>
       <button
         type="button"
-        onClick={resetField}
+        onClick={(e) => {
+          e.stopPropagation()
+          resetField()
+        }}
         className="transition-transform hover:scale-110 focus:scale-110"
         aria-label="Cancel"
       >

@@ -1,4 +1,4 @@
 export default function formatRelativeTime(time: string) {
-  if (time === "tomorrow") return "tomorrow"
+  if (time === "tomorrow" || time === "this minute") return time
   return `${time.replace(/^in/g, "")} remaining`
 }

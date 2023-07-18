@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ProjectWithUsers } from "@/types/trpc"
 import LayoutContext from "@/context/LayoutContext"
 import useBooleanState from "@/hooks/useBooleanState"
-import ColorDot from "./ColorDot"
+import ColorDot, { ColorDotButton } from "./ColorDot"
 import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import ListsPanel from "./ListsPanel"
@@ -79,7 +79,11 @@ function Dashboard({ userProjects, isLoading }: DashboardProps) {
             <div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 [&>button]:cursor-default">
-                  <ColorDot color={chosenBoard.color} />
+                  <ColorDot>
+                    <div
+                      className={`h-full w-full bg-${chosenBoard.color}-500`}
+                    />
+                  </ColorDot>
                   <h2 className="max-w-xs break-words text-base font-bold sm:max-w-lg sm:text-2xl md:max-w-xl xl:max-w-4xl 2xl:max-w-6xl">
                     {chosenBoard.name}
                   </h2>

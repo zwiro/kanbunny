@@ -54,7 +54,10 @@ function ColorPicker({ close, id, editColor, currentColor }: ColorPickerProps) {
         {...pickerAnimation}
         ref={pickerRef}
         className="absolute -left-2 -top-2 flex gap-2 bg-zinc-900 p-2"
-        onClick={pickColor}
+        onClick={(e) => {
+          e.stopPropagation()
+          pickColor(e)
+        }}
       >
         {Object.values(colorSchema.shape.color.enum).map((color) => (
           <button
