@@ -23,7 +23,13 @@ export const createNewList = (
         (old) =>
           [
             ...old!,
-            { ...input, tasks: [], color: "blue", order: old?.length },
+            {
+              ...input,
+              tasks: [],
+              color: "blue",
+              order: old?.length,
+              id: Math.random().toString(),
+            },
           ] as any
       )
       closeAdd()

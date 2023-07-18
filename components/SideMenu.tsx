@@ -39,13 +39,6 @@ interface SideMenuProps {
 function SideMenu({ data, isLoading }: SideMenuProps) {
   const [isAdding, add, closeAdd] = useBooleanState()
 
-  const sideMenuAnimation = {
-    initial: { x: "-100vw" },
-    animate: { x: 0 },
-    exit: { x: "-100vw" },
-    transition: { type: "tween" },
-  }
-
   const utils = trpc.useContext()
 
   const projectMutationCounter = useRef(0)
@@ -77,6 +70,13 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
     })
   )
 
+  const sideMenuAnimation = {
+    initial: { x: "-100vw" },
+    animate: { x: 0 },
+    exit: { x: "-100vw" },
+    transition: { type: "tween" },
+  }
+
   return (
     <FocusLock group="aside-nav" autoFocus={false}>
       <motion.aside
@@ -106,16 +106,17 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
             items={data!.map((p) => p.id)}
             strategy={verticalListSortingStrategy}
           >
-            {data?.map((project) => (
-              <Project
-                key={project.id}
-                mutationCounter={projectMutationCounter}
-                {...project}
-              />
-            ))}
+            <AnimatePresence>
+              {data?.map((project) => (
+                <Project
+                  key={project.id}
+                  mutationCounter={projectMutationCounter}
+                  {...project}
+                />
+              ))}
+            </AnimatePresence>
           </SortableContext>
         </DndContext>
-
         {!data?.length && !isLoading && (
           <p className="pt-12 text-center text-neutral-300">no projects yet</p>
         )}

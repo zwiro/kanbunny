@@ -225,7 +225,7 @@ function ListsPanel({
             lists?.length || isLoading ? "mx-2 lg:mx-4 xl:mx-8" : "ml-0"
           } `}
         >
-          <AddButton onClick={add}>
+          <AddButton onClick={add} disabled={createList.isLoading}>
             new list <PlusIcon />
           </AddButton>
         </div>

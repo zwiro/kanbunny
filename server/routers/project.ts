@@ -298,8 +298,6 @@ export const projectRouter = createTRPCRouter({
         },
       })
 
-      console.log(users)
-
       users.map(async (user) => {
         await ctx.prisma.user.update({
           where: { id: user.id },

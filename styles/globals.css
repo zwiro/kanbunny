@@ -2,15 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  overflow: hidden;
+}
+
 /* scrollbar */
 /* Firefox */
 * {
-  scrollbar-width: none;
-  scrollbar-color: #000000 #737373;
-}
-
-body {
-  overflow: hidden;
+  scrollbar-width: auto;
+  scrollbar-color: rgb(161 161 170);
 }
 
 /* Chrome, Edge, and Safari */

@@ -116,12 +116,6 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     closeEditUsers()
   }
 
-  const projectUsersAnimation = {
-    initial: { height: 0, opacity: 0 },
-    animate: { height: "auto", opacity: 1 },
-    exit: { height: 0, opacity: 0 },
-  }
-
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     if (!active || !over) return
@@ -165,8 +159,21 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     })
   )
 
+  const projectAnimation = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+  }
+
+  const projectUsersAnimation = {
+    initial: { height: 0, opacity: 0 },
+    animate: { height: "auto", opacity: 1 },
+    exit: { height: 0, opacity: 0 },
+  }
+
   return (
-    <section
+    <motion.section
+      {...projectAnimation}
       ref={setNodeRef}
       style={style}
       {...attributes}
@@ -324,35 +331,33 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
         )}
       </AnimatePresence>
       <div className="flex flex-col py-4">
-        <AnimatePresence>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={onDragEnd}
-            modifiers={[restrictToVerticalAxis]}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={onDragEnd}
+          modifiers={[restrictToVerticalAxis]}
+        >
+          <SortableContext
+            items={boards.map((b) => b.id)}
+            strategy={verticalListSortingStrategy}
+            disabled={createBoard.isLoading}
           >
-            <SortableContext
-              items={boards.map((b) => b.id)}
-              strategy={verticalListSortingStrategy}
-              disabled={createBoard.isLoading}
-            >
-              {boards?.map((board) => (
-                <Board
-                  key={board.id}
-                  isUpdating={createBoard.isLoading}
-                  owner={owner.name!}
-                  mutationCounter={boardMutationCounter}
-                  {...board}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
-        </AnimatePresence>
+            {boards?.map((board) => (
+              <Board
+                key={board.id}
+                isUpdating={createBoard.isLoading}
+                owner={owner.name!}
+                mutationCounter={boardMutationCounter}
+                {...board}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
         {!boards.length && (
           <p className="text-base font-bold text-neutral-300">no boards yet</p>
         )}
       </div>
-    </section>
+    </motion.section>
   )
 }
 

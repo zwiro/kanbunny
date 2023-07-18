@@ -151,9 +151,16 @@ function Task({
 
   const isLoading = updateName.isLoading || updateColor.isLoading
 
+  const taskAnimation = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+  }
+
   return (
     <>
-      <div
+      <motion.div
+        {...taskAnimation}
         tabIndex={0}
         className={`group flex items-center justify-between border-b border-l-8 border-r border-t border-b-neutral-800 border-r-neutral-800 border-t-neutral-800 ${
           colorVariants[color]
@@ -264,7 +271,7 @@ function Task({
             )}
           </div>
         )}
-      </div>
+      </motion.div>
       <AnimatePresence>
         {isEditingUsers && (
           <EditTaskUsers

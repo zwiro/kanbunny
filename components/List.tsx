@@ -240,34 +240,37 @@ function List({
               ref={provided.innerRef}
               className="flex flex-col gap-4"
             >
-              {displayedTasks
-                .filter(
-                  (task) =>
-                    task.name
-                      .toLowerCase()
-                      .includes(searchQuery.toLowerCase()) || searchQuery === ""
-                )
-                .map((task, i) => (
-                  <Draggable key={task.id} draggableId={task.id} index={i}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        className="draggable"
-                      >
-                        <Task
-                          key={task.id}
-                          dragHandleProps={provided.dragHandleProps}
-                          isDragging={snapshot.isDragging}
-                          length={tasks.length}
-                          mutationCounter={taskMutationCounter}
-                          isFiltered={isFiltered}
-                          {...task}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
+              <AnimatePresence>
+                {displayedTasks
+                  .filter(
+                    (task) =>
+                      task.name
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase()) ||
+                      searchQuery === ""
+                  )
+                  .map((task, i) => (
+                    <Draggable key={task.id} draggableId={task.id} index={i}>
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className="draggable"
+                        >
+                          <Task
+                            key={task.id}
+                            dragHandleProps={provided.dragHandleProps}
+                            isDragging={snapshot.isDragging}
+                            length={tasks.length}
+                            mutationCounter={taskMutationCounter}
+                            isFiltered={isFiltered}
+                            {...task}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+              </AnimatePresence>
               {provided.placeholder}
             </div>
           )}
