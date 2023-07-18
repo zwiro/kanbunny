@@ -10,15 +10,18 @@ interface UserSelectProps {
 
 function UserSelect({ selectedUsers, setSelectedUsers }: UserSelectProps) {
   const [searchQuery, setSearchQuery] = useState("")
+
   const debouncedQuery = useDebounce<string>(searchQuery, 500)
 
-  const userOptions = trpc.project.getAllUsers.useQuery(debouncedQuery)
+  const userOptions = trpc.project.getAllUsers.useQuery(debouncedQuery, {
+    enabled: debouncedQuery.length > 0,
+  })
 
   const utils = trpc.useContext()
 
   useEffect(() => {
     utils.project.getAllUsers.invalidate()
-  }, [searchQuery, utils.project.getAllUsers])
+  }, [debouncedQuery, utils.project.getAllUsers])
 
   const filteredOptions =
     userOptions.data?.filter((u) => u.name?.includes(debouncedQuery)) || []
