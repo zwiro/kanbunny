@@ -262,6 +262,7 @@ function Task({
                 close={closeEditName}
                 handleSubmit={taskMethods.handleSubmit(onSubmit)}
                 className="[&>input]:h-9"
+                defaultValue={name}
               />
             </FormProvider>
             {taskMethods.formState.errors && (

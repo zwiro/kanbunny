@@ -44,6 +44,7 @@ import MenuItem from "./MenuItem"
 import AddEditForm from "./AddEditForm"
 import ConfirmPopup from "./ConfirmPopup"
 import UserSelect from "./UserSelect"
+import PlusIcon from "./PlusIcon"
 
 interface ProjectProps {
   boards: Board[]
@@ -197,7 +198,7 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
       className="my-4 cursor-default border-b border-neutral-700"
     >
       {!isEditingName ? (
-        <div className="flex gap-4 pb-4">
+        <div className="flex gap-2 pb-4">
           <h2
             className={`relative max-w-[80%] break-words text-lg after:absolute after:-bottom-1 after:left-0 after:h-1 after:w-0 after:bg-white after:transition-all lg:text-2xl ${
               boards.map((b) => b.id).includes(chosenBoard?.id!) &&
@@ -207,6 +208,14 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
           >
             {name}
           </h2>
+          <button
+            onClick={add}
+            className="group py-2"
+            disabled={isLoading}
+            aria-label="Add new board"
+          >
+            <PlusIcon />
+          </button>
           <div className="ml-auto flex items-center self-start">
             <MenuWrapper isLoading={isLoading}>
               <MenuItem handleClick={add}>add board</MenuItem>

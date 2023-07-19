@@ -221,6 +221,7 @@ function List({
                   close={closeEditName}
                   handleSubmit={listMethods.handleSubmit(onSubmit)}
                   className="[&>input]:h-9"
+                  defaultValue={name}
                 />
               </FormProvider>
               {listMethods.formState.errors && (

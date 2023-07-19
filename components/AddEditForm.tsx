@@ -9,8 +9,7 @@ interface AddEditFormProps {
   name: string
   placeholder: string
   close: () => void
-  projectId?: string
-  handleSubmit?: SubmitHandler<any>
+  handleSubmit: SubmitHandler<any>
   defaultValue?: string
   className?: string
 }
@@ -23,18 +22,20 @@ function AddEditForm({
   defaultValue,
   className,
 }: AddEditFormProps) {
-  const { reset } = useFormContext()
+  const { reset, setValue } = useFormContext()
 
-  const resetField = () => {
-    reset({}, { keepDefaultValues: true })
+  setValue("name", defaultValue || "")
+
+  const resetForm = () => {
+    reset()
     close()
   }
 
-  useCloseOnEscape(resetField)
+  useCloseOnEscape(resetForm)
 
   const formRef = useRef<HTMLFormElement>(null)
 
-  useClickOutside([formRef], resetField)
+  useClickOutside([formRef], resetForm)
 
   return (
     <form
@@ -59,7 +60,7 @@ function AddEditForm({
         type="button"
         onClick={(e) => {
           e.stopPropagation()
-          resetField()
+          resetForm()
         }}
         className="transition-transform hover:scale-110 focus:scale-110"
         aria-label="Cancel"

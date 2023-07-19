@@ -189,6 +189,7 @@ function Board({
         <div>
           <FormProvider {...boardMethods}>
             <AddEditForm
+              defaultValue={name}
               name="name"
               placeholder="board name"
               close={closeEditName}
