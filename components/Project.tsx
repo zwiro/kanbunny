@@ -96,7 +96,12 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     }
   }
 
-  const updateUsers = updateProjectUsers(utils)
+  const updateUsers = updateProjectUsers(
+    utils,
+    closeEditUsers,
+    mutationCounter,
+    id
+  )
   const updateName = updateProjectName(utils, closeEditName, mutationCounter)
   const deleteProject = deleteOneProject(utils, mutationCounter, unselectBoard)
   const leaveProject = leaveOneProject(utils, mutationCounter, unselectBoard)
@@ -114,7 +119,6 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
   const handleSubmitUsers = (e: React.FormEvent) => {
     e.preventDefault()
     updateUsers.mutate({ projectId: id, participants: selectedUsers })
-    closeEditUsers()
   }
 
   const handleDragEnd = (event: DragEndEvent) => {

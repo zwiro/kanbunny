@@ -1,3 +1,4 @@
+import type { MutableRefObject } from "react"
 import type { TRPCContextType } from "@/types/trpc"
 import { trpc } from "@/utils/trpc"
 
@@ -9,10 +10,27 @@ export const createNewProject = (utils: TRPCContextType, close: () => void) =>
     },
   })
 
-export const updateProjectUsers = (utils: TRPCContextType) =>
+export const updateProjectUsers = (
+  utils: TRPCContextType,
+  closeEditUsers: () => void,
+  counter: MutableRefObject<number>,
+  id: string
+) =>
   trpc.project.editUsers.useMutation({
-    onSuccess() {
-      utils.project.getUsers.invalidate()
+    async onMutate(input) {
+      await utils.project.getUsers.cancel()
+      counter.current += 1
+      const prevData = utils.project.getUsers.getData()
+
+      return { prevData }
+    },
+    onError(err, input, ctx) {
+      utils.project.getUsers.setData(id, ctx?.prevData)
+    },
+    onSettled() {
+      counter.current -= 1
+      counter.current === 0 && utils.project.getUsers.invalidate(id)
+      closeEditUsers()
     },
   })
 

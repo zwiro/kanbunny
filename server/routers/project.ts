@@ -130,6 +130,50 @@ export const projectRouter = createTRPCRouter({
         },
       })
 
+      const projectUsersToDelete = await ctx.prisma.projectUser.findMany({
+        where: {
+          userId: { in: toDeleteUsers.map((u) => u.id) },
+        },
+      })
+
+      for (let projectUser of projectUsersToDelete.filter(
+        (u) => u.userId !== ctx.session.user.id
+      )) {
+        const projectToDelete = await ctx.prisma.projectUser.findFirst({
+          where: {
+            userId: projectUser.userId,
+            projectId: input.projectId,
+          },
+        })
+
+        if (projectToDelete!.order < projectUser.order) {
+          await ctx.prisma.projectUser.update({
+            where: {
+              id: projectUser.id,
+            },
+
+            data: { order: { decrement: 1 } },
+          })
+        }
+      }
+
+      const projectUsersToAdd = await ctx.prisma.projectUser.findMany({
+        where: {
+          userId: { in: newUsers.map((u) => u.id) },
+        },
+      })
+
+      for (let projectUser of projectUsersToAdd.filter(
+        (u) => u.userId !== ctx.session.user.id
+      )) {
+        await ctx.prisma.projectUser.update({
+          where: {
+            id: projectUser.id,
+          },
+          data: { order: { increment: 1 } },
+        })
+      }
+
       await ctx.prisma.projectUser.deleteMany({
         where: {
           AND: [

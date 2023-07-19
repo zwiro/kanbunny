@@ -26,6 +26,8 @@ function UserSelect({ selectedUsers, setSelectedUsers }: UserSelectProps) {
   const filteredOptions =
     userOptions.data?.filter((u) => u.name?.includes(debouncedQuery)) || []
 
+  console.log(userOptions.status)
+
   return (
     <Select
       options={
@@ -38,7 +40,9 @@ function UserSelect({ selectedUsers, setSelectedUsers }: UserSelectProps) {
       isMulti
       placeholder="type to find user"
       noOptionsMessage={() =>
-        userOptions.isLoading ? "loading..." : "no users found"
+        userOptions.isLoading && debouncedQuery
+          ? "loading..."
+          : "no users found"
       }
       styles={{
         control: (base, state) => ({
