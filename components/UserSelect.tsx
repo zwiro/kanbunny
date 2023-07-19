@@ -26,8 +26,6 @@ function UserSelect({ selectedUsers, setSelectedUsers }: UserSelectProps) {
   const filteredOptions =
     userOptions.data?.filter((u) => u.name?.includes(debouncedQuery)) || []
 
-  console.log(userOptions.status)
-
   return (
     <Select
       options={

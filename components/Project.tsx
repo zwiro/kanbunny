@@ -262,6 +262,7 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
             </AnimatePresence>
             <button
               {...listeners}
+              disabled={deleteProject.isLoading}
               ref={setActivatorNodeRef}
               className="ml-auto"
               aria-label="Grab to drag"

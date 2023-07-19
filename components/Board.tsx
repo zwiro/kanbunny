@@ -173,6 +173,7 @@ function Board({
             </AnimatePresence>
             <button
               {...listeners}
+              disabled={deleteBoard.isLoading}
               ref={setActivatorNodeRef}
               aria-label="Grab to drag"
               tabIndex={0}

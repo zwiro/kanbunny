@@ -243,6 +243,7 @@ function Task({
               <button
                 {...dragHandleProps}
                 aria-label="Grab to drag"
+                disabled={deleteTask.isLoading}
                 tabIndex={0}
                 className={`group-focus-within:visible group-hover:visible 
                 ${isDragging ? "visible" : !isMobile && "invisible"} 

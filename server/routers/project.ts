@@ -342,14 +342,36 @@ export const projectRouter = createTRPCRouter({
         },
       })
 
-      users.map(async (user) => {
-        await ctx.prisma.user.update({
-          where: { id: user.id },
-          data: {
-            projects_in: { disconnect: { id: input } },
+      const projectsToDelete = await ctx.prisma.projectUser.findMany({
+        where: {
+          AND: [
+            { projectId: input },
+            {
+              userId: { in: [...users.map((u) => u.id), ctx.session.user.id] },
+            },
+          ],
+        },
+      })
+
+      for (let project of projectsToDelete) {
+        const projectToDelete = await ctx.prisma.projectUser.findFirst({
+          where: {
+            AND: [
+              { projectId: projectUser.projectId },
+              { userId: project.userId },
+            ],
           },
         })
-      })
+        await ctx.prisma.projectUser.updateMany({
+          where: {
+            AND: [
+              { userId: project.userId },
+              { order: { gt: projectToDelete!.order } },
+            ],
+          },
+          data: { order: { decrement: 1 } },
+        })
+      }
 
       await ctx.prisma.projectUser.deleteMany({
         where: { projectId: input },
@@ -357,19 +379,6 @@ export const projectRouter = createTRPCRouter({
 
       await ctx.prisma.project.deleteMany({
         where: { id: input },
-      })
-
-      await ctx.prisma.projectUser.updateMany({
-        where: {
-          AND: [
-            { NOT: { id: input } },
-            { order: { gt: projectUser.order } },
-            {
-              userId: { in: [...users.map((u) => u.id), ctx.session.user.id] },
-            },
-          ],
-        },
-        data: { order: { decrement: 1 } },
       })
 
       return { success: true }

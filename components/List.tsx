@@ -100,7 +100,11 @@ function List({
     pink: "border-pink-500",
   }
 
-  const isLoading = isUpdating || updateName.isLoading || updateColor.isLoading
+  const isLoading =
+    isUpdating ||
+    updateName.isLoading ||
+    updateColor.isLoading ||
+    deleteList.isLoading
 
   const isFiltered =
     Boolean(dateFilter) ||
