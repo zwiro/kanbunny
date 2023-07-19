@@ -19,6 +19,7 @@ interface ColorPickerProps {
 
 function ColorPicker({ close, id, editColor, currentColor }: ColorPickerProps) {
   const pickerRef = useRef(null)
+
   useClickOutside([pickerRef], close)
 
   useCloseOnEscape(close)

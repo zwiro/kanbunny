@@ -1,10 +1,10 @@
-import { GiRabbit } from "react-icons/gi"
-import { useSession, signOut } from "next-auth/react"
-import { useRouter } from "next/router"
 import { useContext } from "react"
+import { useRouter } from "next/router"
+import { useSession, signOut } from "next-auth/react"
+import { GiRabbit } from "react-icons/gi"
+import FocusLock from "react-focus-lock"
 import LayoutContext from "@/context/LayoutContext"
 import { LoadingDots } from "./LoadingDots"
-import FocusLock from "react-focus-lock"
 
 function Navbar() {
   const { data: session, status } = useSession()

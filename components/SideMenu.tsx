@@ -21,11 +21,11 @@ import {
 } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import dynamic from "next/dynamic"
+import { ProjectWithUsers } from "@/types/trpc"
+import useBooleanState from "@/hooks/useBooleanState"
 import PlusIcon from "./PlusIcon"
 import AddButton from "./AddButton"
-import useBooleanState from "@/hooks/useBooleanState"
 import ProjectSkeleton from "./ProjectSkeleton"
-import { ProjectWithUsers } from "@/types/trpc"
 import AddProjectModal from "./AddProjectModal"
 const Project = dynamic(() => import("@/components/Project"), {
   ssr: false,
@@ -46,17 +46,23 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
 
   const reorder = reorderProjects(utils, projectMutationCounter)
 
-  // const onDragEnd = (event: DragEndEvent) => {
-  //   const { active, over } = event
-  //   if (!active || !over) return
-  //   if (active.id !== over.id) {
-  //     return reorder.mutate({
-  //       itemOneIndex: active.data.current!.sortable.index,
-  //       itemTwoIndex: over.data.current!.sortable.index,
-  //       draggableId: active.id as string,
-  //     })
-  //   }
-  // }
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!active || !over) return
+    if (active.id !== over.id) {
+      setDisplayedProjects((projects) => {
+        if (!projects) return projects
+        const oldIndex = projects.map((p) => p.id).indexOf(active.id as string)
+        const newIndex = projects.map((p) => p.id).indexOf(over.id as string)
+        return arrayMove(projects, oldIndex, newIndex)
+      })
+      return reorder.mutate({
+        itemOneIndex: active.data.current!.sortable.index,
+        itemTwoIndex: over.data.current!.sortable.index,
+        draggableId: active.id as string,
+      })
+    }
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -79,24 +85,6 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
   }
 
   const [displayedProjects, setDisplayedProjects] = useState(data)
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
-    if (!active || !over) return
-    if (active.id !== over.id) {
-      setDisplayedProjects((projects) => {
-        if (!projects) return projects
-        const oldIndex = projects.map((p) => p.id).indexOf(active.id as string)
-        const newIndex = projects.map((p) => p.id).indexOf(over.id as string)
-        return arrayMove(projects, oldIndex, newIndex)
-      })
-      return reorder.mutate({
-        itemOneIndex: active.data.current!.sortable.index,
-        itemTwoIndex: over.data.current!.sortable.index,
-        draggableId: active.id as string,
-      })
-    }
-  }
 
   useEffect(() => {
     setDisplayedProjects(data)

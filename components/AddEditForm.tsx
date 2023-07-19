@@ -1,9 +1,9 @@
 import { useRef } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import { SubmitHandler, useFormContext } from "react-hook-form"
-import TextInput from "./TextInput"
 import useClickOutside from "@/hooks/useClickOutside"
 import useCloseOnEscape from "@/hooks/useCloseOnEscape"
+import TextInput from "./TextInput"
 
 interface AddEditFormProps {
   name: string

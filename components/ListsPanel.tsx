@@ -23,11 +23,11 @@ import {
 import { restrictToHorizontalAxis } from "@dnd-kit/modifiers"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 import getFilteredLists from "@/utils/getFilteredLists"
+import { listSchema } from "@/utils/schemas"
 import { type ListWithTasks } from "@/types/trpc"
 import { createNewList, reorderLists } from "@/mutations/listMutations"
 import { reorderTasks } from "@/mutations/taskMutations"
 import List from "./List"
-import { listSchema } from "@/utils/schemas"
 import ListSkeleton from "./ListSkeleton"
 import AddButton from "./AddButton"
 import PlusIcon from "./PlusIcon"
@@ -104,15 +104,23 @@ function ListsPanel({
     taskMutationCounter
   )
 
-  // const onDragEnd = (event: DragEndEvent) => {
-  //   const { active, over } = event
-  //   if (!active || !over) return
-  //   reorder.mutate({
-  //     itemOneIndex: active.data.current!.sortable.index,
-  //     itemTwoIndex: over.data.current!.sortable.index,
-  //     draggableId: active.id as string,
-  //   })
-  // }
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!active || !over) return
+    if (active.id !== over.id) {
+      setDisplayedLists((lists) => {
+        if (!lists) return lists
+        const oldIndex = lists.map((l) => l.id).indexOf(active.id as string)
+        const newIndex = lists.map((l) => l.id).indexOf(over.id as string)
+        return arrayMove(lists, oldIndex, newIndex)
+      })
+      return reorder.mutate({
+        itemOneIndex: active.data.current!.sortable.index,
+        itemTwoIndex: over.data.current!.sortable.index,
+        draggableId: active.id as string,
+      })
+    }
+  }
 
   const onTaskDragEnd = (result: DropResult) => {
     const { source, destination } = result
@@ -156,28 +164,6 @@ function ListsPanel({
 
   const [displayedLists, setDisplayedLists] = useState(lists)
 
-  useEffect(() => {
-    setDisplayedLists(lists)
-  }, [lists])
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (!active || !over) return
-    if (active.id !== over.id) {
-      setDisplayedLists((lists) => {
-        if (!lists) return lists
-        const oldIndex = lists.map((l) => l.id).indexOf(active.id as string)
-        const newIndex = lists.map((l) => l.id).indexOf(over.id as string)
-        return arrayMove(lists, oldIndex, newIndex)
-      })
-      return reorder.mutate({
-        itemOneIndex: active.data.current!.sortable.index,
-        itemTwoIndex: over.data.current!.sortable.index,
-        draggableId: active.id as string,
-      })
-    }
-  }
-
   const filteredLists =
     getFilteredLists(
       displayedLists!,
@@ -186,6 +172,10 @@ function ListsPanel({
       dateFilter,
       session?.user.id
     ) || []
+
+  useEffect(() => {
+    setDisplayedLists(lists)
+  }, [lists])
 
   return (
     <div className="flex pb-12">

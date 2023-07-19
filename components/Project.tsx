@@ -117,17 +117,23 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     closeEditUsers()
   }
 
-  // const onDragEnd = (event: DragEndEvent) => {
-  //   const { active, over } = event
-  //   if (!active || !over) return
-  //   if (active.id !== over.id) {
-  //     return reorder.mutate({
-  //       itemOneIndex: active.data.current!.sortable.index,
-  //       itemTwoIndex: over.data.current!.sortable.index,
-  //       draggableId: active.id as string,
-  //     })
-  //   }
-  // }
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!active || !over) return
+    if (active.id !== over.id) {
+      setDisplayedBoards((boards) => {
+        if (!boards) return boards
+        const oldIndex = boards.map((b) => b.id).indexOf(active.id as string)
+        const newIndex = boards.map((b) => b.id).indexOf(over.id as string)
+        return arrayMove(boards, oldIndex, newIndex)
+      })
+      return reorder.mutate({
+        itemOneIndex: active.data.current!.sortable.index,
+        itemTwoIndex: over.data.current!.sortable.index,
+        draggableId: active.id as string,
+      })
+    }
+  }
 
   const isLoading = createBoard.isLoading || updateName.isLoading
 
@@ -173,24 +179,6 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
   }
 
   const [displayedBoards, setDisplayedBoards] = useState(boards)
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (!active || !over) return
-    if (active.id !== over.id) {
-      setDisplayedBoards((boards) => {
-        if (!boards) return boards
-        const oldIndex = boards.map((b) => b.id).indexOf(active.id as string)
-        const newIndex = boards.map((b) => b.id).indexOf(over.id as string)
-        return arrayMove(boards, oldIndex, newIndex)
-      })
-      return reorder.mutate({
-        itemOneIndex: active.data.current!.sortable.index,
-        itemTwoIndex: over.data.current!.sortable.index,
-        draggableId: active.id as string,
-      })
-    }
-  }
 
   useEffect(() => {
     setDisplayedBoards(boards)

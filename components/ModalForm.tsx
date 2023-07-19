@@ -1,7 +1,7 @@
-import { createPortal } from "react-dom"
-import useClickOutside from "@/hooks/useClickOutside"
-import { motion } from "framer-motion"
 import { useRef } from "react"
+import { createPortal } from "react-dom"
+import { motion } from "framer-motion"
+import useClickOutside from "@/hooks/useClickOutside"
 
 const modalVariant = {
   hidden: {

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext } from "react"
 import { useSession } from "next-auth/react"
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { AnimatePresence } from "framer-motion"
@@ -16,16 +16,16 @@ import {
   updateListColor,
   updateListName,
 } from "@/mutations/listMutations"
-import { TaskWithAssignedTo } from "@/types/trpc"
+import type { TaskWithAssignedTo } from "@/types/trpc"
+import getFilteredTasks from "@/utils/getFilteredTasks"
+import useBooleanState from "@/hooks/useBooleanState"
+import LayoutContext from "@/context/LayoutContext"
 import MenuWrapper from "./MenuWrapper"
 import MenuItem from "./MenuItem"
 import PlusIcon from "./PlusIcon"
 import AddEditForm from "./AddEditForm"
-import useBooleanState from "@/hooks/useBooleanState"
 import ColorPicker from "./ColorPicker"
 import ColorDot, { ColorDotButton } from "./ColorDot"
-import LayoutContext from "@/context/LayoutContext"
-import getFilteredTasks from "@/utils/getFilteredTasks"
 import ConfirmPopup from "./ConfirmPopup"
 import Task from "./Task"
 import AddTaskModal from "./AddTaskModal"
@@ -124,6 +124,7 @@ function List({
     transform: CSS.Translate.toString(transform),
     transition,
   }
+
   const filteredTasks = getFilteredTasks(
     tasks,
     assignedFilter,

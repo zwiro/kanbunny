@@ -10,13 +10,13 @@ import { taskSchema } from "@/utils/schemas"
 import { createNewTask } from "@/mutations/taskMutations"
 import LayoutContext from "@/context/LayoutContext"
 import useAssignUser from "@/hooks/useAssignUser"
+import useCloseOnEscape from "@/hooks/useCloseOnEscape"
 import TextInput from "./TextInput"
 import AddButton from "./AddButton"
 import PlusIcon from "./PlusIcon"
 import UserCheckbox from "./UserCheckbox"
 import ModalForm from "./ModalForm"
 import FormFieldContainer from "./FormFieldContainer"
-import useCloseOnEscape from "@/hooks/useCloseOnEscape"
 
 interface AddTaskModalProps {
   close: () => void
