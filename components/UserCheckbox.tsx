@@ -7,8 +7,8 @@ interface UserCheckboxProps {
   isAssigned?: boolean
 }
 
-function UserCheckbox({ name, id, assignUser }: UserCheckboxProps) {
-  const [isChecked, setIsChecked] = useState(false)
+function UserCheckbox({ name, id, assignUser, isAssigned }: UserCheckboxProps) {
+  const [isChecked, setIsChecked] = useState(isAssigned || false)
 
   const check = (id: string) => {
     setIsChecked((prevChecked) => !prevChecked)

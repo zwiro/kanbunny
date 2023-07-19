@@ -21,7 +21,7 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable"
 import { restrictToHorizontalAxis } from "@dnd-kit/modifiers"
-import { DragDropContext, DropResult } from "@hello-pangea/dnd"
+import { DragDropContext, type DropResult } from "@hello-pangea/dnd"
 import getFilteredLists from "@/utils/getFilteredLists"
 import { listSchema } from "@/utils/schemas"
 import { type ListWithTasks } from "@/types/trpc"
@@ -194,7 +194,7 @@ function ListsPanel({
         <SortableContext
           items={filteredLists.map((list) => list.id)}
           strategy={horizontalListSortingStrategy}
-          disabled={createList.isLoading}
+          disabled={createList.isLoading || reorderDisplayedTasks.isLoading}
         >
           <DragDropContext onDragEnd={onTaskDragEnd}>
             <div className="flex min-h-[16rem] items-start">
