@@ -13,15 +13,21 @@ function ColorDot({ children }: ColorDotProps) {
 interface ColorDotButtonProps {
   editColor?: () => void
   color: Color
+  disabled: boolean
 }
 
-export function ColorDotButton({ editColor, color }: ColorDotButtonProps) {
+export function ColorDotButton({
+  editColor,
+  color,
+  disabled,
+}: ColorDotButtonProps) {
   return (
     <button
       onClick={(e) => {
         e.stopPropagation()
         editColor?.()
       }}
+      disabled={disabled}
       className={`h-full w-full bg-${color}-500`}
       aria-label="Edit color"
     />

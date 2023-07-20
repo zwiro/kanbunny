@@ -147,7 +147,11 @@ function Board({
               currentColor={color}
             />
           ) : (
-            <ColorDotButton editColor={editColor} color={color} />
+            <ColorDotButton
+              editColor={editColor}
+              color={color}
+              disabled={isLoading}
+            />
           )}
         </AnimatePresence>
       </ColorDot>

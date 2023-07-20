@@ -168,6 +168,7 @@ function List({
                 <ColorDotButton
                   editColor={!isEditingName ? editColor : undefined}
                   color={color}
+                  disabled={isLoading}
                 />
               )}
             </AnimatePresence>
