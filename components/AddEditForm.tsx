@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import { SubmitHandler, useFormContext } from "react-hook-form"
 import useClickOutside from "@/hooks/useClickOutside"
