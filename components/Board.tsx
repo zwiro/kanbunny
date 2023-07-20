@@ -1,4 +1,4 @@
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { GoGrabber } from "react-icons/go"
@@ -117,7 +117,11 @@ function Board({
       {...attributes}
       style={style}
       tabIndex={0}
-      onClick={() => chooseOpenedBoard({ id, color, name, owner })}
+      onClick={
+        !isLoading
+          ? () => chooseOpenedBoard({ id, color, name, owner })
+          : undefined
+      }
       onKeyDown={(e) =>
         e.key === "Enter" && chooseOpenedBoard({ id, color, name, owner })
       }

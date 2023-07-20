@@ -67,6 +67,7 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
 
   const isOwner = session?.user?.id === owner.id
 
+  const [displayedBoards, setDisplayedBoards] = useState(boards)
   const [isLeaving, setIsLeaving] = useState(false)
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
 
@@ -188,11 +189,15 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     exit: { height: 0, opacity: 0 },
   }
 
-  const [displayedBoards, setDisplayedBoards] = useState(boards)
-
   useEffect(() => {
     setDisplayedBoards(boards)
   }, [boards])
+
+  useEffect(() => {
+    if (!boards.map((b) => b.id).includes(chosenBoard?.id!)) {
+      chooseOpenedBoard(undefined)
+    }
+  }, [chosenBoard, boards, chooseOpenedBoard])
 
   return (
     <motion.section
