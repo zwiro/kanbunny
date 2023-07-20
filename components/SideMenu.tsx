@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { trpc } from "@/utils/trpc"
 import { reorderProjects } from "@/mutations/projectMutations"
@@ -22,6 +22,7 @@ import {
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import dynamic from "next/dynamic"
 import { ProjectWithUsers } from "@/types/trpc"
+import LayoutContext from "@/context/LayoutContext"
 import useBooleanState from "@/hooks/useBooleanState"
 import PlusIcon from "./PlusIcon"
 import AddButton from "./AddButton"
@@ -39,6 +40,8 @@ interface SideMenuProps {
 
 function SideMenu({ data, isLoading }: SideMenuProps) {
   const [isAdding, add, closeAdd] = useBooleanState()
+
+  const { chosenBoard, chooseOpenedBoard } = useContext(LayoutContext)
 
   const utils = trpc.useContext()
 
@@ -89,6 +92,18 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
   useEffect(() => {
     setDisplayedProjects(data)
   }, [data])
+
+  useEffect(() => {
+    if (
+      chosenBoard &&
+      !data
+        ?.map((p) => p.boards.map((b) => b.id))
+        .flat()
+        .includes(chosenBoard.id)
+    ) {
+      chooseOpenedBoard(undefined)
+    }
+  }, [chosenBoard, data, chooseOpenedBoard])
 
   return (
     <FocusLock group="aside-nav" autoFocus={false}>

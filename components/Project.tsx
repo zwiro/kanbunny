@@ -193,12 +193,6 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     setDisplayedBoards(boards)
   }, [boards])
 
-  useEffect(() => {
-    if (!boards.map((b) => b.id).includes(chosenBoard?.id!)) {
-      chooseOpenedBoard(undefined)
-    }
-  }, [chosenBoard, boards, chooseOpenedBoard])
-
   return (
     <motion.section
       {...projectAnimation}
