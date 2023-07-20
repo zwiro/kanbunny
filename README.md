@@ -1,28 +1,22 @@
-
 # kanbunny
 
 A web application for creating kanban boards.
- 
-
 
 ## Technologies used
 
-* React
-* TypeScript
-* Tailwind
-* Next.js
-* Next Auth with GitHub OAuth
-* Prisma
-* tRPC
-* dnd kit
-* Framer Motion
-
-
+- React
+- TypeScript
+- Tailwind
+- Next.js
+- Next Auth with GitHub OAuth
+- Prisma
+- tRPC
+- dnd kit
+- Framer Motion
 
 ## Demo
 
 [Live Site](https://kanbunny.vercel.app/)
-
 
 ## Features
 
@@ -38,14 +32,12 @@ A web application for creating kanban boards.
 - Changing boards, lists and tasks colors
 - Authorization with GitHub OAuth
 
-
 ## Screenshots
 
-![Inital page](https://i.ibb.co/5hYztML/Screenshot-2023-07-20-at-16-49-59-kanbunny-zwiro.png)
-![Dashboard](https://i.ibb.co/s5xFTRg/Screenshot-2023-07-20-at-16-50-19-kanbunny-zwiro.png)
-![Filters menu](https://i.ibb.co/Bcftc8M/Screenshot-2023-07-20-at-16-50-35-kanbunny-zwiro.png)
-![New task form](https://i.ibb.co/kgsx4H2/Screenshot-2023-07-20-at-16-51-01-kanbunny-zwiro.png)
-
+![Inital page](/public/screenshot1.png)
+![Dashboard](/public/screenshot2.png)
+![Filters menu](/public/screenshot3.png)
+![New task form](/public/screenshot4.png)
 
 ## Installation
 
@@ -87,6 +79,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
 ## Environment Variables
 
 To run this project, you will need to add the following environment variables to your .env file
@@ -100,4 +93,3 @@ To run this project, you will need to add the following environment variables to
 `NEXTAUTH_SECRET`
 
 `NEXTAUTH_URL` / `NEXTAUTH_URL_INTERNAL`
-
