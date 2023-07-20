@@ -149,7 +149,8 @@ function Task({
     pink: "border-pink-500",
   }
 
-  const isLoading = updateName.isLoading || updateColor.isLoading
+  const isLoading =
+    updateName.isLoading || updateColor.isLoading || deleteTask.isLoading
 
   const taskAnimation = {
     initial: { opacity: 0 },
@@ -243,11 +244,12 @@ function Task({
               <button
                 {...dragHandleProps}
                 aria-label="Grab to drag"
-                disabled={deleteTask.isLoading}
+                disabled={isLoading}
                 tabIndex={0}
                 className={`group-focus-within:visible group-hover:visible 
                 ${isDragging ? "visible" : !isMobile && "invisible"} 
-                ${isFiltered && "pointer-events-none"} `}
+                ${(isFiltered || isLoading) && "pointer-events-none"}
+                `}
                 onClick={(e) => e.stopPropagation()}
               >
                 <GoGrabber size={24} />

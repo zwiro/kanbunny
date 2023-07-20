@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai"
 import { SubmitHandler, useFormContext } from "react-hook-form"
 import useClickOutside from "@/hooks/useClickOutside"
@@ -24,10 +24,9 @@ function AddEditForm({
 }: AddEditFormProps) {
   const { reset, setValue } = useFormContext()
 
-  setValue("name", defaultValue || "")
-
   const resetForm = () => {
     reset()
+    setValue("name", defaultValue || "")
     close()
   }
 

@@ -87,7 +87,11 @@ function Board({
     updateName.mutate({ name: data.name, id })
   }
 
-  const isLoading = isUpdating || updateName.isLoading || updateColor.isLoading
+  const isLoading =
+    isUpdating ||
+    updateName.isLoading ||
+    updateColor.isLoading ||
+    deleteBoard.isLoading
 
   const {
     attributes,
@@ -99,6 +103,7 @@ function Board({
     isDragging,
   } = useSortable({
     id,
+    disabled: isLoading,
   })
 
   const style = {
@@ -173,7 +178,7 @@ function Board({
             </AnimatePresence>
             <button
               {...listeners}
-              disabled={deleteBoard.isLoading}
+              disabled={isLoading}
               ref={setActivatorNodeRef}
               aria-label="Grab to drag"
               tabIndex={0}
@@ -190,11 +195,11 @@ function Board({
         <div>
           <FormProvider {...boardMethods}>
             <AddEditForm
-              defaultValue={name}
               name="name"
               placeholder="board name"
-              close={closeEditName}
               handleSubmit={boardMethods.handleSubmit(onSubmit)}
+              defaultValue={name}
+              close={closeEditName}
               className="[&>input]:h-[37px]"
             />
           </FormProvider>

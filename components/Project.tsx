@@ -140,7 +140,11 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     }
   }
 
-  const isLoading = createBoard.isLoading || updateName.isLoading
+  const isLoading =
+    createBoard.isLoading ||
+    updateName.isLoading ||
+    deleteProject.isLoading ||
+    leaveProject.isLoading
 
   const {
     attributes,
@@ -151,6 +155,7 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     transition,
   } = useSortable({
     id,
+    disabled: isLoading,
   })
 
   const style = {
@@ -262,9 +267,9 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
             </AnimatePresence>
             <button
               {...listeners}
-              disabled={deleteProject.isLoading}
+              disabled={isLoading}
               ref={setActivatorNodeRef}
-              className="ml-auto"
+              className="ml-auto cursor-grab"
               aria-label="Grab to drag"
               tabIndex={0}
             >

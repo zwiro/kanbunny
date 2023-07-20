@@ -122,6 +122,7 @@ function List({
     isDragging,
   } = useSortable({
     id,
+    disabled: isLoading,
   })
 
   const style = {
