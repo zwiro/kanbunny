@@ -41,10 +41,10 @@ A web application for creating kanban boards.
 
 ## Screenshots
 
-![Inital page](https://i.postimg.cc/0Q8Pc9QQ/Screenshot-2023-07-20-at-16-49-59-kanbunny-zwiro.png)
-![Dashboard](https://i.postimg.cc/85tDYxJb/Screenshot-2023-07-20-at-16-50-19-kanbunny-zwiro.png)
-![Filters menu](https://i.postimg.cc/mkkRWV7W/Screenshot-2023-07-20-at-16-50-35-kanbunny-zwiro.png)
-![New task form](https://i.postimg.cc/y8Z1NftV/Screenshot-2023-07-20-at-16-51-01-kanbunny-zwiro.png)
+![Inital page](https://i.ibb.co/5hYztML/Screenshot-2023-07-20-at-16-49-59-kanbunny-zwiro.png)
+![Dashboard](https://i.ibb.co/s5xFTRg/Screenshot-2023-07-20-at-16-50-19-kanbunny-zwiro.png)
+![Filters menu](https://i.ibb.co/Bcftc8M/Screenshot-2023-07-20-at-16-50-35-kanbunny-zwiro.png)
+![New task form](https://i.ibb.co/kgsx4H2/Screenshot-2023-07-20-at-16-51-01-kanbunny-zwiro.png)
 
 
 ## Installation
