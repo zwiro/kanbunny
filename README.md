@@ -1,6 +1,57 @@
+
+# kanbunny
+
+A web application for creating kanban boards.
+ 
+
+
+## Technologies used
+
+* React
+* TypeScript
+* Tailwind
+* Next.js
+* Next Auth with GitHub OAuth
+* Prisma
+* tRPC
+* dnd kit
+* Framer Motion
+
+
+
+## Demo
+
+[Live Site](https://kanbunny.vercel.app/)
+
+
+## Features
+
+- Adding projects, boards, lists and tasks
+- Reordering items by dragging and droping
+- Moving tasks between different lists
+- Filtering tasks by their assignment or due to date
+- Hiding empty lists while filtering tasks
+- Searching for specifc tasks
+- Inviting other users to participate in projects
+- Assigning users to specific tasks
+- Adding deadline date for tasks
+- Changing boards, lists and tasks colors
+- Authorization with GitHub OAuth
+
+
+## Screenshots
+
+![Inital page](https://i.postimg.cc/0Q8Pc9QQ/Screenshot-2023-07-20-at-16-49-59-kanbunny-zwiro.png)
+![Dashboard](https://i.postimg.cc/85tDYxJb/Screenshot-2023-07-20-at-16-50-19-kanbunny-zwiro.png)
+![Filters menu](https://i.postimg.cc/mkkRWV7W/Screenshot-2023-07-20-at-16-50-35-kanbunny-zwiro.png)
+![New task form](https://i.postimg.cc/y8Z1NftV/Screenshot-2023-07-20-at-16-51-01-kanbunny-zwiro.png)
+
+
+## Installation
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+### Getting Started
 
 First, run the development server:
 
@@ -22,7 +73,7 @@ The `pages/api` directory is mapped to `/api/*`. Files in this directory are tre
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+### Learn More
 
 To learn more about Next.js, take a look at the following resources:
 
@@ -31,8 +82,22 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+### Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`DATABASE_URL`
+
+`GITHUB_ID`
+
+`GITHUB_SECRET`
+
+`NEXTAUTH_SECRET`
+
+`NEXTAUTH_URL` / `NEXTAUTH_URL_INTERNAL`
+
