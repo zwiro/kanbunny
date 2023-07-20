@@ -373,6 +373,33 @@ export const projectRouter = createTRPCRouter({
         })
       }
 
+      const boards = await ctx.prisma.board.findMany({
+        where: { projectId: input },
+      })
+
+      for (let board of boards) {
+        const lists = await ctx.prisma.list.findMany({
+          where: { boardId: board.id },
+        })
+
+        for (let list of lists) {
+          const tasks = await ctx.prisma.task.findMany({
+            where: { listId: list.id },
+          })
+          for (let task of tasks) {
+            const users = await ctx.prisma.user.findMany({
+              where: { tasks: { some: { id: task.id } } },
+            })
+            await ctx.prisma.task.update({
+              where: { id: task.id },
+              data: {
+                assigned_to: { disconnect: users.map((u) => ({ id: u.id })) },
+              },
+            })
+          }
+        }
+      }
+
       await ctx.prisma.projectUser.deleteMany({
         where: { projectId: input },
       })

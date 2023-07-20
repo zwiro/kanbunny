@@ -33,7 +33,7 @@ function UserCheckbox({ name, id, assignUser, isAssigned }: UserCheckboxProps) {
             e.currentTarget.click()
           }
         }}
-        className={`block cursor-pointer border border-zinc-900 p-2 transition-all hover:bg-zinc-900 focus-visible:bg-zinc-900 active:scale-90 peer-checked:bg-zinc-950`}
+        className={`block cursor-pointer border border-zinc-900 bg-zinc-700 p-2 transition-all hover:bg-zinc-900 focus-visible:bg-zinc-900 active:scale-90 peer-checked:bg-zinc-950`}
       >
         {name}
       </label>

@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { protectedProcedure, createTRPCRouter } from "../trpc"
+import { protectedProcedure, createTRPCRouter, publicProcedure } from "../trpc"
 import { colorSchema, taskSchema } from "@/utils/schemas"
 import { editTaskSchema } from "@/utils/schemas"
 
@@ -304,7 +304,7 @@ export const taskRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const task = await ctx.prisma.task.findUnique({
         where: { id: input },
-        include: { list: { include: { board: true } } },
+        include: { list: { include: { board: true } }, assigned_to: true },
       })
 
       const project = await ctx.prisma.project.findUnique({
@@ -322,6 +322,15 @@ export const taskRouter = createTRPCRouter({
       ) {
         throw new Error("You are not a member of this project")
       }
+
+      const userIds = task.assigned_to.map((user) => ({ id: user.id }))
+
+      await ctx.prisma.task.update({
+        where: { id: task.id },
+        data: {
+          assigned_to: { disconnect: userIds },
+        },
+      })
 
       await ctx.prisma.task.delete({
         where: { id: task.id },

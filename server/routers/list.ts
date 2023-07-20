@@ -185,7 +185,7 @@ export const listRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const list = await ctx.prisma.list.findUnique({
         where: { id: input },
-        include: { board: true },
+        include: { board: true, tasks: true },
       })
 
       const project = await ctx.prisma.project.findUnique({
@@ -202,6 +202,22 @@ export const listRouter = createTRPCRouter({
         !project.users.map((u) => u.userId).includes(ctx.session.user.id)
       ) {
         throw new Error("You are not a member of this project")
+      }
+
+      const tasks = await ctx.prisma.task.findMany({
+        where: { listId: list.id },
+      })
+
+      for (let task of tasks) {
+        const users = await ctx.prisma.user.findMany({
+          where: { tasks: { some: { id: task.id } } },
+        })
+        await ctx.prisma.task.update({
+          where: { id: task.id },
+          data: {
+            assigned_to: { disconnect: users.map((u) => ({ id: u.id })) },
+          },
+        })
       }
 
       await ctx.prisma.list.delete({
