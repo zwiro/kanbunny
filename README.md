@@ -34,7 +34,7 @@ A web application for creating kanban boards.
 
 ## Screenshots
 
-![Inital page](/public/screenshot1.png)
+![Inital page](/public/screenshot.png)
 ![Dashboard](/public/screenshot2.png)
 ![Filters menu](/public/screenshot3.png)
 ![New task form](/public/screenshot4.png)
