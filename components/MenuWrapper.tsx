@@ -80,7 +80,7 @@ function Menu({ children }: MenuProps) {
   }, [])
 
   const getDirection = () => {
-    if (xPosition - menuWidth < 0) {
+    if (xPosition - menuWidth < 100) {
       return "left-0 origin-top-left"
     } else {
       return "right-0 origin-top-right"
