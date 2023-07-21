@@ -52,11 +52,19 @@ interface ProjectProps {
   name: string
   owner: User
   mutationCounter: React.MutableRefObject<number>
+  isReordering: boolean
 }
 
 type BoardAndProjectSchema = z.infer<typeof boardAndProjectSchema>
 
-function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
+function Project({
+  id,
+  name,
+  boards,
+  owner,
+  mutationCounter,
+  isReordering,
+}: ProjectProps) {
   trpc.project.getUsers.useQuery(id, {
     onSuccess(data) {
       setSelectedUsers(data?.map((user) => user.name!))
@@ -145,7 +153,8 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
     createBoard.isLoading ||
     updateName.isLoading ||
     deleteProject.isLoading ||
-    leaveProject.isLoading
+    leaveProject.isLoading ||
+    isReordering
 
   const {
     attributes,
@@ -208,7 +217,7 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
               boards.map((b) => b.id).includes(chosenBoard?.id!) &&
               chosenBoard &&
               "after:w-[100%]"
-            } ${updateName.isLoading && "opacity-50"}`}
+            } ${isLoading && "opacity-50"}`}
           >
             {name}
           </h2>
@@ -379,6 +388,7 @@ function Project({ id, name, boards, owner, mutationCounter }: ProjectProps) {
                 isUpdating={createBoard.isLoading}
                 owner={owner.name!}
                 mutationCounter={boardMutationCounter}
+                isReordering={reorder.isLoading}
                 {...board}
               />
             ))}

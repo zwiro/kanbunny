@@ -43,6 +43,7 @@ interface TaskProps extends TaskWithAssignedTo {
   length: number
   mutationCounter: React.MutableRefObject<number>
   isFiltered: boolean
+  isReordering: boolean
 }
 
 function Task({
@@ -56,6 +57,7 @@ function Task({
   isFiltered,
   dragHandleProps,
   isDragging,
+  isReordering,
 }: TaskProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingUsers, editUsers, closeEditUsers] = useBooleanState()
@@ -150,7 +152,12 @@ function Task({
   }
 
   const isLoading =
-    updateName.isLoading || updateColor.isLoading || deleteTask.isLoading
+    updateName.isLoading ||
+    updateColor.isLoading ||
+    deleteTask.isLoading ||
+    updateDate.isLoading ||
+    updateUsers.isLoading ||
+    isReordering
 
   const taskAnimation = {
     initial: { opacity: 0 },

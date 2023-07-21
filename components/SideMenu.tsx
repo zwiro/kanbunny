@@ -138,6 +138,7 @@ function SideMenu({ data, isLoading }: SideMenuProps) {
               {displayedProjects?.map((project) => (
                 <Project
                   key={project.id}
+                  isReordering={reorder.isLoading}
                   mutationCounter={projectMutationCounter}
                   {...project}
                 />

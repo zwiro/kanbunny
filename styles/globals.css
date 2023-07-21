@@ -50,7 +50,6 @@ select option {
 }
 
 .main {
+  height: calc(100vh - 80px); /* fallback */
   height: calc(100svh - 80px);
-  /* fallback  */
-  height: calc(100vh - 80px);
 }

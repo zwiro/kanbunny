@@ -209,6 +209,8 @@ function ListsPanel({
                     isUpdating={createList.isLoading}
                     taskMutationCounter={taskMutationCounter}
                     mutationCounter={listMutationCounter}
+                    isReordering={reorder.isLoading}
+                    isReorderingTask={reorderDisplayedTasks.isLoading}
                     {...list}
                   />
                 ))}

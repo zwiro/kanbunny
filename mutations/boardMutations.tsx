@@ -28,7 +28,7 @@ export const createNewBoard = (
                     ...input,
                     color: "red",
                     order: 0,
-                    id: Math.random().toString(),
+                    id: `temp-${Math.random().toString()}`,
                   } as Board,
                   ...p.boards,
                 ],

@@ -32,6 +32,7 @@ interface BoardProps {
   projectId: string
   isUpdating: boolean
   mutationCounter: React.MutableRefObject<number>
+  isReordering: boolean
 }
 
 function Board({
@@ -42,6 +43,7 @@ function Board({
   projectId,
   isUpdating,
   mutationCounter,
+  isReordering,
 }: BoardProps) {
   const [isEditingName, editName, closeEditName] = useBooleanState()
   const [isEditingColor, editColor, closeEditColor] = useBooleanState()
@@ -88,10 +90,10 @@ function Board({
   }
 
   const isLoading =
-    isUpdating ||
     updateName.isLoading ||
     updateColor.isLoading ||
-    deleteBoard.isLoading
+    deleteBoard.isLoading ||
+    isReordering
 
   const {
     attributes,
@@ -103,7 +105,7 @@ function Board({
     isDragging,
   } = useSortable({
     id,
-    disabled: isLoading,
+    disabled: isLoading || isUpdating,
   })
 
   const style = {
@@ -118,7 +120,7 @@ function Board({
       style={style}
       tabIndex={0}
       onClick={
-        !isLoading
+        !isLoading || !isUpdating
           ? () => chooseOpenedBoard({ id, color, name, owner })
           : undefined
       }
@@ -129,12 +131,8 @@ function Board({
         chosenBoard?.id === id && id
           ? "bg-zinc-900 hover:bg-zinc-900 focus:bg-zinc-900"
           : "hover:bg-zinc-900/40 focus:bg-zinc-900/40"
-      } ${
-        ((isUpdating && !id) ||
-          updateName.isLoading ||
-          updateColor.isLoading) &&
-        "opacity-50"
-      }
+      } ${isUpdating && id.startsWith("temp") && "opacity-50"}
+      ${isLoading && "opacity-50"}
       `}
     >
       <ColorDot>
@@ -150,7 +148,7 @@ function Board({
             <ColorDotButton
               editColor={editColor}
               color={color}
-              disabled={isLoading}
+              disabled={isLoading || isUpdating}
             />
           )}
         </AnimatePresence>
@@ -168,7 +166,7 @@ function Board({
                   : "group-focus-within:visible group-focus-within:scale-100 group-hover:visible group-hover:scale-100 group-focus:visible group-focus:scale-100 peer-focus:visible peer-focus:scale-100"
               }`}
             >
-              <MenuWrapper isLoading={isLoading}>
+              <MenuWrapper isLoading={isLoading || isUpdating}>
                 <MenuItem handleClick={editName}>edit board name</MenuItem>
                 <MenuItem handleClick={editColor}>change color</MenuItem>
                 <MenuItem handleClick={openPopup}>delete board</MenuItem>
@@ -186,7 +184,7 @@ function Board({
             </AnimatePresence>
             <button
               {...listeners}
-              disabled={isLoading}
+              disabled={isLoading || isUpdating}
               ref={setActivatorNodeRef}
               aria-label="Grab to drag"
               tabIndex={0}

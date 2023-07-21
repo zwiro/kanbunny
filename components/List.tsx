@@ -39,6 +39,8 @@ interface ListProps extends ListType {
   taskMutationCounter: React.MutableRefObject<number>
   mutationCounter: React.MutableRefObject<number>
   hideEmptyLists: boolean
+  isReordering: boolean
+  isReorderingTask: boolean
 }
 
 function List({
@@ -54,6 +56,8 @@ function List({
   mutationCounter,
   taskMutationCounter,
   hideEmptyLists,
+  isReordering,
+  isReorderingTask,
 }: ListProps) {
   const { data: session } = useSession()
   const userId = session?.user?.id
@@ -101,10 +105,10 @@ function List({
   }
 
   const isLoading =
-    isUpdating ||
     updateName.isLoading ||
     updateColor.isLoading ||
-    deleteList.isLoading
+    deleteList.isLoading ||
+    isReordering
 
   const isFiltered =
     Boolean(dateFilter) ||
@@ -122,7 +126,7 @@ function List({
     isDragging,
   } = useSortable({
     id,
-    disabled: isLoading,
+    disabled: isLoading || isUpdating,
   })
 
   const style = {
@@ -145,12 +149,8 @@ function List({
         style={style}
         className={`mx-2 mt-4 flex min-w-[18rem] max-w-xs cursor-default flex-col gap-4 border-b border-l border-r border-t-4 border-b-neutral-700 border-l-neutral-700 border-r-neutral-700 bg-zinc-800 p-4 first-of-type:ml-0 sm:max-w-sm lg:mx-4 xl:mx-8 ${
           colorVariants[color]
-        } ${isUpdating && !id && "opacity-50"}       ${
-          ((isUpdating && !id) ||
-            updateName.isLoading ||
-            updateColor.isLoading) &&
-          "opacity-50"
-        }
+        } ${isUpdating && id.startsWith("temp") && "opacity-50"}
+        ${isLoading && "opacity-50"}
         ${isDragging ? "z-10" : ""}
         `}
       >
@@ -168,7 +168,7 @@ function List({
                 <ColorDotButton
                   editColor={!isEditingName ? editColor : undefined}
                   color={color}
-                  disabled={isLoading}
+                  disabled={isLoading || isUpdating}
                 />
               )}
             </AnimatePresence>
@@ -181,14 +181,14 @@ function List({
               <button
                 onClick={add}
                 className={`group py-2 ${isEditingColor && "scale-0"} `}
-                disabled={isEditingColor || isLoading}
+                disabled={isEditingColor || isLoading || isUpdating}
                 aria-label="Add new task"
               >
                 <PlusIcon />
               </button>
               <div className="ml-auto flex items-center self-start">
                 <div className="ml-auto pr-2">
-                  <MenuWrapper isLoading={isLoading}>
+                  <MenuWrapper isLoading={isLoading || isUpdating}>
                     <MenuItem handleClick={add}>add task</MenuItem>
                     <MenuItem handleClick={editName}>edit list name</MenuItem>
                     <MenuItem handleClick={editColor}>change color</MenuItem>
@@ -206,7 +206,7 @@ function List({
                   )}
                 </AnimatePresence>
                 <button
-                  disabled={isLoading}
+                  disabled={isLoading || isUpdating}
                   ref={setActivatorNodeRef}
                   {...listeners}
                   aria-label="Grab to drag"
@@ -260,7 +260,12 @@ function List({
                       searchQuery === ""
                   )
                   .map((task, i) => (
-                    <Draggable key={task.id} draggableId={task.id} index={i}>
+                    <Draggable
+                      key={task.id}
+                      draggableId={task.id}
+                      index={i}
+                      isDragDisabled={isReorderingTask}
+                    >
                       {(provided, snapshot) => (
                         <div
                           ref={provided.innerRef}
@@ -274,6 +279,7 @@ function List({
                             length={tasks.length}
                             mutationCounter={taskMutationCounter}
                             isFiltered={isFiltered}
+                            isReordering={isReorderingTask}
                             {...task}
                           />
                         </div>

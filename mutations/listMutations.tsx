@@ -28,7 +28,7 @@ export const createNewList = (
               tasks: [],
               color: "blue",
               order: old?.length,
-              id: Math.random().toString(),
+              id: `temp-${Math.random().toString()}`,
             },
           ] as any
       )
