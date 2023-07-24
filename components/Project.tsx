@@ -294,7 +294,7 @@ function Project({
               handleSubmit={projectMethods.handleSubmit(onSubmitName)}
               defaultValue={name}
               close={closeEditName}
-              className="pb-4 pt-[5px]"
+              className="pb-3"
             />
           </FormProvider>
           {projectMethods.formState.errors && (

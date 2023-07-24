@@ -1,10 +1,6 @@
 import dynamic from "next/dynamic"
 import { getSession, type GetSessionParams } from "next-auth/react"
-// import { createServerSideHelpers } from "@trpc/react-query/server"
-// import superjson from "superjson"
 import { trpc } from "@/utils/trpc"
-// import { prisma } from "@/server/db"
-// import { appRouter } from "@/server/routers/_app"
 import { LoadingDots } from "@/components/LoadingDots"
 const Dashboard = dynamic(() => import("@/components/Dashboard"), {
   loading: () => (
@@ -35,13 +31,6 @@ export async function getServerSideProps(params: GetSessionParams) {
       },
     }
   }
-  // const helpers = createServerSideHelpers({
-  //   router: appRouter,
-  //   ctx: { prisma, session },
-  //   transformer: superjson,
-  // })
-
-  // await helpers.project.getByUser.prefetch()
 
   return {
     props: {},

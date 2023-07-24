@@ -206,7 +206,7 @@ function Board({
               handleSubmit={boardMethods.handleSubmit(onSubmit)}
               defaultValue={name}
               close={closeEditName}
-              className="[&>input]:h-[37px]"
+              className="[&>input]:h-9"
             />
           </FormProvider>
           {boardMethods.formState.errors && (
